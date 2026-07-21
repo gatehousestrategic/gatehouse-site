@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+@keyframes gh-drift { 0% { transform: translate(0,0); } 50% { transform: translate(2%, -1.5%); } 100% { transform: translate(0,0); } }
+@keyframes gh-motes { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 0.55; } 90% { opacity: 0.35; } 100% { transform: translateY(-90px) translateX(14px); opacity: 0; } }
+body { margin: 0; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+* { box-sizing: border-box; }
+</style>
+</helmet>
+
+<div style="background: oklch(0.97 0.012 75); color: oklch(0.2 0.02 60); font-family: Manrope, sans-serif; overflow-x: hidden;">
+
+<nav id="gh-nav" style="position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: {{ navPadding }}; background: oklch(0.15 0.02 48); border-bottom: 1px solid oklch(1 0 0 / 0.06); transition: padding 0.15s ease;">
+  <a href="#top" aria-label="Gatehouse Strategic" style="display: flex; align-items: center; flex-shrink: 0; text-decoration: none;">
+    <svg width="192" height="38" viewBox="0 0 240 38" fill="none" style="flex-shrink: 0;">
+      <path d="M6 34V19C6 11.8 11.6 6 18.5 6C25.4 6 31 11.8 31 19V34" stroke="oklch(0.72 0.11 65)" strokeWidth="2"></path>
+      <line x1="6" y1="34" x2="6" y2="15" stroke="oklch(0.72 0.11 65)" strokeWidth="2"></line>
+      <line x1="31" y1="34" x2="31" y2="15" stroke="oklch(0.72 0.11 65)" strokeWidth="2"></line>
+      <line x1="2.5" y1="34.5" x2="34.5" y2="34.5" stroke="oklch(0.72 0.11 65)" strokeWidth="2"></line>
+      <line x1="18.5" y1="17" x2="18.5" y2="34" stroke="oklch(0.72 0.11 65)" strokeWidth="1.2" opacity="0.55"></line>
+      <path d="M14 22.5C14 19.5 16 17.5 18.5 17.5C21 17.5 23 19.5 23 22.5" stroke="oklch(0.85 0.13 80)" strokeWidth="1.4"></path>
+      <circle cx="18.5" cy="10" r="1.5" fill="oklch(0.85 0.13 80)"></circle>
+      <text x="46" y="18" font-family="Newsreader, serif" font-weight="600" font-size="16" letter-spacing="0.15em" fill="oklch(0.95 0.02 80)">GATEHOUSE</text>
+      <line x1="46" y1="25" x2="130" y2="25" stroke="oklch(0.72 0.11 65)" strokeWidth="0.75" opacity="0.7"></line>
+      <text x="46" y="34" font-family="Manrope, sans-serif" font-weight="500" font-size="10.5" letter-spacing="0.32em" fill="oklch(0.75 0.06 75)">STRATEGIC</text>
+    </svg>
+  </a>
+  <sc-if value="{{ isMobileNav }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ toggleMobileMenu }}" aria-label="Menu" style="width: 44px; height: 44px; background: transparent; border: 1px solid oklch(1 0 0 / 0.2); border-radius: 2px; color: oklch(0.95 0.02 80); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;">☰</button>
+  </sc-if>
+  <sc-if value="{{ isDesktopNav }}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; gap: 24px; align-items: center; flex-wrap: nowrap; white-space: nowrap;">
+      <a href="#custom-solutions" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">Custom Solutions</a>
+      <a href="#ai-strategy" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">AI Strategy</a>
+      <a href="#case-studies" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">Case Studies</a>
+      <a href="#process" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">Process</a>
+      <a href="#about" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">About</a>
+      <a href="#faq" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">FAQ</a>
+      <a href="#contact" style="font-size: 14px; font-weight: 600; color: oklch(0.15 0.02 48); background: oklch(0.85 0.08 80); padding: 10px 20px; border-radius: 2px;">Talk to us</a>
+    </div>
+  </sc-if>
+</nav>
+<div style="height: {{ navHeight }}px;"></div>
+<sc-if value="{{ mobileMenuOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position: fixed; top: {{ mobileMenuTop }}; left: 0; right: 0; z-index: 39; display: flex; flex-direction: column; background: oklch(0.15 0.02 48); border-bottom: 1px solid oklch(1 0 0 / 0.1); padding: 8px 20px 20px; max-height: {{ mobileMenuMaxHeight }}; overflow-y: auto;">
+    <a href="#custom-solutions" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">Custom Solutions</a>
+    <a href="#ai-strategy" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">AI Strategy</a>
+    <a href="#case-studies" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">Case Studies</a>
+    <a href="#process" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">Process</a>
+    <a href="#about" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">About</a>
+    <a href="#faq" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">FAQ</a>
+    <a href="#contact" onClick="{{ closeMobileMenu }}" style="font-size: 16px; font-weight: 600; color: oklch(0.15 0.02 48); background: oklch(0.85 0.08 80); padding: 12px 20px; border-radius: 2px; text-align: center; margin-top: 14px;">Talk to us</a>
+  </div>
+</sc-if>
+
+<section id="top" data-screen-label="Hero" style="position: relative; min-height: 92vh; overflow: hidden; background: oklch(0.15 0.02 48); display: flex; align-items: center;">
+  <div style="position: absolute; inset: 0; color: oklch(0.85 0.02 75);">
+    <image-slot id="hero-bg" shape="rect" fit="cover" placeholder="Drop hero photo: light spilling from an open door"></image-slot>
+  </div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(100deg, oklch(0.14 0.02 50 / 0.92) 0%, oklch(0.14 0.02 50 / 0.55) 38%, oklch(0.14 0.02 50 / 0.15) 65%, transparent 100%); pointer-events: none;"></div>
+  <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 65% 30%, transparent 40%, oklch(0.08 0.02 45 / 0.45) 100%); pointer-events: none;"></div>
+  <div style="position: absolute; top: 0; left: 0; bottom: 0; width: min(668px, 88%); background: linear-gradient(90deg, oklch(0.1 0.02 45 / 0.4) 0%, oklch(0.1 0.02 45 / 0.32) 78%, transparent 100%); pointer-events: none;"></div>
+
+  <div style="position: relative; z-index: 2; padding: 0 48px; max-width: 620px;">
+    <div style="font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.85 0.07 82); margin-bottom: 28px; font-weight: 600;">AI development &amp; consulting</div>
+    <h1 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(40px, 5.4vw, 76px); line-height: 1.04; color: oklch(0.96 0.015 78); margin: 0 0 28px;">The way through starts here.</h1>
+    <p style="font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; color: oklch(0.85 0.02 75); margin: 0 0 44px;">We build custom software and AI strategy for companies ready to move past what's slowing them down.</p>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+      <a href="#custom-solutions" style="font-size: 16px; font-weight: 600; color: oklch(0.15 0.02 48); background: oklch(0.85 0.08 80); padding: 16px 28px; border-radius: 2px;">Build something</a>
+      <a href="#ai-strategy" style="font-size: 16px; font-weight: 600; color: oklch(0.94 0.015 78); border: 1px solid oklch(1 0 0 / 0.3); padding: 16px 28px; border-radius: 2px;">Get an AI strategy</a>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="Two Paths" style="padding: 140px 48px; max-width: 1280px; margin: 0 auto;">
+  <div style="text-align: center; max-width: 720px; margin: 0 auto 72px;">
+    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(34px, 4vw, 54px); line-height: 1.1; margin: 0 0 20px;">Two ways in.</h2>
+    <p style="font-size: 19px; line-height: 1.6; color: oklch(0.42 0.02 60); margin: 0;">Every engagement starts with the same question: is the bottleneck technical, or is it strategic? That answer decides which door you walk through.</p>
+  </div>
+  <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+    <a href="#custom-solutions" style="flex: 1 1 420px; display: block; padding: 48px 40px; background: oklch(0.99 0.008 75); border-top: 3px solid oklch(0.5 0.13 35); box-shadow: 0 1px 3px oklch(0.2 0.02 60 / 0.06);" style-hover="box-shadow: 0 14px 30px oklch(0.2 0.02 60 / 0.1); transform: translateY(-3px);">
+      <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.5 0.13 35); margin-bottom: 18px;">Custom Solutions</div>
+      <h3 style="font-family: Newsreader, serif; font-weight: 500; font-size: 30px; margin: 0 0 18px;">Build the software that removes the bottleneck.</h3>
+      <p style="font-size: 17px; line-height: 1.6; color: oklch(0.42 0.02 60); margin: 0 0 28px;">Custom apps, internal tools, and integrations designed around how your team actually works, not how off-the-shelf software assumes you work.</p>
+      <div style="font-size: 15px; font-weight: 600; color: oklch(0.2 0.02 60);">See how we build →</div>
+    </a>
+    <a href="#ai-strategy" style="flex: 1 1 420px; display: block; padding: 48px 40px; background: oklch(0.99 0.008 75); border-top: 3px solid oklch(0.62 0.11 82); box-shadow: 0 1px 3px oklch(0.2 0.02 60 / 0.06);" style-hover="box-shadow: 0 14px 30px oklch(0.2 0.02 60 / 0.1); transform: translateY(-3px);">
+      <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.62 0.11 82); margin-bottom: 18px;">AI Strategy &amp; Consulting</div>
+      <h3 style="font-family: Newsreader, serif; font-weight: 500; font-size: 30px; margin: 0 0 18px;">Know what AI can actually do for you.</h3>
+      <p style="font-size: 17px; line-height: 1.6; color: oklch(0.42 0.02 60); margin: 0 0 28px;">A clear-eyed look at where AI fits in your business, a roadmap to get there, and help building the team to run it.</p>
+      <div style="font-size: 15px; font-weight: 600; color: oklch(0.2 0.02 60);">See how we advise →</div>
+    </a>
+  </div>
+</section>
+
+<section id="custom-solutions" data-screen-label="Custom Solutions" style="padding: 120px 48px; background: oklch(0.955 0.01 75);">
+  <div style="max-width: 1120px; margin: 0 auto;">
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; margin-bottom: 80px;">
+      <div style="flex: 1 1 380px;">
+        <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.5 0.13 35); margin-bottom: 18px;">Custom Solutions</div>
+        <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.15; margin: 0;">Software built around your bottleneck, not a template.</h2>
+      </div>
+      <div style="flex: 1 1 380px; display: flex; align-items: center;">
+        <p style="font-size: 18px; line-height: 1.65; color: oklch(0.42 0.02 60); margin: 0;">We design and build custom applications and internal tools that close the gap between what your team needs and what generic software gives them. No unnecessary complexity, no features you didn't ask for.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ai-strategy" data-screen-label="AI Strategy" style="padding: 120px 48px;">
+  <div style="max-width: 1120px; margin: 0 auto;">
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; margin-bottom: 56px;">
+      <div style="flex: 1 1 380px;">
+        <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.62 0.11 82); margin-bottom: 18px;">AI Strategy &amp; Consulting</div>
+        <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.15; margin: 0;">A clear roadmap for what AI actually changes in your business.</h2>
+      </div>
+      <div style="flex: 1 1 380px; display: flex; align-items: center;">
+        <p style="font-size: 18px; line-height: 1.65; color: oklch(0.42 0.02 60); margin: 0;">We help leadership teams cut through the noise: where AI genuinely helps, where it doesn't, and what it takes to build a team that can run it well. Strategy first, tools second.</p>
+      </div>
+    </div>
+    <div style="width: 100%; height: 420px;">
+      <image-slot id="ai-strategy-hero" shape="rect" fit="cover" placeholder="Drop an image for AI Strategy &amp; Consulting"></image-slot>
+    </div>
+  </div>
+</section>
+
+<section id="case-studies" data-screen-label="Case Studies" style="padding: 120px 48px; background: oklch(0.955 0.01 75);">
+  <div style="max-width: 1120px; margin: 0 auto;">
+    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.15; margin: 0 0 20px;">Case studies.</h2>
+    <p style="font-size: 18px; line-height: 1.65; color: oklch(0.42 0.02 60); max-width: 680px; margin: 0 0 56px;">A mix of custom builds and strategy work, across both tracks. Client identities are withheld; some are ours to show.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 24px;">
+      <sc-for list="{{ caseStudies }}" as="cs" hint-placeholder-count="4">
+        <div style="background: oklch(0.99 0.008 75); border: 1px solid oklch(0.88 0.012 70); overflow: hidden;">
+          <sc-if value="{{ cs.hasImage }}" hint-placeholder-val="{{ true }}">
+            <div style="position: relative; width: 100%; height: 220px; color: oklch(0.55 0.02 60);">
+              <image-slot id="cs-shot-{{ cs.slotId }}" shape="rect" fit="cover" placeholder="Drop an anonymized screenshot of the tool"></image-slot>
+            </div>
+          </sc-if>
+          <div style="padding: 36px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.5 0.13 35);">{{ cs.industry }}</span>
+            <span style="font-size: 11px; font-weight: 600; color: oklch(0.55 0.02 60); background: oklch(0.9 0.01 70); padding: 4px 9px; border-radius: 2px;">{{ cs.tag }}</span>
+          </div>
+          <h4 style="font-size: 19px; font-weight: 700; margin: 0 0 12px; line-height: 1.35;">{{ cs.problem }}</h4>
+          <p style="font-size: 15.5px; line-height: 1.6; color: oklch(0.42 0.02 60); margin: 0 0 18px;">{{ cs.outcome }}</p>
+          <sc-if value="{{ cs.link }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ cs.link }}" target="_blank" style="font-size: 22px; font-family: Newsreader, serif; font-style: italic; color: oklch(0.5 0.13 35); text-decoration: underline;">{{ cs.metric }} ↗</a>
+          </sc-if>
+          <sc-if value="{{ cs.noLink }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size: 22px; font-family: Newsreader, serif; font-style: italic; color: oklch(0.2 0.02 60);">{{ cs.metric }}</div>
+          </sc-if>
+          <p style="font-size: 13px; color: oklch(0.55 0.02 60); margin: 16px 0 0;">{{ cs.note }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ hasMoreCaseStudies }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; justify-content: center; margin-top: 40px;">
+        <button onClick="{{ toggleCaseStudiesExpanded }}" style="font-size: 15px; font-weight: 600; color: oklch(0.2 0.02 60); background: transparent; border: 1px solid oklch(0.8 0.012 70); padding: 14px 28px; border-radius: 2px; cursor: pointer;">{{ caseStudiesToggleLabel }}</button>
+      </div>
+    </sc-if>
+  </div>
+</section>
+
+<section id="process" data-screen-label="Process" style="padding: 120px 48px; background: oklch(0.15 0.02 48);">
+  <div style="max-width: 1120px; margin: 0 auto;">
+    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); color: oklch(0.96 0.015 78); margin: 0 0 64px;">How we work.</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 40px;">
+      <sc-for list="{{ processSteps }}" as="step" hint-placeholder-count="4">
+        <div>
+          <div style="font-family: Newsreader, serif; font-style: italic; font-size: 34px; color: oklch(0.75 0.07 82); margin-bottom: 16px;">{{ step.n }}</div>
+          <h3 style="font-size: 19px; font-weight: 700; color: oklch(0.96 0.015 78); margin: 0 0 10px;">{{ step.title }}</h3>
+          <p style="font-size: 15.5px; line-height: 1.6; color: oklch(0.8 0.015 75); margin: 0;">{{ step.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="about" data-screen-label="About" style="padding: 120px 48px;">
+  <div style="max-width: 760px; margin: 0 auto;">
+    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); margin: 0 0 32px;">Who we are.</h2>
+    <p style="font-size: 19px; line-height: 1.7; color: oklch(0.35 0.02 60); margin: 0 0 20px;">Gatehouse Strategic is an AI development and consulting practice built for mid-size companies that need more than off-the-shelf software or a generic AI pitch deck.</p>
+    <p style="font-size: 19px; line-height: 1.7; color: oklch(0.35 0.02 60); margin: 0;">We work in two modes: as engineers who build the specific tool your team needs, and as advisors who help leadership figure out where AI genuinely fits and how to staff for it. Most clients start with one and end up needing both.</p>
+  </div>
+</section>
+
+<section id="faq" data-screen-label="FAQ" style="padding: 120px 48px; background: oklch(0.955 0.01 75);">
+  <div style="max-width: 760px; margin: 0 auto;">
+    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); margin: 0 0 48px;">Questions.</h2>
+    <sc-for list="{{ faqItems }}" as="item" hint-placeholder-count="5">
+      <div style="border-bottom: 1px solid oklch(0.85 0.012 70);">
+        <div onClick="{{ item.toggle }}" style="display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 26px 0; cursor: pointer;">
+          <span style="font-size: 18px; font-weight: 600;">{{ item.q }}</span>
+          <span style="font-size: 22px; color: oklch(0.55 0.02 60); flex-shrink: 0;">{{ item.symbol }}</span>
+        </div>
+        <sc-if value="{{ item.open }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size: 16px; line-height: 1.65; color: oklch(0.42 0.02 60); margin: 0 0 26px;">{{ item.a }}</p>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section id="contact" data-screen-label="Contact" style="padding: 120px 48px; background: oklch(0.15 0.02 48); position: relative; overflow: hidden;">
+  <div style="position: absolute; top: -30%; right: -10%; width: 50%; height: 120%; background: radial-gradient(ellipse at center, oklch(0.85 0.08 80 / 0.18), transparent 70%); filter: blur(60px); pointer-events: none;"></div>
+  <div style="max-width: 640px; margin: 0 auto; position: relative; z-index: 1;">
+    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); color: oklch(0.96 0.015 78); margin: 0 0 16px;">Talk to us.</h2>
+    <p style="font-size: 17px; line-height: 1.6; color: oklch(0.8 0.015 75); margin: 0 0 44px;">Tell us what's slowing you down. We'll tell you honestly whether it's a build problem or a strategy problem.</p>
+
+    <sc-if value="{{ formSubmitted }}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 40px; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.1);">
+        <p style="font-size: 19px; color: oklch(0.96 0.015 78); margin: 0;">Thanks, that's on its way. We'll get back to you within a couple of business days.</p>
+      </div>
+    </sc-if>
+    <sc-if value="{{ formNotSubmitted }}" hint-placeholder-val="{{ true }}">
+      <form onSubmit="{{ handleSubmit }}" style="display: flex; flex-direction: column; gap: 18px;">
+        <input name="name" type="text" placeholder="Name" required="{{ true }}" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78);"></input>
+        <input name="email" type="email" placeholder="Email" required="{{ true }}" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78);"></input>
+        <input name="company" type="text" placeholder="Company" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78);"></input>
+        <select name="interest" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78);">
+          <option value="">What are you looking for?</option>
+          <option value="custom">Custom Solutions</option>
+          <option value="strategy">AI Strategy &amp; Consulting</option>
+          <option value="unsure">Not sure yet</option>
+        </select>
+        <textarea name="message" placeholder="What's the bottleneck?" rows="4" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78); resize: vertical;"></textarea>
+        <button type="submit" style="padding: 18px; font-size: 16px; font-weight: 600; background: oklch(0.85 0.08 80); color: oklch(0.15 0.02 48); border: none; cursor: pointer; margin-top: 10px;">Send it over</button>
+      </form>
+    </sc-if>
+  </div>
+</section>
+
+<footer style="padding: 40px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; background: oklch(0.16 0.02 50);">
+  <svg width="148" height="29" viewBox="0 0 240 38" fill="none" aria-label="Gatehouse Strategic" style="flex-shrink: 0;">
+    <path d="M6 34V19C6 11.8 11.6 6 18.5 6C25.4 6 31 11.8 31 19V34" stroke="oklch(0.7 0.1 65)" strokeWidth="2"></path>
+    <line x1="6" y1="34" x2="6" y2="15" stroke="oklch(0.7 0.1 65)" strokeWidth="2"></line>
+    <line x1="31" y1="34" x2="31" y2="15" stroke="oklch(0.7 0.1 65)" strokeWidth="2"></line>
+    <line x1="2.5" y1="34.5" x2="34.5" y2="34.5" stroke="oklch(0.7 0.1 65)" strokeWidth="2"></line>
+    <line x1="18.5" y1="17" x2="18.5" y2="34" stroke="oklch(0.7 0.1 65)" strokeWidth="1.2" opacity="0.55"></line>
+    <path d="M14 22.5C14 19.5 16 17.5 18.5 17.5C21 17.5 23 19.5 23 22.5" stroke="oklch(0.82 0.12 80)" strokeWidth="1.4"></path>
+    <circle cx="18.5" cy="10" r="1.5" fill="oklch(0.82 0.12 80)"></circle>
+    <text x="46" y="18" font-family="Newsreader, serif" font-weight="600" font-size="16" letter-spacing="0.15em" fill="oklch(0.8 0.02 75)">GATEHOUSE</text>
+    <line x1="46" y1="25" x2="130" y2="25" stroke="oklch(0.7 0.1 65)" strokeWidth="0.75" opacity="0.6"></line>
+    <text x="46" y="34" font-family="Manrope, sans-serif" font-weight="500" font-size="10.5" letter-spacing="0.32em" fill="oklch(0.65 0.05 75)">STRATEGIC</text>
+  </svg>
+  <span style="font-size: 13px; color: oklch(0.6 0.015 70);">hello@gatehousestrategic.com</span>
+</footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    faqOpen: null,
+    formSubmitted: false,
+    customExpanded: false,
+    scrolled: false,
+    isMobileNav: false,
+    mobileMenuOpen: false,
+    navHeight: 80,
+  };
+
+  componentDidMount() {
+    this._onScroll = () => this.setState(s => (s.scrolled !== window.scrollY > 8 ? { scrolled: window.scrollY > 8 } : null));
+    this._onResize = () => this.setState(s => (s.isMobileNav !== window.innerWidth < 1100 ? { isMobileNav: window.innerWidth < 1100, mobileMenuOpen: window.innerWidth < 1100 ? s.mobileMenuOpen : false } : null));
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    window.addEventListener('resize', this._onResize);
+    this._onScroll();
+    this._onResize();
+    this._attachNavRef();
+  }
+
+  componentDidUpdate() {
+    this._attachNavRef();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._onScroll);
+    window.removeEventListener('resize', this._onResize);
+    if (this._ro) this._ro.disconnect();
+  }
+
+  _attachNavRef() {
+    const el = document.getElementById('gh-nav');
+    if (!el || el === this._navEl) return;
+    this._navEl = el;
+    if (this._ro) this._ro.disconnect();
+    this._ro = new ResizeObserver(() => {
+      const h = this._navEl.getBoundingClientRect().height;
+      this.setState(s => (s.navHeight !== h ? { navHeight: h } : null));
+    });
+    this._ro.observe(el);
+    const h = el.getBoundingClientRect().height;
+    if (h !== this.state.navHeight) this.setState({ navHeight: h });
+  }
+
+  toggleFaq(i) {
+    this.setState(s => ({ faqOpen: s.faqOpen === i ? null : i }));
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    this.setState({ formSubmitted: true });
+  }
+
+  renderVals() {
+    const rawFaq = [
+      { q: "Do we need an AI strategy if we just need an app built?", a: "No. Plenty of engagements are pure build: you know what tool you need, we build it. Strategy work only comes in when the question is bigger than one piece of software." },
+      { q: "How long does a typical build take?", a: "Most custom tools ship in 6 to 12 weeks depending on scope. We scope tightly on purpose, so you get something usable fast rather than waiting a year for a perfect system." },
+      { q: "Do you work with our existing team, or replace them?", a: "We work alongside your team. On the build side we hand off clean, documented software. On the strategy side we help you hire and structure an AI team if you don't have one yet." },
+      { q: "What if we don't know what we need yet?", a: "That's normal, and it's exactly what the first conversation is for. We'll help you figure out whether the real issue is a missing tool or a missing strategy before we scope anything." },
+      { q: "Can we do both a custom build and a strategy engagement?", a: "Yes, and most clients end up doing both. They often start on one side and realize the other is needed to make the first investment pay off." },
+    ];
+    const faqItems = rawFaq.map((item, i) => ({
+      ...item,
+      open: this.state.faqOpen === i,
+      symbol: this.state.faqOpen === i ? "−" : "+",
+      toggle: () => this.toggleFaq(i),
+    }));
+
+    const customCaseStudies = [
+      { slotId: "howismy", industry: "Our own product", urlLabel: "howismy.site", tag: "Our company", problem: "Companies shifting spend from SEO to AEO had no way to see how they show up in AI answers.", outcome: "Built howismy.site: a white-label platform agencies can resell or embed directly on their own site.", metric: "howismy.site", link: "https://howismy.site", note: "This one's ours." },
+      { slotId: "om-builder", industry: "Real Estate", urlLabel: "app.client-portal.io/om-builder", tag: "Anonymized", problem: "Paying a designer for every offering memorandum, and again for every number change.", outcome: "Built a custom OM builder that generates offering memoranda and reflows every number perfectly on demand, no designer required.", metric: "Revisions: days to minutes", note: "Client identity withheld." },
+      { slotId: "sales-intel", industry: "Sales Intelligence", urlLabel: "app.client-portal.io/lead-scoring", tag: "Anonymized", problem: "A sales team sitting on a massive contact list with no way to tell who to reach out to.", outcome: "Built a scoring engine that ranks every contact by warmth, pulled from signals scraped across many sources.", metric: "Every contact, ranked", note: "Client identity withheld." },
+      { slotId: "prospecting", industry: "B2B Services", urlLabel: "app.client-portal.io/prospecting", tag: "Anonymized", problem: "No existing contact list, just a target market to go find.", outcome: "Built a lead-hunting tool that surfaces companies matching the target profile, explains the fit, and identifies who to contact.", metric: "Fit-scored leads, sourced cold", note: "Client identity withheld." },
+      { slotId: "utility-audit", industry: "Utilities", urlLabel: "confidential", tag: "Confidential", problem: "A manual audit process that didn't scale.", outcome: "Built an internal auditing tool to automate the review. Both the client and the tool's workings are confidential by agreement.", metric: "Audit time cut significantly", note: "Company and tool details withheld." },
+      { slotId: "benefits-app", industry: "Government / Healthcare", urlLabel: "confidential", tag: "Confidential", problem: "Applicants struggling with a complex, error-prone application process.", outcome: "Built a guided application tool to reduce errors and speed up submissions. Details withheld by agreement.", metric: "Fewer errors, faster submissions", note: "Company and tool details withheld." },
+      { slotId: "snf-marketplace", industry: "Marketplace", urlLabel: "confidential", tag: "Anonymized", problem: "Selling or buying a skilled nursing facility meant broker fees on both sides, with no way to vet a counterparty before sharing sensitive details.", outcome: "Built a membership marketplace where owners and buyers list and vet each other with built-in NDAs, and generate the OM directly on the platform, no broker required.", metric: "Broker fees eliminated", note: "Client identity withheld." },
+      { slotId: "lead-hunter-membership", industry: "B2B Services", urlLabel: "confidential", tag: "Anonymized", problem: "Prospecting tools were either too generic or too expensive to justify for a single team.", outcome: "Built a membership version of our lead-hunting engine: set your target parameters and run searches on demand.", metric: "Self-serve, on demand", note: "Client identity withheld." },
+      { slotId: "strategy-manufacturing", industry: "Manufacturing", tag: "Anonymized", problem: "Leadership wanted an AI plan but had no one who could own it.", outcome: "Delivered a 12-month AI roadmap and helped hire and structure a two-person AI team to run it.", metric: "First AI hire in 45 days", note: "Client identity withheld." },
+      { slotId: "strategy-prof-services", industry: "Professional Services", tag: "Anonymized", problem: "Teams were experimenting with AI tools with no shared direction.", outcome: "Ran a strategy engagement that set clear guardrails, use cases, and ownership across departments.", metric: "6 use cases prioritized", note: "Client identity withheld." },
+    ].map(cs => ({ ...cs, noLink: !cs.link, hasImage: !cs.slotId.startsWith('strategy-') }));
+    const allCaseStudies = customCaseStudies;
+    const caseStudiesExpanded = this.state.customExpanded;
+    const visibleCaseStudies = caseStudiesExpanded ? allCaseStudies : allCaseStudies.slice(0, 4);
+    const hasMoreCaseStudies = allCaseStudies.length > 4;
+    const caseStudiesToggleLabel = caseStudiesExpanded ? "Show fewer" : "Show " + (allCaseStudies.length - 4) + " more";
+
+    const processSteps = [
+      { n: "01", title: "Diagnose", body: "We map where time, money, or people are getting stuck, and why." },
+      { n: "02", title: "Design", body: "We scope the smallest solution or strategy that solves the real problem." },
+      { n: "03", title: "Build or Advise", body: "Custom software gets built. Strategy gets a roadmap and a team." },
+      { n: "04", title: "Operate", body: "We stay close after launch, tuning the work as your business changes." },
+    ];
+
+    const navPadding = (this.state.scrolled ? '12px ' : '20px ') + (this.state.isMobileNav ? '20px' : '48px');
+    return {
+      navPadding,
+      navHeight: this.state.navHeight,
+      mobileMenuTop: this.state.navHeight + 'px',
+      mobileMenuMaxHeight: 'calc(100vh - ' + this.state.navHeight + 'px)',
+      isMobileNav: this.state.isMobileNav,
+      isDesktopNav: !this.state.isMobileNav,
+      mobileMenuOpen: this.state.mobileMenuOpen,
+      toggleMobileMenu: () => this.setState(s => ({ mobileMenuOpen: !s.mobileMenuOpen })),
+      closeMobileMenu: () => this.setState({ mobileMenuOpen: false }),
+      setNavRef: this.setNavRef,
+      faqItems,
+      caseStudies: visibleCaseStudies,
+      hasMoreCaseStudies,
+      caseStudiesExpanded,
+      caseStudiesToggleLabel,
+      toggleCaseStudiesExpanded: () => this.setState(s => ({ customExpanded: !s.customExpanded })),
+      processSteps,
+      formSubmitted: this.state.formSubmitted,
+      formNotSubmitted: !this.state.formSubmitted,
+      handleSubmit: (e) => this.handleSubmit(e),
+    };
+  }
+}
+</script>
+</body>
+</html>
