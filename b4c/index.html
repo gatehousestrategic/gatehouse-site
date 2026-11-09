@@ -387,10 +387,10 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
   note(423,2006613,W-R-8,y(2006613)+34,"Shalom Stein: $2M from 423 donors","end");
 
   var route=document.getElementById("route"),rg=document.getElementById("riders"),len=route.getTotalLength();
-  [[0.30,""],[0.375,""],[0.455,"lead"]].forEach(function(r){
+  [[0.215,""],[0.34,""],[0.465,"lead"]].forEach(function(r){
     var a=route.getPointAtLength(len*r[0]-6),b=route.getPointAtLength(len*r[0]+6),p=route.getPointAtLength(len*r[0]);
     var ang=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;
-    var u=el("use",{href:"#rider",transform:"translate("+p.x+" "+p.y+") rotate("+ang+") scale(1.05) translate(-59 -78)"},rg);
+    var u=el("use",{href:"#rider",transform:"translate("+p.x+" "+p.y+") rotate("+ang+") scale(1.15) translate(-59 -78)"},rg);
     if(r[1])u.setAttribute("class",r[1]);
   });
 
