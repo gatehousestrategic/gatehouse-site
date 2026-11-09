@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Different Hills</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Azeret+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: race-telemetry broadsheet. Problem and solution side by side right under the hero, then proof, then the honors, then what it looks like. Jersey colors are the only color besides cobalt. */
+:root{
+  --bg:#F1F2EF; --surface:#FFFFFF; --ink:#0F1113; --muted:#5C6268; --line:#D6D9D3; --accent:#2433F5;
+  --j-yellow:#E5AE00; --j-green:#10915A; --j-red:#D1262E; --j-orange:#E05A16; --j-teal:#0B8585; --j-white:#FFFFFF; --j-ink:#0F1113; --j-cobalt:#2433F5;
+  --dot-few:#D1262E; --dot-many:#10915A; --dot-mid:#9AA0A6;
+  --display:"Archivo", "Arial Narrow", Arial, sans-serif;
+  --body:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono:"Azeret Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C0E10; --surface:#15181B; --ink:#ECEEEA; --muted:#979DA3; --line:#2A2E33; --accent:#7380FF;
+  --j-white:#ECEEEA; --j-ink:#ECEEEA; --j-cobalt:#7380FF; --dot-mid:#5D646B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C0E10; --surface:#15181B; --ink:#ECEEEA; --muted:#979DA3; --line:#2A2E33; --accent:#7380FF;
+  --j-white:#ECEEEA; --j-ink:#ECEEEA; --j-cobalt:#7380FF; --dot-mid:#5D646B; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.label{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+h2{font-size:clamp(30px,4.6vw,54px);line-height:.98;font-weight:850;font-variation-settings:"wdth" 118;letter-spacing:-.01em;text-transform:uppercase}
+h3{font-size:19px;font-weight:700;font-variation-settings:"wdth" 108;line-height:1.2}
+p{margin:0;max-width:64ch}
+.muted{color:var(--muted)}
+
+.top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:22px;border-bottom:1px solid var(--line)}
+
+/* Hero */
+.hero{padding-block:56px 0}
+.hero h1{font-size:clamp(46px,9.6vw,132px);line-height:.86;font-weight:900;font-variation-settings:"wdth" 125;text-transform:uppercase;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.profile{display:block;width:100%;height:auto;margin-top:28px}
+.profile .ln{fill:none;stroke:var(--ink);stroke-width:1.6}
+.profile .area{fill:var(--accent);opacity:.09}
+.profile{color:var(--ink);overflow:visible}
+#riders .lead{color:var(--accent)}
+
+/* Problem / solution */
+.ps{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--ink)}
+.ps > div{padding:30px 40px 0 0;display:grid;gap:18px;align-content:start;min-width:0}
+.ps > div + div{padding-left:40px;padding-right:0;border-left:1px solid var(--line)}
+.ps h2{font-size:clamp(28px,3.6vw,44px)}
+.ps .solution h2{color:var(--accent)}
+.ps p{font-size:19px;line-height:1.5}
+.ps ul{margin:0;padding:0;list-style:none;display:grid;gap:0;border-top:1px solid var(--line)}
+.ps li{padding:12px 0;border-bottom:1px solid var(--line);font-size:16.5px;display:grid;grid-template-columns:22px 1fr;gap:10px}
+.ps li::before{content:"";width:10px;height:10px;margin-top:8px;background:var(--ink)}
+.ps .solution li::before{background:var(--accent)}
+
+/* Sections */
+section{padding-block:96px 0}
+.sec-head{display:grid;grid-template-columns:220px 1fr;gap:32px;margin-bottom:40px}
+.sec-head > *{min-width:0}
+.sec-head .label{padding-top:12px;border-top:2px solid var(--ink)}
+.sec-head .copy{display:grid;gap:18px}
+
+/* Chart */
+.chart-shell{background:var(--surface);border:1px solid var(--line);padding:22px 22px 14px;position:relative}
+#scatter circle{cursor:pointer;transition:r .12s}
+#scatter circle.on{stroke:var(--ink);stroke-width:2}
+.tip{position:absolute;z-index:5;pointer-events:none;background:var(--ink);color:var(--bg);padding:9px 12px 10px;min-width:150px;max-width:240px;transform:translate(-50%,calc(-100% - 14px))}
+.tip b{display:block;font-family:var(--display);font-variation-settings:"wdth" 108;font-size:15px;line-height:1.2}
+.tip span{font-family:var(--mono);font-size:12px;opacity:.8}
+.tip::after{content:"";position:absolute;left:50%;bottom:-6px;width:12px;height:12px;background:var(--ink);transform:translateX(-50%) rotate(45deg)}
+.chart-bar{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline;margin-bottom:10px}
+.legend{display:flex;gap:18px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:9px;height:9px;display:inline-block}
+.chart-scroll{overflow-x:auto}
+#scatter{display:block;width:100%;min-width:620px;height:auto}
+#scatter text{font-family:var(--mono);font-size:10.5px;fill:var(--muted)}
+#scatter .grid{stroke:var(--line);stroke-width:1}
+#scatter .axis{stroke:var(--ink);stroke-width:1}
+#scatter .note{fill:var(--ink);font-family:var(--body);font-size:12.5px;font-weight:600}
+#scatter .lead{stroke:var(--ink);stroke-width:1}
+.versus{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);margin-top:14px}
+.versus > div{padding:16px 16px 4px 0;display:grid;gap:4px;min-width:0}
+.versus > div + div{padding-left:16px;border-left:1px solid var(--line)}
+.versus b{font-family:var(--display);font-variation-settings:"wdth" 115;font-weight:850;font-size:clamp(26px,3.4vw,38px);line-height:1}
+.versus .sw{width:10px;height:10px;display:inline-block;margin-right:8px;vertical-align:1px}
+
+/* Jerseys */
+.jerseys{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.jersey{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 20px 24px;display:grid;grid-template-rows:auto auto 1fr;gap:10px;min-width:0}
+.jersey svg{width:46px;height:46px}
+.jersey svg path{stroke:var(--ink);stroke-width:1.3}
+.jersey p{font-size:15.5px;color:var(--muted)}
+
+/* Rider page mock */
+.rider{display:grid;grid-template-columns:1.1fr 1fr;border:1px solid var(--line);background:var(--surface)}
+.rider > *{min-width:0}
+.rider-main{padding:30px;border-right:1px solid var(--line);display:grid;gap:22px;align-content:start}
+.rider-name{font-family:var(--display);font-variation-settings:"wdth" 122;font-weight:900;font-size:clamp(30px,4vw,46px);line-height:.95;text-transform:uppercase}
+.bars{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;align-items:end;height:150px;border-bottom:1px solid var(--ink)}
+.bars div{background:var(--ink);opacity:.85;min-width:0}
+.bars div.now{background:var(--accent);opacity:1}
+.bar-years{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin-top:6px}
+.bar-years span{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center}
+.earned{display:grid;align-content:start}
+.earned div{display:grid;grid-template-columns:28px 1fr auto;gap:14px;align-items:center;padding:18px 26px;border-bottom:1px solid var(--line)}
+.earned div:last-child{border-bottom:0}
+.earned svg{width:28px;height:28px}
+.earned svg path{stroke:var(--ink);stroke-width:1.5}
+.earned b{font-family:var(--display);font-variation-settings:"wdth" 108;font-weight:700;font-size:16px;display:block}
+.earned span{font-size:13.5px;color:var(--muted)}
+.earned .num{font-size:15px;text-align:right;color:var(--ink)}
+
+/* Columns */
+.cols{display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid var(--ink)}
+.cols > div{padding:22px 24px 0 0;display:grid;gap:10px;align-content:start;min-width:0}
+.cols > div + div{padding-left:24px;border-left:1px solid var(--line)}
+.cols p{font-size:15.5px}
+
+.rules{border-top:2px solid var(--ink)}
+.rule{display:grid;grid-template-columns:280px 1fr;gap:24px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.rule > *{min-width:0}
+.rule h3{font-size:17px}
+.rule p{font-size:15.5px}
+
+footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media (max-width:980px){
+  .jerseys{grid-template-columns:repeat(2,1fr)}
+  .rule{grid-template-columns:1fr;gap:6px}
+}
+@media (max-width:760px){
+  body{font-size:16px}
+  .hero{padding-block:36px 0}
+  .ps,.sec-head,.rider,.cols{grid-template-columns:1fr}
+  .ps > div{padding:24px 0 0}
+  .ps > div + div{padding-left:0;border-left:0;border-top:2px solid var(--accent);margin-top:30px}
+  .ps p{font-size:17.5px}
+  .sec-head{gap:14px;margin-bottom:28px}
+  section{padding-block:64px 0}
+  .rider-main{border-right:0;border-bottom:1px solid var(--line);padding:20px}
+  .cols > div + div{padding-left:0;border-left:0;border-top:1px solid var(--line);margin-top:18px}
+  .earned div{padding:14px 18px}
+}
+@media (max-width:480px){
+  .jerseys{grid-template-columns:1fr}
+  .versus{grid-template-columns:1fr} .versus > div + div{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  .chart-shell{padding:16px 14px 10px}
+}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="jersey" viewBox="0 0 48 48"><path d="M17 5 L8 9 L2 19 L9 23 L12 19 L12 44 L36 44 L36 19 L39 23 L46 19 L40 9 L31 5 C29.5 8.5 26.8 10 24 10 C21.2 10 18.5 8.5 17 5 Z"/></symbol>
+    <pattern id="polka" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="var(--j-white)"/><circle cx="3.5" cy="3.5" r="1.9" fill="var(--j-red)"/></pattern>
+    <pattern id="hoops" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--j-teal)"/><rect y="5" width="8" height="3" fill="var(--j-white)"/></pattern>
+  </defs>
+</svg>
+
+<header class="wrap top">
+  <span class="label">Proposal · Rider &amp; donor recognition</span>
+  <span class="label">Prepared for Bike4Chai · November 2026</span>
+</header>
+
+<main>
+<div class="wrap hero">
+  <h1>Every rider<br>climbs a <em>different</em><br>hill.</h1>
+  <svg class="profile" id="scene" viewBox="0 0 1180 232" role="img" aria-label="Three cyclists climbing a hill">
+    <defs>
+      <g id="rider">
+        <circle cx="24" cy="61" r="17" fill="none" stroke="currentColor" stroke-width="2.6"/>
+        <circle cx="94" cy="61" r="17" fill="none" stroke="currentColor" stroke-width="2.6"/>
+        <circle cx="24" cy="61" r="2.2" fill="currentColor"/><circle cx="94" cy="61" r="2.2" fill="currentColor"/>
+        <path d="M24 61 L54 63 L46 33 Z M46 33 L84 31 L54 63 M84 31 L94 61 M84 31 L91 29 Q96 30 94 37" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M39 30 L51 30" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M45 26 L56 44 L47 58" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
+        <path d="M45 26 L77 14" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+        <path d="M77 14 L85 23 L91 30" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M45 26 L64 40 L60 66" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="86" cy="8" r="7" fill="currentColor"/>
+        <path d="M78 5 Q86 -2 94 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </defs>
+    <path class="area" d="M0 206 L60 197 L120 200 L190 180 L250 186 L320 158 L370 166 L430 133 L480 144 L540 102 L585 116 L640 91 L700 124 L760 138 L820 122 L880 152 L940 144 L1000 172 L1060 164 L1120 189 L1180 183 L1180 232 L0 232 Z"/>
+    <path class="ln" id="route" d="M0 206 L60 197 L120 200 L190 180 L250 186 L320 158 L370 166 L430 133 L480 144 L540 102 L585 116 L640 91 L700 124 L760 138 L820 122 L880 152 L940 144 L1000 172 L1060 164 L1120 189 L1180 183"/>
+    <g id="riders"></g>
+  </svg>
+
+  <div class="ps">
+    <div class="problem">
+      <span class="label">Today</span>
+      <h2>The problem</h2>
+      <p>Riders are ranked on one thing: how much money they raised. Some riders know wealthy people and can raise $100,000 with a few phone calls. Others ask hundreds of friends, one by one, and raise $25,000. The first rider is celebrated. The second, who often worked much harder, is barely noticed.</p>
+      <ul>
+        <li>Hard work and reach go unrecognized</li>
+        <li>Most riders can never get near the top of the list</li>
+        <li>Donors get a receipt and little else</li>
+      </ul>
+    </div>
+    <div class="solution">
+      <span class="label">Proposed</span>
+      <h2>The solution</h2>
+      <p>Keep celebrating the top fundraisers. Add honors for the other kinds of effort: how many people a rider got to give, how much they grew, and how long they have ridden. Every rider has a real way to be recognized, and donors get recognized too.</p>
+      <ul>
+        <li>Eight honors instead of one ranking</li>
+        <li>Calculated automatically from the donations</li>
+        <li>Donors get their own history and thanks</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="wrap" id="proof">
+  <div class="sec-head">
+    <span class="label">The proof</span>
+    <div class="copy">
+      <h2>Their own numbers<br>show it</h2>
+      <p>Each dot is a rider on this year's Bike4Chai leaderboard. Higher means more money. Further right means more donors. The current ranking only looks at height.</p>
+    </div>
+  </div>
+  <div class="chart-shell">
+    <div class="chart-bar">
+      <span class="label">Dollars raised vs. number of donors · 2026</span>
+      <div class="legend label">
+        <span><i style="background:var(--dot-few)"></i>10 donors or fewer</span>
+        <span><i style="background:var(--dot-many)"></i>150 donors or more</span>
+      </div>
+    </div>
+    <div class="tip" id="tip" hidden><b id="tip-name"></b><span id="tip-val"></span></div>
+    <div class="chart-scroll"><svg id="scatter" viewBox="0 0 760 420" role="img" aria-label="Chart of riders: dollars raised against number of donors"></svg></div>
+    <div class="versus">
+      <div><span class="label"><span class="sw" style="background:var(--dot-few)"></span>Zacharia Waxler · 100K Club</span><b class="num">$101,100</b><span class="muted">from 3 donors</span></div>
+      <div><span class="label"><span class="sw" style="background:var(--dot-many)"></span>Eli Greengart · Chai Club</span><b class="num">236 donors</b><span class="muted">$27,492 raised, up every year since 2018</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="honors">
+  <div class="sec-head">
+    <span class="label">How it works</span>
+    <div class="copy">
+      <h2>Eight ways to<br>be recognized</h2>
+      <p>Like the jerseys in a pro bike race, each honor rewards a different strength. Each gets its own leaderboard, a mark on the rider's page, and a moment on stage at the ride.</p>
+    </div>
+  </div>
+  <div class="jerseys">
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-yellow)"/></svg><h3>Top Fundraiser</h3><p>Most money raised. Stays exactly as it is today.</p></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-green)"/></svg><h3>Community Builder</h3><p>Most people and companies who gave.</p></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-cobalt)"/></svg><h3>New Faces</h3><p>Most donors giving to Bike4Chai for the first time.</p></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="url(#polka)"/></svg><h3>Climber</h3><p>Biggest growth over the rider's own total last year.</p></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-orange)"/></svg><h3>Streak</h3><p>Most years ridden in a row.</p></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="url(#hoops)"/></svg><h3>Keeper</h3><p>Most of last year's donors giving again.</p></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-white)"/></svg><h3>Rookie</h3><p>Best first-year rider.</p></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-ink)"/></svg><h3>Goal Crusher</h3><p>Hit their own goal, whatever the size. Every rider who does it earns it.</p></article>
+  </div>
+</section>
+
+<section class="wrap" id="rider">
+  <div class="sec-head">
+    <span class="label">What riders see</span>
+    <div class="copy">
+      <h2>Eli Greengart,<br>recognized</h2>
+      <p>Today Eli is one name in a long list. With the new system, their page shows nine years of growth and four honors earned.</p>
+    </div>
+  </div>
+  <div class="rider">
+    <div class="rider-main">
+      <div>
+        <span class="label">Eli Greengart · Baltimore, MD · Team Maryland</span>
+        <div class="rider-name">Nine years.<br>Up every one.</div>
+      </div>
+      <div>
+        <div class="bars" id="bars"></div>
+        <div class="bar-years" id="bar-years"></div>
+      </div>
+      <p class="muted" style="font-size:15px">$166,140 raised since 2018.</p>
+    </div>
+    <div class="earned">
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-orange)"/></svg><span><b>Streak</b>Rode every year since 2018</span><span class="num">9 yrs</span></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-green)"/></svg><span><b>Community Builder</b>Second-most donors of any rider</span><span class="num">236</span></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="url(#polka)"/></svg><span><b>Climber</b>Raised more than last year, again</span><span class="num">+5%</span></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-ink)"/></svg><span><b>Goal Crusher</b>$27,492 of a $28,762 goal</span><span class="num">96%</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="donors">
+  <div class="sec-head">
+    <span class="label">Donors and teams</span>
+    <div class="copy">
+      <h2>Donors and teams<br>get recognized too</h2>
+    </div>
+  </div>
+  <div class="cols">
+    <div><h3>A donor history</h3><p>Every donor sees what they have given across years and riders. Anyone who gives three years in a row, at any amount, is named at the ride.</p></div>
+    <div><h3>A real thank-you</h3><p>Riders are reminded to send a personal thank-you after each gift. Each gift is shown as what it pays for, like a day of Camp Simcha.</p></div>
+    <div><h3>Fairer team rankings</h3><p>Teams are also ranked by donors per rider and by how many of their riders hit their goal, not only by total dollars.</p></div>
+  </div>
+</section>
+
+<section class="wrap" id="rules">
+  <div class="sec-head">
+    <span class="label">Keeping it fair</span>
+    <div class="copy">
+      <h2>Simple counting<br>rules</h2>
+    </div>
+  </div>
+  <div class="rules">
+    <div class="rule"><h3>Corporate gifts</h3><p>Count fully, for dollars and as a donor. A company is one donor per rider, however many times it gives.</p></div>
+    <div class="rule"><h3>Employer matches</h3><p>Add to dollars. The person and their employer's match count as one donor.</p></div>
+    <div class="rule"><h3>Small gifts</h3><p>Every dollar counts. A gift has to be $18 or more to count as a donor.</p></div>
+    <div class="rule"><h3>A rider's own gifts</h3><p>Add to dollars, but don't count as donors.</p></div>
+  </div>
+</section>
+</main>
+
+<footer class="wrap">
+  <span class="label">Figures from bike4chai.com, November 2026</span>
+  <span class="label">Hover or tap any dot in the chart to see the rider</span>
+</footer>
+
+<script>
+(function(){
+  // [raised, donors] from the public 2026 leaderboard
+  var D=[[2006613,423],[522414,138],[360478,86],[330875,64],[268019,20],[217094,61],[180859,96],[174219,75],[150748,109],[143285,35],[138342,25],[134992,126],[124304,207],[117016,41],[116239,41],[108883,131],[107684,30],[103383,159],[101464,115],[101100,3],[93485,151],[86465,168],[84460,4],[79738,93],[79274,16],[78629,19],[73960,87],[73254,58],[58432,36],[56046,109],[53332,27],[50595,69],[50500,3],[48484,119],[45468,88],[44057,41],[43598,57],[43514,20],[43351,192],[42727,227],[42181,59],[41816,172],[41379,68],[41372,58],[40635,67],[38174,68],[37807,14],[37645,202],[37573,64],[37122,215],[36904,78],[36819,140],[36697,73],[36680,51],[33231,44],[32103,55],[31885,114],[31128,25],[30936,140],[30492,65],[29655,36],[29601,11],[29581,58],[29419,35],[29357,119],[28471,105],[28235,104],[28049,143],[27492,236],[27364,47],[25260,7],[20982,175],[20554,141],[20300,8],[19485,163],[18100,2],[18008,144],[18278,137],[17661,69],[16662,76],[15167,121],[15036,137],[13594,146],[12700,3],[10100,2],[10593,133],[10793,124],[10666,106],[10461,110],[10253,126],[9657,86],[9101,2],[8118,3],[7671,92]];
+  var N=["Shalom Stein","Nathan Low","Ralph Herzka","Jack Eisenberger","Eli Schron","Alan Shamah","Rubin Bendelstein","Joe Wasser (Theil)","Brenton Eisenreich","Brian Haimm and Seth Gerszberg","Abie Maleh","Gabriel Low","Jack Dweck","Naftali Zanziper","Jay Eisenstadt","Avi Iczkovits","Yehuda Benscher","Morris Tabush","Yitzchok Levi","Zacharia Waxler","Barry Aranoff","Gary Bauman","Yosef Meta","Mendy Braun","Elliot (Eliezer) Abramson","Mark Sultan","Mordechai (Martin) Leybovich","Laivi Freundlich","Avi Nachum","Yitz Henkin","Solomon Rosenzweig","Yonoson Tesser","Zev Munk","Stan Weiss","Yosi Berger","Matthew Chase","Mordy Eisenberg","Sammy Sitt","Jeremy Schnittman","Jeff Rosner","Yaakov Forchheimer","Aaron Spivak","Elie Edalati","Mark \"Mojo\" Klein","Shimshe Lubowsky","Isaac / Yitzchok Goldberger","UMJCA","Akiva Solkowitz","David Zami","Yehuda Kalisch","Osher Douek","Avi Lazarus","Abe Schur","Moishe Dachs","Yuda Silverstein","Shaya Lieber","Shalom Ganz","Paul Gilbert","Simon Bock","Meyer Roberts","Abe Hirsch","Moshe Dovid Fischman","Shamir Seidman","Danny Morris","Yisrael Nemanov","Etai Lahav","Rami Harari","Jan Moore","Eli Greengart","Pinny Berger","Sruly Thaler","Nechemya Jakobovits","Akiva J. Palmer","Jay Lubin","Yechiel Goldberger","Yummy Shoner","Cody Hakimian","Howard Fishman","Avrohom Goldwasser","Adam Loskove","Zev Beylus","Mordy Wenick","Sruly Steinberg","Psachya Skaist","Matin Hakimi","Moshe Halberstam","Moshe Pollak","Avi Freedman","Yaakov Wachtel","Joe Weiser","Daniel Checkanow","Ralph Setton","Ari Dicker","Ami K."];
+  var NS="http://www.w3.org/2000/svg";
+  function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+  function money(v){return v>=1e6?"$"+(v/1e6).toFixed(0)+"M":"$"+Math.round(v/1000)+"k";}
+
+  var svg=document.getElementById("scatter");
+  var W=760,H=420,L=64,R=24,T=20,B=48,xMax=450,yMin=5000,yMax=3000000;
+  function x(v){return L+(v/xMax)*(W-L-R);}
+  function y(v){return T+(1-(Math.log(v)-Math.log(yMin))/(Math.log(yMax)-Math.log(yMin)))*(H-T-B);}
+  [10000,25000,50000,100000,250000,500000,1000000,2000000].forEach(function(t){
+    el("line",{x1:L,x2:W-R,y1:y(t),y2:y(t),class:"grid"},svg);
+    el("text",{x:L-8,y:y(t)+3.5,"text-anchor":"end"},svg).textContent=money(t);
+  });
+  [0,100,200,300,400].forEach(function(t){
+    el("line",{x1:x(t),x2:x(t),y1:T,y2:H-B,class:"grid"},svg);
+    el("text",{x:x(t),y:H-B+18,"text-anchor":"middle"},svg).textContent=t;
+  });
+  el("line",{x1:L,x2:W-R,y1:H-B,y2:H-B,class:"axis"},svg);
+  el("text",{x:W-R,y:H-8,"text-anchor":"end"},svg).textContent="NUMBER OF DONORS →";
+  D.forEach(function(d,i){
+    var few=d[1]<=10, many=d[1]>=150;
+    var c=few?"var(--dot-few)":(many?"var(--dot-many)":"var(--dot-mid)");
+    var dot=el("circle",{cx:x(d[1]),cy:y(d[0]),r:(few||many)?5.2:3.8,fill:c,"fill-opacity":(few||many)?1:.7,tabindex:0,"aria-label":N[i]+": $"+d[0].toLocaleString()+" from "+d[1]+" donors"},svg);
+    dot.dataset.i=i;
+  });
+  var tip=document.getElementById("tip"),tipN=document.getElementById("tip-name"),tipV=document.getElementById("tip-val"),shell=svg.closest(".chart-shell"),cur=null;
+  function show(dot){
+    var d=D[dot.dataset.i];
+    if(cur)cur.classList.remove("on");cur=dot;dot.classList.add("on");
+    tipN.textContent=N[dot.dataset.i];
+    tipV.textContent="$"+d[0].toLocaleString()+" · "+d[1]+" donor"+(d[1]===1?"":"s");
+    var r=dot.getBoundingClientRect(),s=shell.getBoundingClientRect();
+    var left=r.left+r.width/2-s.left;
+    left=Math.max(90,Math.min(s.width-90,left));
+    tip.style.left=left+"px";tip.style.top=(r.top-s.top)+"px";tip.hidden=false;
+  }
+  function hide(){tip.hidden=true;if(cur)cur.classList.remove("on");cur=null;}
+  svg.addEventListener("pointerover",function(e){if(e.target.tagName==="circle")show(e.target);});
+  svg.addEventListener("pointerout",function(e){if(e.target.tagName==="circle"&&e.pointerType==="mouse")hide();});
+  svg.addEventListener("click",function(e){if(e.target.tagName==="circle")show(e.target);else hide();});
+  svg.addEventListener("focusin",function(e){if(e.target.tagName==="circle")show(e.target);});
+  svg.addEventListener("focusout",hide);
+  svg.closest(".chart-scroll").addEventListener("scroll",hide);
+  function note(dx,dy,tx,ty,txt,anchor){
+    el("line",{x1:x(dx),y1:y(dy),x2:tx,y2:ty,class:"lead"},svg);
+    el("text",{x:tx+(anchor==="end"?-4:4),y:ty+4,class:"note","text-anchor":anchor||"start"},svg).textContent=txt;
+  }
+  note(3,101100,120,82,"Zacharia Waxler: $101,100 from 3 donors");
+  note(236,27492,470,330,"Eli Greengart: 236 donors, $27,492");
+  note(423,2006613,W-R-8,y(2006613)+34,"Shalom Stein: $2M from 423 donors","end");
+
+  var route=document.getElementById("route"),rg=document.getElementById("riders"),len=route.getTotalLength();
+  [[0.30,""],[0.375,""],[0.455,"lead"]].forEach(function(r){
+    var a=route.getPointAtLength(len*r[0]-6),b=route.getPointAtLength(len*r[0]+6),p=route.getPointAtLength(len*r[0]);
+    var ang=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;
+    var u=el("use",{href:"#rider",transform:"translate("+p.x+" "+p.y+") rotate("+ang+") scale(1.05) translate(-59 -78)"},rg);
+    if(r[1])u.setAttribute("class",r[1]);
+  });
+
+  var hist=[[2018,8567],[2019,10758],[2020,11812],[2021,15335],[2022,20551],[2023,21425],[2024,24053],[2025,26147],[2026,27492]];
+  var bars=document.getElementById("bars"),yrs=document.getElementById("bar-years");
+  hist.forEach(function(h,i){
+    var b=document.createElement("div");b.style.height=(h[1]/28762*100)+"%";b.title=h[0]+": $"+h[1].toLocaleString();
+    if(i===hist.length-1)b.className="now";bars.appendChild(b);
+    var s=document.createElement("span");s.textContent="'"+String(h[0]).slice(2);yrs.appendChild(s);
+  });
+})();
+</script>
+
+</body>
+</html>
