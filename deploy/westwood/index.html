@@ -123,7 +123,8 @@ kbd{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);bo
 .where{color:var(--muted);font-size:14px;margin-top:3px}
 .where b{color:var(--bronze);font-weight:600}
 .desc{color:#45413b;overflow-wrap:anywhere}
-.person{color:var(--muted);font-size:14px}
+.person{display:flex;align-items:center;gap:7px;color:var(--ink);font-weight:600;font-size:14.5px}
+.person svg{color:var(--bronze)}
 .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:4px}
 .act{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;background:var(--soft);border:1px solid var(--line);color:var(--ink);max-width:100%;transition:background .18s,border-color .18s,color .18s}
 .act span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -261,7 +262,7 @@ textarea{min-height:96px;resize:vertical}
     <div class="hero-body">
      <div>
       <h1>Find it <em>down the hall.</em></h1>
-      <p class="lede">Every business at Westwood One and Westwood Two, in one place. Search by name or by what you need, and see who gives fellow tenants a discount.</p>
+      <p class="lede">Every business at Westwood One and Westwood Two, in one place. Search by business, person or what you need, and see who gives fellow tenants a discount.</p>
       <div class="stats" id="stats" hidden>
         <div class="stat"><div class="n" id="sBiz">0</div><div class="l">Businesses</div></div>
         <div class="stat"><div class="n" id="sInd">0</div><div class="l">Industries</div></div>
@@ -276,7 +277,7 @@ textarea{min-height:96px;resize:vertical}
 <div class="wrap searchwrap">
   <label class="search" role="search">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-    <input type="search" id="q" placeholder="Search a business name, industry or service" autocomplete="off" aria-label="Search the directory">
+    <input type="search" id="q" placeholder="Search a business, person, industry or service" autocomplete="off" aria-label="Search the directory">
     <kbd id="slash" title="Press / to search">/</kbd>
     <button class="xbtn" id="qx" type="button" aria-label="Clear search" hidden>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
@@ -372,8 +373,8 @@ textarea{min-height:96px;resize:vertical}
     </label>
 
     <div class="row">
-      <label class="field"><span>Contact name</span>
-        <input type="text" name="contact_name" maxlength="120" autocomplete="name">
+      <label class="field"><span>Your name</span>
+        <input type="text" name="contact_name" maxlength="120" autocomplete="name" placeholder="Owner or main contact">
       </label>
       <label class="field"><span>Phone</span>
         <input type="tel" name="phone" maxlength="40" autocomplete="tel">
@@ -464,6 +465,7 @@ textarea{min-height:96px;resize:vertical}
     web:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
     arrow:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
     close:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+    user:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
     tag:'<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h6.6a1.5 1.5 0 0 1 1.06.44l8.4 8.4a1.5 1.5 0 0 1 0 2.12l-6.6 6.6a1.5 1.5 0 0 1-2.12 0l-8.4-8.4A1.5 1.5 0 0 1 3 11.1V4.5Zm4.75 1.75a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg>'
   };
 
@@ -506,7 +508,9 @@ textarea{min-height:96px;resize:vertical}
 
   function ready(){
     rows.forEach(function(r){ if (!r._k) r._k = ++seq; });
-    rows.sort(function(a,b){ return a.business_name.localeCompare(b.business_name, undefined, {sensitivity:'base'}); });
+    // A new random order on every visit, so no business is always first. It holds steady while you search.
+    rows.forEach(function(r){ if (r._o == null) r._o = Math.random(); });
+    rows.sort(function(a,b){ return a._o - b._o; });
     buildTabs();
     stats();
     render();
@@ -586,7 +590,7 @@ textarea{min-height:96px;resize:vertical}
     first = false;
 
     $('qx').hidden = !$('q').value; $('slash').hidden = !!$('q').value;
-    $('count').textContent = rows.length ? shown.length + (shown.length === 1 ? ' business' : ' businesses') + (filtered ? ' found' : '') : '';
+    $('count').textContent = rows.length ? shown.length + (shown.length === 1 ? ' business' : ' businesses') + (filtered ? ' found' : '') + (shown.length > 1 ? ' · shown in random order' : '') : '';
 
     if (!shown.length){
       var e = el('div', 'empty');
@@ -690,6 +694,7 @@ textarea{min-height:96px;resize:vertical}
     body.appendChild(top);
 
     if (r.description) body.appendChild(hl(el('p', 'desc clamp'), r.description, w));
+    if (r.contact_name){ var who = el('p', 'person'); who.appendChild(icon('user')); who.appendChild(hl(el('span'), r.contact_name, w)); body.appendChild(who); }
 
     var acts = el('div', 'acts');
     if (r.phone) acts.appendChild(act('phone', r.phone, 'tel:' + r.phone.replace(/[^\d+]/g, '')));
@@ -992,7 +997,7 @@ textarea{min-height:96px;resize:vertical}
     if (!editing && code.length < 6) return fail('Make up an edit code of at least 6 characters.', 'edit_code');
 
     // Bots fill the hidden field; people never see it.
-    if (form.elements.company_url.value) return finish('Thank you.', 'Your listing was sent. It will appear in the directory once it has been checked.');
+    if (form.elements.company_url.value) return finish('Thank you.', 'Your listing is now in the directory.');
 
     var btn = $('submit'), label = btn.textContent;
     btn.disabled = true; btn.textContent = editing ? 'Saving…' : 'Sending…';
@@ -1015,7 +1020,8 @@ textarea{min-height:96px;resize:vertical}
       return rpc('westwood_listing_add', {p: rec, p_code: code});
     }).then(function(id){
       if (!id) throw new Error('rejected');
-      finish('Thank you.', 'Your listing was sent. It will appear in the directory once it has been checked.' + LATER);
+      finish('Thank you.', 'Your listing is now in the directory.' + LATER);
+      load();
     });
   }
 
