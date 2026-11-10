@@ -181,12 +181,11 @@ dialog.detail[open]{animation:pop .3s var(--ease)}
 
 .dacts .linkbtn + .linkbtn{margin-left:0}
 .danger{color:var(--bad)}
-.linkbox{display:grid;gap:10px;justify-items:start;width:100%;padding:16px;border:1px solid #e5cfae;background:var(--gold-soft);border-radius:10px}
-.linkbox input{font-size:13.5px}
 
 /* ---------- Footer ---------- */
 footer{background:var(--char);color:rgba(244,234,225,.66);font-size:13.5px}
 .fine{display:flex;justify-content:space-between;align-items:center;gap:6px 24px;flex-wrap:wrap;padding-top:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.fine .linkbtn{color:var(--cream)}
 .gh{display:flex;align-items:center;gap:14px;flex-wrap:wrap;color:var(--cream)}
 .gh .btn{padding:7px 12px;font-size:13.5px;border-radius:7px}
 
@@ -202,7 +201,7 @@ dialog::backdrop{background:rgba(43,42,38,.6);-webkit-backdrop-filter:blur(3px);
 .hint{color:var(--muted);font-size:14px;margin-top:6px}
 .field > span{display:block;font-size:13px;font-weight:600;color:#514a42;margin-bottom:5px}
 .req{color:var(--bad);font-style:normal}
-input[type=text],input[type=email],input[type=tel],select,textarea{font:inherit;color:var(--ink);background:#fff;border:1px solid #cfc0af;border-radius:8px;padding:10px 12px;width:100%;min-height:44px;transition:border-color .15s, box-shadow .15s}
+input[type=text],input[type=email],input[type=tel],input[type=password],select,textarea{font:inherit;color:var(--ink);background:#fff;border:1px solid #cfc0af;border-radius:8px;padding:10px 12px;width:100%;min-height:44px;transition:border-color .15s, box-shadow .15s}
 textarea{min-height:96px;resize:vertical}
 .form input:focus,.form select:focus,.form textarea:focus{outline:0;border-color:var(--tan);box-shadow:0 0 0 3px rgba(176,150,114,.3)}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -311,7 +310,7 @@ textarea{min-height:96px;resize:vertical}
 
 <footer>
   <div class="wrap fine">
-    <span>Listings are provided by tenants. To change or remove yours, use the private link you were given when you added it.</span>
+    <span>Listings are provided by tenants. To change or remove yours, open it and choose "Edit this listing".</span>
     <span class="gh">Built by Gatehouse Strategic
       <a class="btn light" href="https://gatehousestrategic.com/" target="_blank" rel="noopener">See what we build
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -389,6 +388,11 @@ textarea{min-height:96px;resize:vertical}
       </label>
     </div>
 
+    <label class="field" id="codeWrap"><span>Edit code <i class="req">*</i></span>
+      <input type="password" name="edit_code" maxlength="72" autocomplete="new-password">
+      <small class="hint" style="display:block">Make one up, at least 6 characters. You will need it to change or remove your listing later.</small>
+    </label>
+
     <div class="discbox">
       <label class="check"><input type="checkbox" name="offers_discount" id="offers"> We offer a discount to Westwood tenants</label>
       <label class="field" id="discWrap" hidden><span>What is the discount?</span>
@@ -408,17 +412,21 @@ textarea{min-height:96px;resize:vertical}
   <div class="done" id="done" hidden>
     <h2 id="doneTitle">Thank you.</h2>
     <p id="doneMsg"></p>
-    <div class="linkbox" id="linkBox" hidden>
-      <b>Keep this private link</b>
-      <p class="hint" style="margin:0">It is the only way to change or remove your listing later. Anyone who has it can edit your listing, so don't share it.</p>
-      <input type="text" id="editLink" readonly aria-label="Your private edit link">
-      <div class="logorow">
-        <button class="btn primary" type="button" id="copyLink">Copy link</button>
-        <a class="btn ghost" id="mailLink" href="#">Email it to myself</a>
-      </div>
-    </div>
     <button class="btn primary" type="button" id="doneClose">Back to the directory</button>
   </div>
+  <form class="done" id="ask" hidden novalidate>
+    <h2>Edit this listing</h2>
+    <p id="askFor"></p>
+    <label class="field" style="width:100%"><span>Edit code</span>
+      <input type="password" id="askCode" maxlength="72" autocomplete="current-password">
+    </label>
+    <p class="err" id="askErr" role="alert" hidden></p>
+    <div class="logorow">
+      <button class="btn primary" type="submit" id="askGo">Continue</button>
+      <button class="btn ghost" type="button" id="askClose">Cancel</button>
+    </div>
+    <p class="hint">Forgot your code? Ask <a href="https://gatehousestrategic.com/" target="_blank" rel="noopener">Gatehouse Strategic</a> to reset it.</p>
+  </form>
 </dialog>
 
 <dialog id="detail" class="detail" aria-labelledby="dTitle"></dialog>
@@ -762,11 +770,9 @@ textarea{min-height:96px;resize:vertical}
       });
       acts.appendChild(copy);
     }
-    if (mine[r.id]){
-      var mineBtn = el('button', 'linkbtn', 'Edit this listing'); mineBtn.type = 'button';
-      mineBtn.addEventListener('click', function(){ location.hash = '#/edit/' + r.id + '.' + mine[r.id]; });
-      acts.appendChild(mineBtn);
-    }
+    var editBtn = el('button', 'linkbtn', 'Edit this listing'); editBtn.type = 'button';
+    editBtn.addEventListener('click', function(){ askEdit(r); });
+    acts.appendChild(editBtn);
     body.appendChild(acts);
     detail.appendChild(body);
     if (!detail.open) detail.showModal();
@@ -774,8 +780,6 @@ textarea{min-height:96px;resize:vertical}
   }
   // The address decides which listing is open, so a listing can be linked to and Back closes it.
   function route(){
-    var e = location.hash.match(/^#\/edit\/([0-9a-f-]{36})\.([0-9a-f]{64})$/);
-    if (e) return startEdit(e[1], e[2]);
     var m = location.hash.match(/^#\/b\/(.+)$/);
     var r = m && rows.filter(function(x){ return key(x) === m[1]; })[0];
     if (r) showDetail(r);
@@ -812,14 +816,21 @@ textarea{min-height:96px;resize:vertical}
     new IntersectionObserver(function(en){ $('filters').classList.toggle('stuck', !en[0].isIntersecting && en[0].boundingClientRect.top < 0); }).observe(sentinel);
   }
 
-  /* ---------- Add a listing ---------- */
+  /* ---------- Add or edit a listing ---------- */
   var dlg = $('dlg'), form = $('form');
   INDUSTRIES.forEach(function(name){ $('industrySelect').appendChild(el('option', null, name)); });
 
-  // The listing being edited ({id, key, data, logo_path, _logo}), or null when adding a new one.
+  // The dialog shows one of three panels: the form, a result message, or the edit-code question.
+  function show(panel){
+    form.hidden = panel !== 'form'; $('done').hidden = panel !== 'done'; $('ask').hidden = panel !== 'ask';
+    if (!dlg.open) dlg.showModal();
+    dlg.scrollTop = 0;
+  }
+
+  // The listing being edited ({id, code, data, logo_path, _logo}), or null when adding a new one.
   var editing = null, lastWasEdit = false;
   function openForm(rec){
-    var next = (rec && rec.id && rec.key) ? rec : null;
+    var next = (rec && rec.code) ? rec : null;
     if (next || lastWasEdit){ editing = null; form.reset(); setLogo(null); }
     editing = next; lastWasEdit = !!next;
     if (editing){
@@ -829,68 +840,19 @@ textarea{min-height:96px;resize:vertical}
       $('offers').checked = !!editing.data.offers_discount;
     }
     $('discWrap').hidden = !$('offers').checked;
+    $('codeWrap').hidden = !!editing;
     $('dlgTitle').textContent = editing ? 'Edit your listing' : 'Add your business';
     $('dlgHint').textContent = editing ? 'Change anything below, then save.' : 'Takes about a minute. Everything here is shown to other Westwood tenants.';
     $('submit').textContent = editing ? 'Save changes' : 'Send listing';
     $('removeBtn').hidden = !editing;
+    $('formErr').hidden = true;
     syncLogo();
-    form.hidden = false; $('done').hidden = true; $('formErr').hidden = true;
     preview();
-    if (!dlg.open) dlg.showModal();
-    dlg.scrollTop = 0;
+    show('form');
   }
-
-  /* ---------- Private edit links ---------- */
-  // Each listing gets a long random secret when it is created. Only its hash is stored,
-  // and the link that carries the secret is the only way to change or remove the listing.
-  // This browser also remembers the secrets of listings made here, to offer "Edit this listing".
-  var mine = {};
-  try { mine = JSON.parse(localStorage.getItem('westwood-my-listings') || '{}') || {}; } catch(e){}
-  function keep(){ if (live) try { localStorage.setItem('westwood-my-listings', JSON.stringify(mine)); } catch(e){} }
-  function remember(id, secret){ mine[id] = secret; keep(); }
-  function forget(id){ delete mine[id]; keep(); }
-  function byId(id){ return rows.filter(function(r){ return r.id === id; })[0]; }
-  function editUrl(id, secret){ return location.origin + location.pathname + '#/edit/' + id + '.' + secret; }
-  function hex(bytes){
-    var h = '';
-    for (var i = 0; i < bytes.length; i++) h += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16);
-    return h;
-  }
-  function randomHex(n){ return hex(crypto.getRandomValues(new Uint8Array(n))); }
-  function sha256(text){
-    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function(buf){ return hex(new Uint8Array(buf)); });
-  }
-  function rpc(name, args){
-    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + name, {
-      method: 'POST', headers: headers({'Content-Type': 'application/json'}), body: JSON.stringify(args)
-    }).then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); });
-  }
-  function startEdit(id, secret){
-    // Take the secret out of the address bar straight away.
-    history.replaceState(null, '', location.pathname + location.search);
-    if (detail.open) detail.close();
-    var found = live ? rpc('westwood_listing_get', {p_id: id, p_key: secret})
-                     : Promise.resolve(mine[id] === secret ? byId(id) : null);
-    found.then(function(data){
-      if (!data) throw new Error('no match');
-      remember(id, secret);
-      openForm({id: id, key: secret, data: data, logo_path: data.logo_path || null, _logo: data._logo || null});
-    }).catch(function(){
-      form.hidden = true; $('done').hidden = false; $('linkBox').hidden = true;
-      $('doneTitle').textContent = 'That link did not work.';
-      $('doneMsg').textContent = 'This edit link is not valid, or the listing was removed. Check that you have the whole link.';
-      if (!dlg.open) dlg.showModal();
-    });
-  }
-  $('copyLink').addEventListener('click', function(){
-    var b = this; $('editLink').select();
-    if (navigator.clipboard) navigator.clipboard.writeText($('editLink').value).then(function(){ b.textContent = 'Copied'; }, function(){});
-  });
-  $('editLink').addEventListener('focus', function(){ this.select(); });
-  function closeForm(){ dlg.close(); }
   $('addBtn').addEventListener('click', function(){ openForm(); });
-  ['cancel','cancelX','doneClose'].forEach(function(id){ $(id).addEventListener('click', closeForm); });
-  dlg.addEventListener('click', function(e){ if (e.target === dlg) closeForm(); });
+  ['cancel','cancelX','doneClose','askClose'].forEach(function(id){ $(id).addEventListener('click', function(){ dlg.close(); }); });
+  dlg.addEventListener('click', function(e){ if (e.target === dlg) dlg.close(); });
   $('offers').addEventListener('change', function(){ $('discWrap').hidden = !this.checked; });
 
   function val(name){
@@ -912,6 +874,18 @@ textarea{min-height:96px;resize:vertical}
     rec._logo = logoShown || (editing && editing._logo) || null;
     if (editing && !logoBlob) rec.logo_path = editing.logo_path;
     box.appendChild(card(rec));
+  }
+  form.addEventListener('input', preview);
+  form.addEventListener('change', preview);
+
+  function fail(msg, field){
+    $('formErr').textContent = msg; $('formErr').hidden = false;
+    if (field) form.elements[field].focus();
+  }
+  function rpc(name, args){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + name, {
+      method: 'POST', headers: headers({'Content-Type': 'application/json'}), body: JSON.stringify(args)
+    }).then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); });
   }
 
   /* ---------- Logo ---------- */
@@ -970,18 +944,44 @@ textarea{min-height:96px;resize:vertical}
       method: 'POST', headers: headers({'Content-Type': 'image/png'}), body: logoBlob
     }).then(function(r){ if (!r.ok) throw new Error(r.status); return name; });
   }
-  form.addEventListener('input', preview);
-  form.addEventListener('change', preview);
 
-  function fail(msg, field){
-    $('formErr').textContent = msg; $('formErr').hidden = false;
-    if (field) form.elements[field].focus();
+  /* ---------- Edit codes ---------- */
+  // The tenant makes up an edit code when adding a listing. To change or remove the listing
+  // later they open it, choose "Edit this listing" and type the code. The database checks it.
+  var asking = null;
+  function askEdit(r){
+    asking = r;
+    $('askFor').textContent = 'Enter the edit code you chose for ' + r.business_name + '.';
+    $('askCode').value = ''; $('askErr').hidden = true;
+    // Leave the listing's address, so a refresh does not reopen it over the form.
+    if (location.hash.indexOf('#/b/') === 0) history.replaceState(null, '', location.pathname + location.search);
+    if (detail.open) detail.close();
+    show('ask');
+    $('askCode').focus();
   }
+  function askFail(msg){ $('askErr').textContent = msg; $('askErr').hidden = false; }
+  $('ask').addEventListener('submit', function(e){
+    e.preventDefault();
+    var r = asking, code = $('askCode').value, btn = $('askGo');
+    $('askErr').hidden = true;
+    if (!r || !code) return askFail('Enter your edit code.');
+    var check = live ? rpc('westwood_listing_get', {p_id: r.id, p_code: code})
+                     : Promise.resolve(r._code === code ? {status: 'ok', data: r} : {status: 'wrong'});
+    btn.disabled = true;
+    check.then(function(res){
+      if (res.status === 'ok') openForm({id: res.data.id, code: code, data: res.data, logo_path: res.data.logo_path || null, _logo: res.data._logo || null});
+      else if (res.status === 'locked') askFail('Too many wrong tries. Wait 15 minutes and try again.');
+      else askFail('That code is not right.');
+    }).catch(function(){
+      askFail('That did not go through. Check your connection and try again.');
+    }).then(function(){ btn.disabled = false; });
+  });
 
+  /* ---------- Saving ---------- */
   form.addEventListener('submit', function(e){
     e.preventDefault();
     $('formErr').hidden = true;
-    var rec = record();
+    var rec = record(), code = form.elements.edit_code.value;
     if (!rec.business_name) return fail('Enter your business name.', 'business_name');
     if (!rec.building) return fail('Choose your building.', 'building');
     if (!rec.industry) return fail('Choose an industry.', 'industry');
@@ -989,44 +989,39 @@ textarea{min-height:96px;resize:vertical}
     if (!rec.email && !rec.phone) return fail('Add a phone number or an email so tenants can reach you.', 'phone');
     if (rec.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rec.email)) return fail('That email address does not look right.', 'email');
     if (rec.website && !siteUrl(rec.website)) return fail('That website address does not look right.', 'website');
+    if (!editing && code.length < 6) return fail('Make up an edit code of at least 6 characters.', 'edit_code');
 
     // Bots fill the hidden field; people never see it.
     if (form.elements.company_url.value) return finish('Thank you.', 'Your listing was sent. It will appear in the directory once it has been checked.');
 
     var btn = $('submit'), label = btn.textContent;
     btn.disabled = true; btn.textContent = editing ? 'Saving…' : 'Sending…';
-    (editing ? saveEdit(editing, rec) : saveNew(rec)).catch(function(){
+    (editing ? saveEdit(editing, rec) : saveNew(rec, code)).catch(function(){
       fail('That could not be saved. Check your connection and try again.');
     }).then(function(){ btn.disabled = false; btn.textContent = label; });
   });
 
-  function saveNew(rec){
-    var secret = randomHex(32);
-    rec.id = uuid();
+  var LATER = ' To change or remove it later, open your listing, choose "Edit this listing" and enter your edit code.';
+  function saveNew(rec, code){
     if (!live){
+      rec.id = uuid(); rec._code = code;
       if (logoBlob) rec._logo = URL.createObjectURL(logoBlob);
-      remember(rec.id, secret);
       rows.push(rec); ready();
-      finish('Thank you.', 'Preview mode: your listing was added to this page only and will disappear when you reload.', editUrl(rec.id, secret));
+      finish('Thank you.', 'Preview mode: your listing was added to this page only and will disappear when you reload.' + LATER);
       return Promise.resolve();
     }
-    return Promise.all([sha256(secret), uploadLogo()]).then(function(v){
-      rec.edit_key_hash = v[0]; rec.logo_path = v[1];
-      return fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
-        method: 'POST',
-        headers: headers({'Content-Type': 'application/json', Prefer: 'return=minimal'}),
-        body: JSON.stringify(rec)
-      });
-    }).then(function(r){
-      if (!r.ok) throw new Error(r.status);
-      remember(rec.id, secret);
-      finish('Thank you.', 'Your listing was sent. It will appear in the directory once it has been checked.', editUrl(rec.id, secret));
+    return uploadLogo().then(function(path){
+      rec.logo_path = path;
+      return rpc('westwood_listing_add', {p: rec, p_code: code});
+    }).then(function(id){
+      if (!id) throw new Error('rejected');
+      finish('Thank you.', 'Your listing was sent. It will appear in the directory once it has been checked.' + LATER);
     });
   }
 
   function saveEdit(ed, rec){
     if (!live){
-      var r = byId(ed.id);
+      var r = rows.filter(function(x){ return x.id === ed.id; })[0];
       if (!r) return Promise.reject(new Error('gone'));
       for (var k in rec) r[k] = rec[k];
       r._logo = logoBlob ? URL.createObjectURL(logoBlob) : ed._logo;
@@ -1036,10 +1031,10 @@ textarea{min-height:96px;resize:vertical}
     }
     return uploadLogo().then(function(path){
       rec.logo_path = path || ed.logo_path;
-      return rpc('westwood_listing_save', {p_id: ed.id, p_key: ed.key, p: rec});
-    }).then(function(ok){
-      if (!ok) throw new Error('rejected');
-      finish('Saved.', 'Your changes are saved. If your listing is already in the directory, they show there now.');
+      return rpc('westwood_listing_save', {p_id: ed.id, p_code: ed.code, p: rec});
+    }).then(function(status){
+      if (status !== 'ok') throw new Error(status);
+      finish('Saved.', 'Your changes are in the directory.');
       load();
     });
   }
@@ -1048,29 +1043,20 @@ textarea{min-height:96px;resize:vertical}
     var ed = editing;
     if (!ed || !confirm('Remove this listing from the directory? This cannot be undone.')) return;
     var gone;
-    if (live) gone = rpc('westwood_listing_delete', {p_id: ed.id, p_key: ed.key});
-    else { rows = rows.filter(function(r){ return r.id !== ed.id; }); gone = Promise.resolve(true); }
-    gone.then(function(ok){
-      if (!ok) throw new Error('rejected');
-      forget(ed.id);
+    if (live) gone = rpc('westwood_listing_delete', {p_id: ed.id, p_code: ed.code});
+    else { rows = rows.filter(function(r){ return r.id !== ed.id; }); gone = Promise.resolve('ok'); }
+    gone.then(function(status){
+      if (status !== 'ok') throw new Error(status);
       finish('Removed.', 'Your listing has been removed from the directory.');
       if (live) load(); else ready();
     }).catch(function(){ fail('Your listing could not be removed. Check your connection and try again.'); });
   });
 
-  function finish(title, msg, link){
+  function finish(title, msg){
     editing = null;
     form.reset(); $('discWrap').hidden = true; setLogo(null);
-    form.hidden = true; $('done').hidden = false;
     $('doneTitle').textContent = title; $('doneMsg').textContent = msg;
-    $('linkBox').hidden = !link;
-    if (link){
-      $('editLink').value = link;
-      $('copyLink').textContent = 'Copy link';
-      $('mailLink').href = 'mailto:?subject=' + encodeURIComponent('My Westwood directory edit link') +
-        '&body=' + encodeURIComponent('Use this private link to change or remove my Westwood directory listing:\n\n' + link);
-    }
-    dlg.scrollTop = 0;
+    show('done');
   }
 
   load();
