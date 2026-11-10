@@ -183,8 +183,13 @@ section{padding-block:110px 0;scroll-margin-top:70px}
 .soldrow em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
 .soldrow em.s{color:var(--muted);text-decoration:line-through}
 .soldrow em.o{color:var(--good);font-weight:600}
-.matrix{margin-top:44px;overflow-x:auto}
-.matrix table{min-width:560px}
+.rules-intro{margin-top:56px;margin-bottom:18px;display:grid;gap:10px}
+.rules-intro h3{font-size:22px;font-variation-settings:"wdth" 112}
+.matrix{overflow-x:auto}
+.matrix table{min-width:760px}
+.matrix td:first-child{width:190px}
+.matrix td:nth-child(2),.matrix td:nth-child(3){width:130px}
+.matrix td.why{font-size:14.5px;color:var(--muted);line-height:1.5}
 
 /* Tables */
 .tbl{overflow-x:auto;border-top:2px solid var(--ink)}
@@ -213,6 +218,27 @@ td small{display:block;color:var(--muted);font-size:13.5px}
 .integr b{font-weight:650}
 .integr .ar{color:var(--accent);font-family:var(--mono)}
 .integr .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* Neon or own */
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.opt{border:1px solid var(--line);background:var(--surface);padding:22px 20px 22px;display:grid;gap:14px;align-content:start;min-width:0;position:relative}
+.opt.rec{border:2px solid var(--accent)}
+.opt.rec::before{content:"Our recommendation";position:absolute;top:-11px;left:16px;background:var(--accent);color:#fff;padding:2px 10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase}
+.opt .letter{font-family:var(--display);font-variation-settings:"wdth" 120;font-weight:900;font-size:44px;line-height:.9;color:var(--accent)}
+.opt h3{font-size:21px;font-variation-settings:"wdth" 112}
+.opt .how{font-size:15.5px}
+.opt h4{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+.opt h4.g{color:var(--good)} .opt h4.b{color:var(--bad)}
+.opt ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.opt li{font-size:14.5px;line-height:1.45;padding-left:20px;position:relative}
+.opt ul.g li::before{content:"+";position:absolute;left:2px;top:-1px;font-weight:800;color:var(--good)}
+.opt ul.b li::before{content:"–";position:absolute;left:2px;top:-1px;font-weight:800;color:var(--bad)}
+.cmp{margin-top:44px}
+.cmp td:not(:first-child){width:22%}
+.lvl{display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px}
+.lvl i{width:12px;height:12px;border:1.5px solid var(--ink);display:block}
+.lvl i.f{background:var(--ink)}
+.lvl-t{font-size:13.5px;color:var(--muted)}
 
 /* Phasing route */
 .stages{position:relative;display:grid;grid-template-columns:repeat(6,1fr) 120px;gap:0;padding-top:34px}
@@ -247,6 +273,30 @@ textarea:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 
 .who > div{min-width:0}
 .who label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.choice{border:0;margin:0;padding:22px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:44px 1fr;gap:14px;min-width:0}
+.choice > *{min-width:0}
+.choice legend{float:left;width:100%;padding:0;font-weight:650;font-size:16.5px;margin-bottom:4px}
+.choice .n{font-family:var(--display);font-variation-settings:"wdth" 120;font-weight:850;font-size:22px;color:var(--muted);line-height:1.2}
+.choice.done .n{color:var(--accent)}
+.picks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 12px;clear:both}
+.picks label{position:relative;border:1px solid var(--line);background:var(--surface);padding:12px 12px 13px;cursor:pointer;display:grid;gap:3px;min-width:0}
+.picks label:hover{border-color:var(--ink)}
+.picks input{position:absolute;opacity:0;pointer-events:none}
+.picks b{font-family:var(--display);font-variation-settings:"wdth" 115;font-weight:850;font-size:20px;line-height:1}
+.picks span{font-size:13.5px;color:var(--muted);line-height:1.35}
+.picks label:has(input:checked){border:2px solid var(--accent);padding:11px 11px 12px}
+.picks label:has(input:checked) b{color:var(--accent)}
+.picks label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:760px){
+  .picks{grid-template-columns:1fr 1fr}
+  .matrix table{min-width:0}
+  .matrix thead{display:none}
+  .matrix tr{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;border-bottom:1px solid var(--line);padding:12px 0}
+  .matrix td{border:0;padding:4px 0;width:auto!important}
+  .matrix td:first-child,.matrix td.why{grid-column:1 / -1}
+  .matrix td:nth-child(2)::before{content:"Dollars ";font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+  .matrix td:nth-child(3)::before{content:"Donor ";font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+}
 .actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding-top:24px}
 button.send{font:inherit;font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--bg);border:0;border-radius:0;padding:15px 26px;cursor:pointer}
 button.send:hover{background:var(--accent);color:#fff}
@@ -258,7 +308,8 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
 
 @media (max-width:1000px){
   .pages,.jerseys,.leaders{grid-template-columns:repeat(2,1fr)}
-  .boards,.give{grid-template-columns:1fr}
+  .boards,.give,.opts{grid-template-columns:1fr}
+  .opts{gap:30px}
   .branches{grid-template-columns:repeat(4,1fr);border-top:0;row-gap:20px}
   .branches > div::before{display:none}
   .admin{grid-template-columns:repeat(2,1fr)}
@@ -322,16 +373,17 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
 
   <svg class="route" viewBox="0 0 1180 230" role="navigation" aria-label="Sections of this scope">
     <defs><pattern id="checker" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="var(--bg)"/><rect width="5" height="5" fill="var(--ink)"/><rect x="5" y="5" width="5" height="5" fill="var(--ink)"/></pattern></defs>
-    <path class="area" d="M0 200 L80 188 L150 198 L220 166 L290 176 L360 140 L430 150 L500 112 L570 126 L640 96 L710 116 L780 130 L850 120 L920 150 L1000 140 L1080 162 L1180 168 L1180 230 L0 230 Z"/>
-    <path class="ln" d="M0 200 L80 188 L150 198 L220 166 L290 176 L360 140 L430 150 L500 112 L570 126 L640 96 L710 116 L780 130 L850 120 L920 150 L1000 140 L1080 162 L1180 168"/>
-    <a href="#current"><rect x="73" y="181" width="14" height="14"/><text class="num" x="80" y="146" text-anchor="middle">01</text><text class="nm" x="80" y="166" text-anchor="middle">Today</text></a>
-    <a href="#donations-today"><rect x="213" y="159" width="14" height="14"/><text class="num" x="220" y="124" text-anchor="middle">02</text><text class="nm" x="220" y="144" text-anchor="middle">Donations</text></a>
-    <a href="#honors"><rect x="353" y="133" width="14" height="14"/><text class="num" x="360" y="98" text-anchor="middle">03</text><text class="nm" x="360" y="118" text-anchor="middle">Honors</text></a>
-    <a href="#sitemap"><rect x="493" y="105" width="14" height="14"/><text class="num" x="500" y="70" text-anchor="middle">04</text><text class="nm" x="500" y="90" text-anchor="middle">Sitemap</text></a>
-    <a href="#giving"><rect x="633" y="89" width="14" height="14"/><text class="num" x="640" y="54" text-anchor="middle">05</text><text class="nm" x="640" y="74" text-anchor="middle">Giving</text></a>
-    <a href="#admin"><rect x="773" y="123" width="14" height="14"/><text class="num" x="780" y="88" text-anchor="middle">06</text><text class="nm" x="780" y="108" text-anchor="middle">Admin &amp; data</text></a>
-    <a href="#phasing"><rect x="913" y="143" width="14" height="14"/><text class="num" x="920" y="108" text-anchor="middle">07</text><text class="nm" x="920" y="128" text-anchor="middle">Phasing</text></a>
-    <a href="#questions" class="finish"><rect class="fin" x="1072" y="118" width="16" height="44"/><rect x="1073" y="155" width="14" height="14"/><text class="num" x="1080" y="88" text-anchor="middle">FINISH</text><text class="nm" x="1080" y="108" text-anchor="middle">Questions</text></a>
+    <path class="area" d="M0 200 L70 188 L130 198 L195 168 L255 178 L320 142 L380 152 L445 114 L505 128 L570 96 L630 112 L695 124 L755 116 L820 138 L880 130 L945 150 L1010 144 L1090 160 L1180 166 L1180 230 L0 230 Z"/>
+    <path class="ln" d="M0 200 L70 188 L130 198 L195 168 L255 178 L320 142 L380 152 L445 114 L505 128 L570 96 L630 112 L695 124 L755 116 L820 138 L880 130 L945 150 L1010 144 L1090 160 L1180 166"/>
+    <a href="#current"><rect x="63" y="181" width="14" height="14"/><text class="num" x="70" y="146" text-anchor="middle">01</text><text class="nm" x="70" y="166" text-anchor="middle">Today</text></a>
+    <a href="#donations-today"><rect x="188" y="161" width="14" height="14"/><text class="num" x="195" y="126" text-anchor="middle">02</text><text class="nm" x="195" y="146" text-anchor="middle">Donations</text></a>
+    <a href="#honors"><rect x="313" y="135" width="14" height="14"/><text class="num" x="320" y="100" text-anchor="middle">03</text><text class="nm" x="320" y="120" text-anchor="middle">Honors</text></a>
+    <a href="#sitemap"><rect x="438" y="107" width="14" height="14"/><text class="num" x="445" y="72" text-anchor="middle">04</text><text class="nm" x="445" y="92" text-anchor="middle">Sitemap</text></a>
+    <a href="#giving"><rect x="563" y="89" width="14" height="14"/><text class="num" x="570" y="54" text-anchor="middle">05</text><text class="nm" x="570" y="74" text-anchor="middle">Giving</text></a>
+    <a href="#admin"><rect x="688" y="117" width="14" height="14"/><text class="num" x="695" y="82" text-anchor="middle">06</text><text class="nm" x="695" y="102" text-anchor="middle">Admin &amp; data</text></a>
+    <a href="#neon"><rect x="813" y="131" width="14" height="14"/><text class="num" x="820" y="96" text-anchor="middle">07</text><text class="nm" x="820" y="116" text-anchor="middle">Neon or own?</text></a>
+    <a href="#phasing"><rect x="938" y="143" width="14" height="14"/><text class="num" x="945" y="108" text-anchor="middle">08</text><text class="nm" x="945" y="128" text-anchor="middle">Phasing</text></a>
+    <a href="#questions" class="finish"><rect class="fin" x="1082" y="116" width="16" height="44"/><rect x="1083" y="153" width="14" height="14"/><text class="num" x="1090" y="86" text-anchor="middle">FINISH</text><text class="nm" x="1090" y="106" text-anchor="middle">Questions</text></a>
   </svg>
   <nav class="jump" aria-label="Sections">
     <a href="#current">The current site <span>01</span></a>
@@ -340,7 +392,8 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
     <a href="#sitemap">Sitemap <span>04</span></a>
     <a href="#giving">Giving <span>05</span></a>
     <a href="#admin">Admin and data <span>06</span></a>
-    <a href="#phasing">Phasing <span>07</span></a>
+    <a href="#neon">Keep Neon or build your own? <span>07</span></a>
+    <a href="#phasing">Phasing <span>08</span></a>
     <a href="#questions"><b>Questions for Bike4Chai</b> <span>Finish</span></a>
   </nav>
 
@@ -531,16 +584,20 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
       <p>Each item shows live SOLD status. A company reserves online and pays by card or invoice; the logo appears in its tier when payment clears.</p>
     </div>
   </div>
+  <div class="rules-intro">
+    <h3>How gifts are counted, and why</h3>
+    <p>There are two counts. <b>Dollars</b> measure how much money a rider raised, so every real dollar counts. <b>Donors</b> measure how many people a rider reached, so a gift only adds a donor when it shows someone new chose to back that rider. That's why the two columns don't always match.</p>
+  </div>
   <div class="tbl matrix"><table>
-    <thead><tr><th>Counting rule</th><th>Adds to dollars</th><th>Counts as a donor</th></tr></thead>
+    <thead><tr><th>Type of gift</th><th>Adds to dollars</th><th>Counts as a donor</th><th>Why</th></tr></thead>
     <tbody>
-      <tr><td>Individual gift, $18 or more</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span><small>Once per rider</small></td></tr>
-      <tr><td>Gift under $18</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span></td></tr>
-      <tr><td>Corporate gift</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span><small>One company, one donor per rider</small></td></tr>
-      <tr><td>Employer match</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span><small>The person and the match count once</small></td></tr>
-      <tr><td>Anonymous gift</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span></td></tr>
-      <tr><td>Rider's own or household gift</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span></td></tr>
-      <tr><td>Gift split across riders</td><td><span class="mk y">✓</span><small>Each rider's share</small></td><td><span class="mk y">✓</span><small>For each rider</small></td></tr>
+      <tr><td>Individual gift, $18 or more</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span><small>Once per rider</small></td><td class="why">A real person chose to back this rider. If they give again, it's still one person, so repeat gifts add dollars but not extra donors.</td></tr>
+      <tr><td>Gift under $18</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span></td><td class="why">Every dollar still helps, so it counts toward dollars. It doesn't add a donor, so nobody can pad their count with a pile of $1 gifts. $18, one chai, is the line.</td></tr>
+      <tr><td>Corporate gift</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span><small>One company, one donor per rider</small></td><td class="why">Getting a business to give takes the same ask as getting a person, so it counts. A company that gives several times is still one supporter.</td></tr>
+      <tr><td>Employer match</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span><small>The person and the match count once</small></td><td class="why">The match is real money for Chai Lifeline, so it counts toward dollars. But it only happened because one person gave, so counting both would count one decision twice.</td></tr>
+      <tr><td>Anonymous gift</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span></td><td class="why">The name is hidden from the public, but Bike4Chai knows who gave, and the rider still earned that gift.</td></tr>
+      <tr><td>Rider's own or household gift</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span></td><td class="why">It's real money, so it counts toward dollars. The donor count is about reaching other people, and giving to yourself or your own household doesn't reach anyone new.</td></tr>
+      <tr><td>Gift split across riders</td><td><span class="mk y">✓</span><small>Each rider's share</small></td><td><span class="mk y">✓</span><small>For each rider</small></td><td class="why">The money is divided, not copied, so the event total still adds up. The donor chose to back each of those riders, so each one counts them.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -586,12 +643,94 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
   </div>
 </section>
 
+<section class="wrap" id="neon">
+  <div class="sec-head">
+    <span class="cp"><i>07</i><span class="label">Your call</span></span>
+    <div class="copy">
+      <h2>Keep Neon, or<br>build your own?</h2>
+      <p>The honors can work either way. The real question is who handles the money: Neon, which does it today, or a new system built just for Bike4Chai. Here are the three ways to do it, in plain terms. You can pick one in the questions form at the bottom of this page.</p>
+    </div>
+  </div>
+  <div class="opts">
+    <article class="opt">
+      <span class="letter">A</span>
+      <h3>Keep Neon, add the honors on top</h3>
+      <p class="how">Donors keep giving through Neon exactly like today. The new site reads the donations from Neon and builds the honors and leaderboards from them.</p>
+      <h4 class="g">The good</h4>
+      <ul class="g">
+        <li>Nothing changes for donors, riders or staff</li>
+        <li>Every way of paying keeps working</li>
+        <li>No risk to the money coming in</li>
+        <li>Quickest to launch</li>
+      </ul>
+      <h4 class="b">The not so good</h4>
+      <ul class="b">
+        <li>Two systems to run instead of one</li>
+        <li>Leaderboards may be a few hours or a day behind, depending on what Neon allows</li>
+        <li>Neon's own pages can only be changed a little</li>
+        <li>Splitting one gift across riders and buying sponsorships online may not be possible</li>
+        <li>Neon's fees continue</li>
+      </ul>
+    </article>
+    <article class="opt">
+      <span class="letter">B</span>
+      <h3>Build our own for everything</h3>
+      <p class="how">A new site replaces Neon completely: donations, registration, receipts and rider pages all move to a system built for Bike4Chai.</p>
+      <h4 class="g">The good</h4>
+      <ul class="g">
+        <li>Everything in one place, designed the way you want</li>
+        <li>Honors show everywhere, the moment a gift comes in</li>
+        <li>Split gifts, monthly giving and online sponsorships</li>
+        <li>All the data belongs to you</li>
+        <li>No platform fee, only card processing fees</li>
+      </ul>
+      <h4 class="b">The not so good</h4>
+      <ul class="b">
+        <li>Bigger and slower to build</li>
+        <li>Every way of paying has to be set up again, and some may be hard</li>
+        <li>You're responsible if something breaks, including on ride day</li>
+        <li>Seventeen seasons of history have to move over correctly</li>
+        <li>Someone has to look after it every year</li>
+      </ul>
+    </article>
+    <article class="opt rec">
+      <span class="letter">C</span>
+      <h3>Start with Neon, decide after 2027</h3>
+      <p class="how">The 2027 ride uses option A. After a full season, once the honors have proven themselves and we know how well Neon shares its data, you decide whether to move the money over.</p>
+      <h4 class="g">The good</h4>
+      <ul class="g">
+        <li>Honors launch on time for 2027</li>
+        <li>No risk to donations in the first year</li>
+        <li>You decide with a real season of experience, not a guess</li>
+        <li>If Neon works well with the honors, you can simply stay</li>
+      </ul>
+      <h4 class="b">The not so good</h4>
+      <ul class="b">
+        <li>Some work gets done twice if you switch later</li>
+        <li>The new ways of giving wait a year</li>
+        <li>Two systems to run for at least one season</li>
+      </ul>
+    </article>
+  </div>
+  <div class="tbl cmp"><table>
+    <thead><tr><th>Side by side</th><th>A · Neon + honors</th><th>B · Our own</th><th>C · Neon first</th></tr></thead>
+    <tbody>
+      <tr><td>Risk to donations</td><td><span class="lvl"><i class="f"></i><i></i><i></i></span><span class="lvl-t">Low</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="lvl-t">Highest</span></td><td><span class="lvl"><i class="f"></i><i></i><i></i></span><span class="lvl-t">Low</span></td></tr>
+      <tr><td>Time to launch</td><td><span class="lvl"><i class="f"></i><i></i><i></i></span><span class="lvl-t">Shortest</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="lvl-t">Longest</span></td><td><span class="lvl"><i class="f"></i><i></i><i></i></span><span class="lvl-t">Shortest</span></td></tr>
+      <tr><td>Cost to build</td><td><span class="lvl"><i class="f"></i><i></i><i></i></span><span class="lvl-t">Lowest</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="lvl-t">Highest</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i></i></span><span class="lvl-t">Spread over two years</span></td></tr>
+      <tr><td>Freedom to design</td><td><span class="lvl"><i class="f"></i><i></i><i></i></span><span class="lvl-t">Limited</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="lvl-t">Full</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i></i></span><span class="lvl-t">Limited, then your call</span></td></tr>
+      <tr><td>New ways of giving</td><td><span class="lvl"><i></i><i></i><i></i></span><span class="lvl-t">Probably not</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="lvl-t">All of them</span></td><td><span class="lvl"><i class="f"></i><i></i><i></i></span><span class="lvl-t">Later</span></td></tr>
+      <tr><td>Ongoing work for you</td><td><span class="lvl"><i class="f"></i><i class="f"></i><i></i></span><span class="lvl-t">Two systems</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="lvl-t">You own it all</span></td><td><span class="lvl"><i class="f"></i><i class="f"></i><i></i></span><span class="lvl-t">Two systems, then decide</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
 <section class="wrap" id="phasing">
   <div class="sec-head">
-    <span class="cp"><i>07</i><span class="label">Plan</span></span>
+    <span class="cp"><i>08</i><span class="label">Plan</span></span>
     <div class="copy">
       <h2>Six stages to<br>the start line</h2>
-      <p>The site goes live before 2027 registration opens, so every returning rider sees their streak and history on day one.</p>
+      <p>The site goes live before 2027 registration opens, so every returning rider sees their streak and history on day one. With option A or C, Neon keeps the payment side and stage 5 waits; with option B, every stage is built in full before launch.</p>
     </div>
   </div>
   <div class="stages">
@@ -616,7 +755,7 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
   <div class="qwrap">
     <div class="meter" aria-live="polite">
       <b class="big" id="m-count">0</b>
-      <div><span class="label">of 15 answered</span><div class="track"><div class="fill" id="m-fill"></div></div></div>
+      <div><span class="label">of 16 answered</span><div class="track"><div class="fill" id="m-fill"></div></div></div>
     </div>
     <form id="qform" class="qform" novalidate>
       <div class="who">
@@ -625,6 +764,21 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
         <div><label for="f-email">Email (optional)</label><input type="email" id="f-email" autocomplete="email" maxlength="200"></div>
       </div>
       <div class="hp" aria-hidden="true"><label for="f-website">Leave empty</label><input type="text" id="f-website" tabindex="-1" autocomplete="off"></div>
+      <fieldset class="choice" id="choice">
+        <span class="n">★</span>
+        <div>
+          <legend>Keep Neon, or build your own?</legend>
+          <p class="hint">The three options are explained in <a href="#neon">section 07</a> above. Pick the one you lean toward.</p>
+          <div class="picks">
+            <label><input type="radio" name="neon" value="A. Keep Neon, add the honors on top"><b>A</b><span>Keep Neon, add the honors on top</span></label>
+            <label><input type="radio" name="neon" value="B. Build our own for everything"><b>B</b><span>Build our own for everything</span></label>
+            <label><input type="radio" name="neon" value="C. Start with Neon, decide after 2027"><b>C</b><span>Start with Neon, decide after 2027</span></label>
+            <label><input type="radio" name="neon" value="Not sure yet"><b>?</b><span>Not sure yet</span></label>
+          </div>
+          <label for="choice-why" class="hint" style="display:block;font-weight:400">Why, or what would change your mind? (optional)</label>
+          <textarea id="choice-why" maxlength="4000"></textarea>
+        </div>
+      </fieldset>
       <div id="qlist"></div>
       <div class="actions">
         <button type="submit" class="send" id="send">Send answers</button>
@@ -669,13 +823,16 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
     if(q[1])d.querySelector('.hint').textContent=q[1];
     list.appendChild(d);
   });
-  var ids=['f-name','f-role','f-email'].concat(Q.map(function(_,i){return 'q'+(i+1);}));
+  var ids=['f-name','f-role','f-email','choice-why'].concat(Q.map(function(_,i){return 'q'+(i+1);}));
   function els(){return ids.map(function(id){return document.getElementById(id);});}
-  function meter(){var n=0;Q.forEach(function(_,i){var t=document.getElementById('q'+(i+1));var on=!!t.value.trim();t.closest('.q').classList.toggle('done',on);if(on)n++;});document.getElementById('m-count').textContent=n;document.getElementById('m-fill').style.width=(n/Q.length*100)+'%';}
-  try{var saved=JSON.parse(localStorage.getItem(KEY)||'{}');els().forEach(function(e){if(saved[e.id])e.value=saved[e.id];});}catch(e){}
+  function picked(){var r=document.querySelector('input[name=neon]:checked');return r?r.value:'';}
+  var TOTAL=Q.length+1;
+  function meter(){var n=0;Q.forEach(function(_,i){var t=document.getElementById('q'+(i+1));var on=!!t.value.trim();t.closest('.q').classList.toggle('done',on);if(on)n++;});var c=!!picked();document.getElementById('choice').classList.toggle('done',c);if(c)n++;document.getElementById('m-count').textContent=n;document.getElementById('m-fill').style.width=(n/TOTAL*100)+'%';}
+  try{var saved=JSON.parse(localStorage.getItem(KEY)||'{}');els().forEach(function(e){if(saved[e.id])e.value=saved[e.id];});if(saved.neon){var r=[].slice.call(document.querySelectorAll('input[name=neon]')).filter(function(x){return x.value===saved.neon;})[0];if(r)r.checked=true;}}catch(e){}
   meter();
-  function save(){try{var o={};els().forEach(function(e){o[e.id]=e.value;});localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
+  function save(){try{var o={};els().forEach(function(e){o[e.id]=e.value;});o.neon=picked();localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
   document.getElementById('qform').addEventListener('input',function(){save();meter();});
+  document.getElementById('qform').addEventListener('change',function(){save();meter();});
 
   var form=document.getElementById('qform'),btn=document.getElementById('send'),st=document.getElementById('status');
   function say(t,c){st.textContent=t;st.className=c||'';}
@@ -685,6 +842,9 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
     var name=document.getElementById('f-name').value.trim();
     if(!name){say('Add your name so we know who answered.','err');document.getElementById('f-name').focus();return;}
     var answers={},count=0;
+    var ch=picked(),why=document.getElementById('choice-why').value.trim();
+    if(ch){answers['Choice: Neon or own site']=ch;count++;}
+    if(why)answers['Choice: why']=why;
     Q.forEach(function(q,i){var v=document.getElementById('q'+(i+1)).value.trim();if(v){answers[(i+1)+'. '+q[0]]=v;count++;}});
     if(!count){say('Answer at least one question before sending.','err');return;}
     btn.disabled=true;say('Sending…');
@@ -696,6 +856,8 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
       say('Sent '+count+' answer'+(count===1?'':'s')+'. Thank you. You can add more and send again any time.','ok');
       try{localStorage.removeItem(KEY);}catch(e){}
       Q.forEach(function(_,i){document.getElementById('q'+(i+1)).value='';});
+      document.getElementById('choice-why').value='';
+      [].slice.call(document.querySelectorAll('input[name=neon]')).forEach(function(x){x.checked=false;});
       meter();
     })
     .catch(function(){btn.disabled=false;say('Your answers could not be sent. Check your connection and try again; what you typed is still here.','err');});

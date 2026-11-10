@@ -63,6 +63,14 @@ button.ghost:hover{background:var(--ink);color:var(--bg)}
 .ans .who{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--muted);margin-bottom:3px}
 .ans p{white-space:pre-wrap;overflow-wrap:anywhere}
 .none{color:var(--muted);font-size:15px;font-style:italic}
+.decision{background:var(--surface);border:2px solid var(--accent);padding:20px 20px 18px;margin-bottom:12px;display:grid;gap:10px}
+.decision h3{font-size:22px;font-variation-settings:"wdth" 112}
+.tally{display:grid;grid-template-columns:minmax(0,280px) 1fr 36px;gap:12px;align-items:center;padding-top:6px}
+.tally .tl{font-weight:650;font-size:15px}
+.tally .tb{height:12px;background:var(--line);display:block}
+.tally .tb i{display:block;height:12px;background:var(--accent)}
+.tally .tc{font-family:var(--mono);font-size:15px;text-align:right}
+@media (max-width:600px){.tally{grid-template-columns:1fr 36px}.tally .tb{grid-column:1 / -1;grid-row:2}}
 .empty{padding:40px 0;color:var(--muted)}
 footer{margin-top:80px;border-top:1px solid var(--line);padding-block:22px 36px}
 @media (max-width:600px){ .item{grid-template-columns:30px 1fr;gap:10px} .stats{gap:22px} .stats b{font-size:28px} }
@@ -133,6 +141,22 @@ footer{margin-top:80px;border-top:1px solid var(--line);padding-block:22px 36px}
     $('s-q').textContent=Object.keys(answered).length+' / '+Q.length;$('s-latest').textContent=latest?fmt(latest):'None';
     var list=$('list');list.innerHTML='';
     if(!rows.length){list.appendChild(el('p','empty','No answers yet. They appear here as soon as someone sends the form.'));return;}
+    var OPTS=['A. Keep Neon, add the honors on top','B. Build our own for everything','C. Start with Neon, decide after 2027','Not sure yet'];
+    var latestPick={};rows.forEach(function(r){var k=r.name.trim().toLowerCase();var c=(r.answers||{})['Choice: Neon or own site'];if(c&&!latestPick[k])latestPick[k]={r:r,c:c,why:(r.answers||{})['Choice: why']||''};});
+    var picks=Object.keys(latestPick).map(function(k){return latestPick[k];});
+    var dec=el('div','decision');
+    dec.appendChild(el('h3',null,'Keep Neon, or build your own?'));
+    dec.appendChild(el('p','label',picks.length?picks.length+' '+(picks.length===1?'person has':'people have')+' picked · latest pick per person':'Nobody has picked yet'));
+    OPTS.forEach(function(o){
+      var who_=picks.filter(function(p){return p.c===o;});
+      var rowEl=el('div','tally');
+      rowEl.appendChild(el('span','tl',o));
+      var tr=el('span','tb');var f=el('i');f.style.width=(picks.length?who_.length/picks.length*100:0)+'%';tr.appendChild(f);rowEl.appendChild(tr);
+      rowEl.appendChild(el('span','tc',String(who_.length)));
+      dec.appendChild(rowEl);
+      who_.forEach(function(p){var a=el('div','ans');a.appendChild(el('div','who',who(p.r)));a.appendChild(el('p',null,p.why||'No reason given'));dec.appendChild(a);});
+    });
+    list.appendChild(dec);
     if(mode==='q'){
       Q.forEach(function(q,i){
         var it=el('div','item'),body=el('div');
@@ -169,7 +193,9 @@ footer{margin-top:80px;border-top:1px solid var(--line);padding-block:22px 36px}
   $('by-p').addEventListener('click',function(){mode='p';this.setAttribute('aria-pressed','true');$('by-q').setAttribute('aria-pressed','false');render();});
   $('refresh').addEventListener('click',function(){$('view-err').textContent='';load(pass).then(function(d){rows=d||[];render();}).catch(function(){$('view-err').textContent='Could not refresh. Try again in a moment.';});});
   $('copy').addEventListener('click',function(){
-    var out=Q.map(function(q,i){var lines=[(i+1)+'. '+q];rows.slice().reverse().forEach(function(r){Object.keys(r.answers||{}).forEach(function(k){if(num(k)===i+1)lines.push('   '+r.name+(r.role?' ('+r.role+')':'')+': '+r.answers[k]);});});if(lines.length===1)lines.push('   (no answer yet)');return lines.join('\n');}).join('\n\n');
+    var ch=rows.filter(function(r){return (r.answers||{})['Choice: Neon or own site'];}).map(function(r){return '   '+r.name+(r.role?' ('+r.role+')':'')+': '+r.answers['Choice: Neon or own site']+(r.answers['Choice: why']?' — '+r.answers['Choice: why']:'');});
+    var head='Keep Neon, or build your own?\n'+(ch.length?ch.join('\n'):'   (no picks yet)')+'\n\n';
+    var out=head+Q.map(function(q,i){var lines=[(i+1)+'. '+q];rows.slice().reverse().forEach(function(r){Object.keys(r.answers||{}).forEach(function(k){if(num(k)===i+1)lines.push('   '+r.name+(r.role?' ('+r.role+')':'')+': '+r.answers[k]);});});if(lines.length===1)lines.push('   (no answer yet)');return lines.join('\n');}).join('\n\n');
     var b=this;navigator.clipboard.writeText(out).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy all';},1600);}).catch(function(){$('view-err').textContent='Copy was blocked by the browser. Select the answers and copy them instead.';});
   });
   try{var p=sessionStorage.getItem('b4c-pass');if(p)show(p).catch(function(){});}catch(e){}
