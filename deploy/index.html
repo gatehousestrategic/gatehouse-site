@@ -1,358 +1,579 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
+<title>Gatehouse Strategic</title>
+<meta name="description" content="Gatehouse Strategic builds custom software and AI strategy for companies ready to move past what's slowing them down.">
+<link rel="canonical" href="https://gatehousestrategic.com/">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0d2a4c">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gatehouse Strategic: custom software and AI strategy">
+<meta property="og:description" content="We build custom software and AI strategy for companies ready to move past what's slowing them down.">
+<meta property="og:url" content="https://gatehousestrategic.com/">
+<meta property="og:image" content="https://gatehousestrategic.com/img/hero.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* one blue family + white */
+:root {
+  --navy: #0d2a4c;
+  --navy-2: #163a63;
+  --blue: #3d8bd6;
+  --blue-light: #a9cdf0;
+  --pale: #e3eaf2;
+  --line: #9cbde0;
+  --line-soft: #d3dde8;
+  --text: #34465c;
+  --serif: "Spectral", Georgia, serif;
+  --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #fff; color: var(--text); font: 400 16px/1.6 var(--serif); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3 { margin: 0; color: var(--navy); font-family: var(--serif); font-weight: 400; }
+p { margin: 0; }
+.mono-img { filter: grayscale(1); }
+.lead { font-family: var(--sans); font-size: clamp(20px, 1.7vw, 24px); line-height: 1.32; color: var(--navy); letter-spacing: -0.01em; }
+.arrow-link { display: inline-flex; align-items: center; gap: 10px; font: 600 15px/1 var(--sans); color: var(--navy); text-decoration: none; padding-bottom: 8px; border-bottom: 1.5px solid var(--blue); }
+.arrow-link::after { content: "→"; color: var(--blue); transition: transform .2s; }
+.arrow-link:hover::after { transform: translateX(4px); }
+.arrow-link.light { color: #fff; border-color: var(--blue-light); }
+.arrow-link.light::after { color: var(--blue-light); }
+.container { max-width: 1440px; margin: 0 auto; position: relative; }
+h2.sec { font-size: clamp(30px, 2.6vw, 38px); line-height: 1.2; }
+
+/* nav: tall cells divided by vertical rules */
+.nav { background: var(--navy); color: #fff; position: relative; z-index: 10; }
+.nav .container { display: grid; grid-template-columns: 1.4fr repeat(5, 1fr) 1.3fr; height: 86px; }
+.logo { display: flex; align-items: center; padding-left: 40px; text-decoration: none; font-family: var(--serif); font-size: 24px; line-height: 1; }
+.logo .mark { width: 42px; height: 42px; margin-right: 12px; flex: 0 0 auto; }
+.logo small { display: block; font: 600 10px/1 var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--blue-light); margin-top: 6px; }
+.cell { border-left: 1px solid rgba(255,255,255,.18); display: flex; align-items: flex-end; padding: 0 16px 18px; font: 700 12px/1.2 var(--sans); letter-spacing: .03em; text-transform: uppercase; text-decoration: none; color: #fff; transition: background .2s; }
+.cell:hover { background: var(--navy-2); }
+.cell.contact { color: var(--blue-light); flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 10px; text-transform: none; font-size: 13px; letter-spacing: 0; }
+.burger { display: none; }
+
+/* hero */
+.hero { position: relative; height: min(760px, 88vh); min-height: 560px; background: #0b1c30 url(img/hero.jpg) 28% center / cover no-repeat; overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(13,42,76,0) 30%, rgba(13,42,76,.5) 55%, rgba(13,42,76,.8) 100%); }
+.hero .hl { position: absolute; left: 0; right: 0; height: 1px; background: rgba(255,255,255,.5); }
+.hero .vl { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,.35); }
+.hero-copy { position: absolute; right: 6%; top: 24%; width: min(400px, 40%); color: #fff; }
+.hero h1 { color: #fff; font-size: clamp(34px, 3vw, 44px); line-height: 1.15; margin-bottom: 26px; }
+.hero p { font-size: 18px; line-height: 1.5; color: rgba(255,255,255,.92); margin-bottom: 30px; }
+
+/* intro: heading left, text right */
+.intro { border-top: 1px solid var(--line); margin-top: 120px; padding: 70px 0 130px; }
+.intro-inner { padding: 0 120px; }
+.intro-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 100px; align-items: start; }
+.intro h2 { max-width: 560px; }
+.together { font-size: clamp(24px, 2vw, 30px); margin-top: 36px; color: var(--blue); }
+.intro-body { font-size: 16.5px; line-height: 1.7; max-width: 560px; padding-top: 6px; }
+.intro-body p + p { margin-top: 20px; }
+.pull { border-left: 2px solid var(--blue); padding: 4px 0 4px 20px; font: 400 21px/1.4 var(--sans); color: var(--navy); margin: 30px 0; }
+.intro-body .arrow-link { margin-top: 30px; }
+
+/* services: two ruled lists on pale blue (no diagram) */
+.services { background: var(--pale); border-top: 1px solid var(--line); }
+.svc-wrap { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.svc-col { padding: 100px 56px 110px; display: flex; flex-direction: column; }
+.svc-col:first-child { padding-left: 120px; }
+.svc-col:last-child { padding-right: 80px; }
+.svc-col { transition: background .3s, color .3s; }
+.svc-col h2, .svc-col li, .svc-col .arrow-link, .svc-col .arrow-link::after { transition: color .3s, border-color .3s; }
+.svc-col:hover { background: var(--navy); color: #c9d8e8; }
+.svc-col:hover h2, .svc-col:hover li, .svc-col:hover .arrow-link { color: #fff; }
+.svc-col:hover li { border-color: rgba(169,205,240,.45); }
+.svc-col:hover .arrow-link { border-color: var(--blue-light); }
+.svc-col:hover .arrow-link::after { color: var(--blue-light); }
+.mono-img { transition: filter .4s; }
+.screen-grid:hover .mono-img { filter: none; }
+.svc-col .arrow-link { margin-top: auto; align-self: flex-start; }
+.svc-col + .svc-col { border-left: 1px solid var(--line); }
+.svc-col h2 { font-size: clamp(28px, 2.3vw, 34px); line-height: 1.15; margin-bottom: 18px; }
+.svc-col > p { font-size: 15.5px; max-width: 420px; margin-bottom: 34px; }
+.svc-col ul { list-style: none; margin: 0 0 40px; padding: 0; max-width: 420px; }
+.svc-col li { border-bottom: 1px solid var(--blue); padding: 13px 0; font-size: 17px; color: var(--navy); }
+.svc-col li:first-child { border-top: 1px solid var(--blue); }
+
+/* soventro in a framed panel */
+.products { background: #fff; border-top: 1px solid var(--line); padding: 120px 0 60px; }
+.prod-head { padding: 0 120px 40px; max-width: 1440px; }
+.prod-head h2 { margin-bottom: 22px; max-width: 640px; }
+.prod-head .lead { max-width: 640px; }
+.screen-grid { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 70px; align-items: center; padding: 70px 120px; border-top: 1px solid var(--line-soft); }
+.prod-head + .screen-grid { border-top: 0; }
+.screen-grid.flip .screen-copy { order: 2; }
+.screen-grid.flip .devices { order: 1; }
+.devices.solo { padding: 0; }
+.prod-name { font-size: clamp(34px, 3.2vw, 46px); line-height: 1.1; margin-bottom: 20px; }
+.gap { font: 400 17px/1.45 var(--sans); color: var(--navy); border-left: 2px solid var(--blue); padding: 2px 0 2px 16px; margin-bottom: 20px; max-width: 470px; }
+.gap b { font-weight: 700; }
+.kicker { font: 700 12px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--blue); margin-bottom: 18px; }
+.screen-copy h2 { margin-bottom: 26px; }
+.screen-copy .lead { margin-bottom: 20px; }
+.screen-copy .body { font-size: 15.5px; margin-bottom: 30px; max-width: 460px; }
+.devices { position: relative; padding: 0 70px 60px 0; }
+.laptop { background: #fff; border: 1px solid var(--line-soft); border-radius: 8px; overflow: hidden; box-shadow: 0 30px 60px -34px rgba(13,42,76,.45); }
+.laptop .bar { height: 26px; background: var(--pale); display: flex; align-items: center; gap: 6px; padding: 0 12px; }
+.laptop .bar i { width: 8px; height: 8px; border-radius: 50%; background: #b9c8d8; }
+.laptop img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: left top; }
+.phone { position: absolute; right: 0; bottom: 0; width: 31%; aspect-ratio: 9 / 19; background: #0b1726; border-radius: 30px; padding: 9px; box-shadow: 0 30px 60px -20px rgba(13,42,76,.6); }
+.phone img { width: 100%; height: 100%; object-fit: cover; object-position: center top; border-radius: 22px; }
+.phone::before { content: ""; position: absolute; top: 15px; left: 50%; width: 30%; height: 6px; margin-left: -15%; border-radius: 3px; background: #0b1726; z-index: 2; }
+
+/* editorial: offset text, bleeding images, vertical rule */
+.edit { position: relative; border-top: 1px solid var(--line); }
+.edit .vrule { position: absolute; top: 0; bottom: 0; left: 120px; width: 1px; background: var(--line); }
+.edit-a { display: grid; grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1fr); min-height: 860px; }
+.edit-a .copy { grid-column: 2; padding: 150px 80px 120px; max-width: 640px; }
+.edit-a .pic { grid-column: 3; align-self: end; margin-bottom: -60px; position: relative; z-index: 2; }
+.edit-a .pic img { width: 100%; aspect-ratio: 4 / 3.4; object-fit: cover; object-position: left top; box-shadow: 0 30px 60px -30px rgba(13,42,76,.5); }
+.edit h2 { margin-bottom: 36px; }
+.edit .lead { margin-bottom: 24px; }
+.edit .body { font-size: 15.5px; margin-bottom: 24px; max-width: 500px; }
+.edit-b { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.edit-b .left img { width: 100%; aspect-ratio: 16 / 8; object-fit: cover; object-position: 35% 60%; }
+.edit-b .copy { padding: 80px 120px 120px; max-width: 760px; }
+.edit-b .side { border-left: 1px solid var(--line); display: flex; align-items: flex-end; padding: 0 70px 160px 80px; }
+.edit-b .side p { font-size: 26px; line-height: 1.28; color: var(--navy); }
+
+
+/* how we work: split text + photo */
+.how { background: linear-gradient(180deg, var(--pale), #f6f8fb); margin-top: 120px; }
+.how-head { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 34px 120px 30px; }
+.how-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+.how-copy { padding: 44px 120px 80px; }
+.steps { list-style: none; margin: 30px 0 34px; padding: 0; max-width: 460px; }
+.steps li { display: grid; grid-template-columns: 54px 1fr; border-top: 1px solid var(--line-soft); padding: 16px 0; }
+.steps li:last-child { border-bottom: 1px solid var(--line-soft); }
+.steps b { font: 300 26px/1 var(--sans); color: var(--blue); }
+.steps h3 { font-size: 20px; margin-bottom: 4px; }
+.steps p { font-size: 15px; line-height: 1.5; }
+.how-pic { background: #0b1c30 url(img/hero.jpg) 30% 38% / 210% auto no-repeat; min-height: 520px; }
+
+/* selected work: ruled rows */
+.work { border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, .62fr) minmax(0, 1.6fr); }
+.work-side { border-right: 1px solid var(--line); padding: 150px 50px 80px 120px; }
+.work-side > div { position: sticky; top: 40px; }
+.work-side h2 { margin-bottom: 30px; }
+.work-side p { font-size: 15.5px; margin-bottom: 30px; max-width: 360px; }
+.work-list { padding: 110px 120px 120px 60px; }
+.wrow { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: center; border-top: 1px solid var(--line-soft); padding: 30px 0; text-decoration: none; }
+.wrow:last-child { border-bottom: 1px solid var(--line-soft); }
+.wrow .thumb { display: block; width: 100%; aspect-ratio: 16 / 10; padding: 0; background: var(--pale) left top / cover no-repeat; border: 1px solid var(--line-soft); filter: grayscale(1); transition: filter .3s, box-shadow .3s; position: relative; }
+button.thumb { cursor: zoom-in; }
+button.thumb::after { content: "View larger"; position: absolute; right: 10px; bottom: 10px; font: 600 12px/1 var(--sans); color: #fff; background: rgba(13,42,76,.88); padding: 7px 10px; border-radius: 4px; opacity: 0; transition: opacity .2s; }
+button.thumb:hover::after, button.thumb:focus-visible::after { opacity: 1; }
+button.thumb:hover { box-shadow: 0 18px 40px -22px rgba(13,42,76,.55); }
+button.thumb:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.wrow:hover .thumb { filter: none; }
+.wrow .thumb.plain { display: grid; place-items: center; background: var(--navy); border-color: var(--navy); filter: none; }
+.wrow .thumb.plain span { font: 300 64px/1 var(--sans); color: var(--blue-light); }
+.wrow .meta { font: 700 11.5px/1.2 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #6c7f95; margin-bottom: 6px; }
+.wrow h3 { font-size: 24px; line-height: 1.25; margin-bottom: 4px; }
+.wrow .out { font: 400 15px/1.4 var(--sans); color: var(--blue); }
+.wrow .go { font: 600 14px/1 var(--sans); color: var(--blue); white-space: nowrap; }
+.wrow .go::after { content: " →"; }
+a.wrow:hover .go { color: var(--navy); }
+
+/* screenshot viewer */
+.viewer { border: 0; padding: 0; background: transparent; max-width: min(1200px, 94vw); max-height: 92vh; overflow: visible; }
+.viewer::backdrop { background: rgba(8,22,40,.86); }
+.viewer img { display: block; max-width: 100%; max-height: 82vh; width: auto; height: auto; background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+.viewer p { color: #fff; font: 500 15px/1.4 var(--sans); margin-top: 14px; }
+.viewer-close { position: absolute; top: -46px; right: 0; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; background: transparent; color: #fff; font: 300 26px/1 var(--sans); cursor: pointer; }
+.viewer-close:hover { background: rgba(255,255,255,.12); }
+
+/* faq */
+.faq { background: linear-gradient(180deg, #eef3f8, #fff); border-top: 1px solid var(--line); }
+.faq-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.6fr); }
+.faq-grid > div:first-child { border-right: 1px solid var(--line-soft); }
+.faq-band { height: 150px; border-bottom: 1px solid var(--line-soft); }
+.faq-copy { padding: 80px 120px 140px; }
+.faq-copy h2 { margin-bottom: 34px; max-width: 460px; }
+.faq details { border-top: 1px solid var(--line-soft); max-width: 640px; }
+.faq details:last-of-type { border-bottom: 1px solid var(--line-soft); }
+.faq summary { list-style: none; cursor: pointer; padding: 18px 40px 18px 0; position: relative; font-size: 19px; color: var(--navy); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: ""; position: absolute; right: 4px; top: 22px; width: 12px; height: 12px; border-right: 1.3px solid var(--blue); border-top: 1.3px solid var(--blue); transform: rotate(135deg); transition: transform .2s; }
+.faq details[open] summary::after { transform: rotate(-45deg); top: 28px; }
+.faq details p { font-size: 15.5px; padding: 0 30px 20px 0; }
+
+/* contact strip */
+.strip { background: var(--navy); color: #fff; padding: 84px 0; }
+.strip-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 40px; align-items: center; padding: 0 240px; }
+.strip h2 { color: #fff; font-size: clamp(20px, 1.8vw, 25px); line-height: 1.3; text-transform: uppercase; letter-spacing: .04em; }
+.strip form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; border: 1px solid var(--blue); border-radius: 6px; overflow: hidden; }
+.strip input { background: transparent; border: 0; border-right: 1px solid rgba(61,139,214,.5); color: #fff; font: 400 15px/1 var(--sans); padding: 20px 18px; min-width: 0; }
+.strip input::placeholder { color: rgba(255,255,255,.6); }
+.strip input:focus { outline: none; background: rgba(255,255,255,.05); }
+.strip button { border: 0; background: var(--blue); color: #fff; font: 700 13px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; padding: 0 30px; cursor: pointer; }
+.strip button:hover { background: #2f78c0; }
+.strip .note { grid-column: 2; font: 400 13px/1.4 var(--sans); color: rgba(255,255,255,.7); margin-top: -24px; }
+
+/* footer: ruled columns */
+.footer .container { display: grid; grid-template-columns: 120px repeat(4, minmax(0, 1fr)) 120px; }
+.fcol { border-left: 1px solid var(--line); padding: 56px 18px 70px; }
+.fcol:nth-child(5) { border-right: 1px solid var(--line); }
+.fcol .lbl { font: 700 11.5px/1.6 var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--navy); display: block; text-decoration: none; }
+.fcol a.lbl:hover { color: var(--blue); }
+.fcol h3 { font-size: 24px; line-height: 1.15; margin: 14px 0 12px; }
+.fcol .big { font-size: 25px; color: var(--blue); text-decoration: none; display: block; line-height: 1.3; }
+.fcol .big:hover { color: var(--navy); }
+.legal { font: 400 12px/1 var(--sans); color: #6c7f95; padding: 18px 0 26px; text-align: center; border-top: 1px solid var(--line-soft); }
+
+@media (max-width: 1180px) {
+  .intro-inner, .screen-grid, .prod-head, .how-head, .how-copy, .faq-copy { padding-left: 48px; padding-right: 48px; }
+  .svc-wrap { grid-template-columns: minmax(0, 1fr); }
+  .svc-col, .svc-col:first-child, .svc-col:last-child { padding: 70px 48px; }
+  .svc-col + .svc-col { border-left: 0; border-top: 1px solid var(--line); }
+  .edit-a { grid-template-columns: 48px minmax(0, 1fr) minmax(0, 1fr); }
+  .edit .vrule { left: 48px; }
+  .edit-a .copy { padding: 120px 48px 100px; }
+  .edit-b .copy { padding: 70px 48px 100px; }
+  .work-side { padding-left: 48px; }
+  .work-list { padding-right: 48px; }
+  .strip-inner { padding: 0 48px; }
+  .footer .container { grid-template-columns: 24px repeat(4, minmax(0, 1fr)) 24px; }
+}
+@media (max-width: 900px) {
+  .nav .container { grid-template-columns: 1fr auto; height: 72px; }
+  .logo { padding-left: 18px; }
+  .cell { display: none; }
+  .burger { display: grid; place-items: center; width: 72px; border: 0; border-left: 1px solid rgba(255,255,255,.18); background: none; color: #fff; cursor: pointer; }
+  .burger span { display: block; width: 24px; height: 1.5px; background: currentColor; box-shadow: 0 7px 0 currentColor, 0 -7px 0 currentColor; }
+  .nav.open .cell { display: flex; grid-column: 1 / -1; border-left: 0; border-top: 1px solid rgba(255,255,255,.18); padding: 18px; align-items: center; font-size: 14px; }
+  .nav.open .container { height: auto; }
+  .nav.open .logo, .nav.open .burger { height: 72px; }
+  .hero { height: 620px; background-position: 30% center; }
+  .hero::before { background: linear-gradient(180deg, rgba(13,42,76,.15) 0%, rgba(13,42,76,.6) 45%, rgba(13,42,76,.92) 100%); }
+  .hero-copy { left: 22px; right: 22px; top: auto; bottom: 48px; width: auto; }
+  .hero .vl { display: none; }
+  .intro { margin-top: 60px; padding: 50px 0 80px; }
+  .intro-inner { padding: 0 22px; }
+  .intro h2 { margin-bottom: 0; }
+  .intro-grid { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+  .together { margin-top: 20px; }
+  .svc-wrap { grid-template-columns: minmax(0, 1fr); }
+  .svc-col, .svc-col:first-child, .svc-col:last-child { padding: 60px 22px; }
+  .svc-col + .svc-col { border-left: 0; border-top: 1px solid var(--line); }
+  .products { padding: 70px 0 30px; }
+  .prod-head { padding: 0 22px 10px; }
+  .screen-grid.flip .screen-copy, .screen-grid.flip .devices { order: 0; }
+  .screen-grid { grid-template-columns: minmax(0, 1fr); gap: 44px; padding: 50px 22px; }
+  .devices { padding: 0 40px 50px 0; }
+  .phone { width: 36%; border-radius: 22px; padding: 6px; }
+  .phone img { border-radius: 17px; }
+  .phone::before { top: 11px; height: 4px; }
+  .edit-a, .edit-b, .how-grid, .work, .faq-grid, .strip-inner { grid-template-columns: minmax(0, 1fr); }
+  .edit .vrule, .faq-grid > div:first-child, .edit-b .side, .faq-band { display: none; }
+  .edit-a { min-height: 0; }
+  .edit-a .copy { grid-column: 1; padding: 70px 22px 40px; }
+  .edit-a .pic { grid-column: 1; margin: 0; }
+  .edit-b .copy { padding: 50px 22px 70px; }
+  .how { margin-top: 60px; }
+  .how-head { padding: 30px 22px; }
+  .how-copy { padding: 34px 22px 50px; }
+  .how-pic { min-height: 320px; }
+  .work-side { border-right: 0; padding: 80px 22px 10px; }
+  .work-side > div { position: static; }
+  .work-list { padding: 20px 22px 80px; }
+  .wrow { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .faq-copy { padding: 70px 22px 90px; }
+  .strip { padding: 60px 0; }
+  .strip-inner { padding: 0 22px; gap: 24px; }
+  .strip form { grid-template-columns: minmax(0, 1fr); }
+  .strip input { border-right: 0; border-bottom: 1px solid rgba(61,139,214,.5); }
+  .strip button { padding: 18px; }
+  .strip .note { grid-column: 1; margin-top: 0; }
+  .footer .container { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .fspace { display: none; }
+  .fcol { padding: 34px 18px 40px; border-top: 1px solid var(--line); }
+  .fcol:nth-child(5) { border-right: 0; }
+}
+@media (max-width: 520px) {
+  .footer .container { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+</style>
 </head>
 <body>
-<x-dc>
-<helmet>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./image-slot.js"></script>
-<style>
-@keyframes gh-drift { 0% { transform: translate(0,0); } 50% { transform: translate(2%, -1.5%); } 100% { transform: translate(0,0); } }
-@keyframes gh-motes { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 0.55; } 90% { opacity: 0.35; } 100% { transform: translateY(-90px) translateX(14px); opacity: 0; } }
-body { margin: 0; -webkit-font-smoothing: antialiased; }
-a { color: inherit; text-decoration: none; }
-* { box-sizing: border-box; }
-</style>
-</helmet>
 
-<div style="background: oklch(0.97 0.012 75); color: oklch(0.2 0.02 60); font-family: Manrope, sans-serif; overflow-x: hidden;">
 
-<nav ref="{{ setNavRef }}" style="position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: {{ navPadding }}; background: oklch(0.15 0.02 48); border-bottom: 1px solid oklch(1 0 0 / 0.06); transition: padding 0.15s ease;">
-  <a href="#top" style="font-family: Newsreader, serif; font-size: 21px; letter-spacing: 0.01em; color: oklch(0.95 0.02 80); font-style: italic; flex-shrink: 0;">Gatehouse Strategic</a>
-  <sc-if value="{{ isMobileNav }}" hint-placeholder-val="{{ false }}">
-    <button onClick="{{ toggleMobileMenu }}" aria-label="Menu" style="width: 44px; height: 44px; background: transparent; border: 1px solid oklch(1 0 0 / 0.2); border-radius: 2px; color: oklch(0.95 0.02 80); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;">☰</button>
-  </sc-if>
-  <sc-if value="{{ isDesktopNav }}" hint-placeholder-val="{{ true }}">
-    <div style="display: flex; gap: 24px; align-items: center; flex-wrap: nowrap; white-space: nowrap;">
-      <a href="#custom-solutions" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">Custom Solutions</a>
-      <a href="#ai-strategy" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">AI Strategy</a>
-      <a href="#case-studies" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">Case Studies</a>
-      <a href="#process" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">Process</a>
-      <a href="#about" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">About</a>
-      <a href="#faq" style="font-size: 14px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500;">FAQ</a>
-      <a href="#contact" style="font-size: 14px; font-weight: 600; color: oklch(0.15 0.02 48); background: oklch(0.85 0.08 80); padding: 10px 20px; border-radius: 2px;">Talk to us</a>
+<header class="nav" id="nav">
+  <div class="container">
+    <a class="logo" href="#top" aria-label="Gatehouse Strategic home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 49V29a11 11 0 0 1 22 0v20" fill="none" stroke="#ffffff" stroke-width="4.5"/><path d="M15 49.5h34" stroke="#3d8bd6" stroke-width="4.5"/></svg><span>Gatehouse<small>Strategic</small></span></a>
+    <a class="cell" href="#services">Services</a>
+    <a class="cell" href="#products">Products</a>
+    <a class="cell" href="#work">Our work</a>
+    <a class="cell" href="#how">How we work</a>
+    <a class="cell" href="#faq">Questions</a>
+    <a class="cell contact" href="#contact">hello@gatehousestrategic.com</a>
+    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <span class="hl" style="top:12%"></span>
+  <span class="hl" style="top:66%"></span>
+  <span class="vl" style="left:50%"></span>
+  <div class="hero-copy">
+    <h1>The Way Through Starts Here.</h1>
+    <p>Gatehouse Strategic builds custom software and AI strategy for companies ready to move past what's slowing them down.</p>
+    <a class="arrow-link light" href="#contact">Talk to us</a>
+  </div>
+</section>
+
+<section class="intro">
+  <div class="container intro-inner intro-grid">
+    <div>
+      <h2 class="sec">Engineers and Advisors for Companies That Have Outgrown Off-the-Shelf</h2>
+      <p class="together">Advise. Build. Fill the gap.</p>
     </div>
-  </sc-if>
-</nav>
-<div style="height: {{ navHeight }}px;"></div>
-<sc-if value="{{ mobileMenuOpen }}" hint-placeholder-val="{{ false }}">
-  <div style="position: fixed; top: {{ mobileMenuTop }}; left: 0; right: 0; z-index: 39; display: flex; flex-direction: column; background: oklch(0.15 0.02 48); border-bottom: 1px solid oklch(1 0 0 / 0.1); padding: 8px 20px 20px; max-height: {{ mobileMenuMaxHeight }}; overflow-y: auto;">
-    <a href="#custom-solutions" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">Custom Solutions</a>
-    <a href="#ai-strategy" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">AI Strategy</a>
-    <a href="#case-studies" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">Case Studies</a>
-    <a href="#process" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">Process</a>
-    <a href="#about" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">About</a>
-    <a href="#faq" onClick="{{ closeMobileMenu }}" style="font-size: 16px; color: oklch(0.88 0.015 75 / 0.85); font-weight: 500; padding: 14px 0; border-bottom: 1px solid oklch(1 0 0 / 0.06);">FAQ</a>
-    <a href="#contact" onClick="{{ closeMobileMenu }}" style="font-size: 16px; font-weight: 600; color: oklch(0.15 0.02 48); background: oklch(0.85 0.08 80); padding: 12px 20px; border-radius: 2px; text-align: center; margin-top: 14px;">Talk to us</a>
-  </div>
-</sc-if>
-
-<section id="top" data-screen-label="Hero" style="position: relative; min-height: 92vh; overflow: hidden; background: oklch(0.15 0.02 48); display: flex; align-items: center;">
-  <div style="position: absolute; inset: 0; color: oklch(0.85 0.02 75);">
-    <image-slot id="hero-bg" shape="rect" fit="cover" placeholder="Drop hero photo: light spilling from an open door"></image-slot>
-  </div>
-  <div style="position: absolute; inset: 0; background: linear-gradient(100deg, oklch(0.14 0.02 50 / 0.92) 0%, oklch(0.14 0.02 50 / 0.55) 38%, oklch(0.14 0.02 50 / 0.15) 65%, transparent 100%); pointer-events: none;"></div>
-  <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 65% 30%, transparent 40%, oklch(0.08 0.02 45 / 0.45) 100%); pointer-events: none;"></div>
-  <div style="position: absolute; top: 0; left: 0; bottom: 0; width: min(668px, 88%); background: linear-gradient(90deg, oklch(0.1 0.02 45 / 0.4) 0%, oklch(0.1 0.02 45 / 0.32) 78%, transparent 100%); pointer-events: none;"></div>
-
-  <div style="position: relative; z-index: 2; padding: 0 48px; max-width: 620px;">
-    <div style="font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.85 0.07 82); margin-bottom: 28px; font-weight: 600;">AI development &amp; consulting</div>
-    <h1 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(40px, 5.4vw, 76px); line-height: 1.04; color: oklch(0.96 0.015 78); margin: 0 0 28px;">The way through starts here.</h1>
-    <p style="font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; color: oklch(0.85 0.02 75); margin: 0 0 44px;">We build custom software and AI strategy for companies ready to move past what's slowing them down.</p>
-    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-      <a href="#custom-solutions" style="font-size: 16px; font-weight: 600; color: oklch(0.15 0.02 48); background: oklch(0.85 0.08 80); padding: 16px 28px; border-radius: 2px;">Build something</a>
-      <a href="#ai-strategy" style="font-size: 16px; font-weight: 600; color: oklch(0.94 0.015 78); border: 1px solid oklch(1 0 0 / 0.3); padding: 16px 28px; border-radius: 2px;">Get an AI strategy</a>
+    <div class="intro-body">
+      <p>Gatehouse Strategic is an AI development and consulting practice for mid-size companies whose work doesn't fit the shape of generic software, and whose leadership is tired of generic AI pitch decks.</p>
+      <p class="pull">Every engagement starts with one question: is the bottleneck technical, or is it strategic?</p>
+      <p>When it's strategic, we help leadership decide where AI fits and how to staff for it. When it's technical, we build the tool your team is missing. And when a whole market is missing a tool, we build that too.</p>
+      <a class="arrow-link" href="#services">What we do</a>
     </div>
   </div>
 </section>
 
-<section data-screen-label="Two Paths" style="padding: 140px 48px; max-width: 1280px; margin: 0 auto;">
-  <div style="text-align: center; max-width: 720px; margin: 0 auto 72px;">
-    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(34px, 4vw, 54px); line-height: 1.1; margin: 0 0 20px;">Two ways in.</h2>
-    <p style="font-size: 19px; line-height: 1.6; color: oklch(0.42 0.02 60); margin: 0;">Every engagement starts with the same question: is the bottleneck technical, or is it strategic? That answer decides which door you walk through.</p>
-  </div>
-  <div style="display: flex; gap: 32px; flex-wrap: wrap;">
-    <a href="#custom-solutions" style="flex: 1 1 420px; display: block; padding: 48px 40px; background: oklch(0.99 0.008 75); border-top: 3px solid oklch(0.5 0.13 35); box-shadow: 0 1px 3px oklch(0.2 0.02 60 / 0.06);" style-hover="box-shadow: 0 14px 30px oklch(0.2 0.02 60 / 0.1); transform: translateY(-3px);">
-      <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.5 0.13 35); margin-bottom: 18px;">Custom Solutions</div>
-      <h3 style="font-family: Newsreader, serif; font-weight: 500; font-size: 30px; margin: 0 0 18px;">Build the software that removes the bottleneck.</h3>
-      <p style="font-size: 17px; line-height: 1.6; color: oklch(0.42 0.02 60); margin: 0 0 28px;">Custom apps, internal tools, and integrations designed around how your team actually works, not how off-the-shelf software assumes you work.</p>
-      <div style="font-size: 15px; font-weight: 600; color: oklch(0.2 0.02 60);">See how we build →</div>
-    </a>
-    <a href="#ai-strategy" style="flex: 1 1 420px; display: block; padding: 48px 40px; background: oklch(0.99 0.008 75); border-top: 3px solid oklch(0.62 0.11 82); box-shadow: 0 1px 3px oklch(0.2 0.02 60 / 0.06);" style-hover="box-shadow: 0 14px 30px oklch(0.2 0.02 60 / 0.1); transform: translateY(-3px);">
-      <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.62 0.11 82); margin-bottom: 18px;">AI Strategy &amp; Consulting</div>
-      <h3 style="font-family: Newsreader, serif; font-weight: 500; font-size: 30px; margin: 0 0 18px;">Know what AI can actually do for you.</h3>
-      <p style="font-size: 17px; line-height: 1.6; color: oklch(0.42 0.02 60); margin: 0 0 28px;">A clear-eyed look at where AI fits in your business, a roadmap to get there, and help building the team to run it.</p>
-      <div style="font-size: 15px; font-weight: 600; color: oklch(0.2 0.02 60);">See how we advise →</div>
-    </a>
+<section class="services" id="services">
+  <div class="container svc-wrap">
+    <div class="svc-col">
+      <h2>AI Consulting</h2>
+      <p>A clear-eyed look at where AI fits in your business, a roadmap to get there, and help building the team to run it.</p>
+      <ul><li>AI roadmaps</li><li>Use-case prioritization</li><li>Guardrails and ownership</li><li>AI team hiring and structure</li></ul>
+      <a class="arrow-link" href="#contact">Plan your strategy</a>
+    </div>
+    <div class="svc-col">
+      <h2>AI Builds</h2>
+      <p>Custom software built around how your team actually works, not how off-the-shelf tools assume you work.</p>
+      <ul><li>Custom applications</li><li>Internal tools</li><li>Integrations and automation</li><li>Data, scoring and reporting</li></ul>
+      <a class="arrow-link" href="#contact">Start a build</a>
+    </div>
+    <div class="svc-col">
+      <h2>Our Products</h2>
+      <p>We find places in a market where nothing does the whole job, and build the product that fills the gap.</p>
+      <ul><li>Soventro, event software</li><li>howismy.site, AI search visibility</li></ul>
+      <a class="arrow-link" href="#products">See our products</a>
+    </div>
   </div>
 </section>
 
-<section id="custom-solutions" data-screen-label="Custom Solutions" style="padding: 120px 48px; background: oklch(0.955 0.01 75);">
-  <div style="max-width: 1120px; margin: 0 auto;">
-    <div style="display: flex; gap: 56px; flex-wrap: wrap; margin-bottom: 80px;">
-      <div style="flex: 1 1 380px;">
-        <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.5 0.13 35); margin-bottom: 18px;">Custom Solutions</div>
-        <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.15; margin: 0;">Software built around your bottleneck, not a template.</h2>
-      </div>
-      <div style="flex: 1 1 380px; display: flex; align-items: center;">
-        <p style="font-size: 18px; line-height: 1.65; color: oklch(0.42 0.02 60); margin: 0;">We design and build custom applications and internal tools that close the gap between what your team needs and what generic software gives them. No unnecessary complexity, no features you didn't ask for.</p>
+
+
+<section class="edit">
+  <span class="vrule"></span>
+  <div class="container edit-a">
+    <div class="copy">
+      <h2 class="sec">Software Built Around How Your Team Actually Works</h2>
+      <p class="lead">Not how off-the-shelf software assumes you work.</p>
+      <p class="body">We design and build custom applications, internal tools and integrations that close the gap between what your team needs and what generic software gives them. No unnecessary complexity, and no features you didn't ask for.</p>
+      <p class="lead">Most custom tools ship in 6 to 12 weeks.</p>
+      <a class="arrow-link" href="#contact">Start a build</a>
+    </div>
+    <div class="pic"><img class="mono-img" src="img/om-builder.png" alt="Offering memorandum builder we built for a real estate client"></div>
+  </div>
+</section>
+
+<section class="edit edit-b">
+  <div class="left">
+    <img src="img/door.jpg" alt="Light coming through an open door" loading="lazy">
+    <div class="copy">
+      <h2 class="sec">Know What AI Can Actually Do for You</h2>
+      <p class="body">We help leadership teams cut through the noise: where AI genuinely helps, where it doesn't, and what it takes to build a team that can run it well.</p>
+      <p class="body">For a manufacturer, that meant a 12-month roadmap and a two-person AI team. For a professional services firm, it meant guardrails, prioritized use cases and clear ownership across departments.</p>
+      <p class="lead" style="margin-bottom:28px">Strategy first, tools second.</p>
+      <a class="arrow-link" href="#contact">Plan your strategy</a>
+    </div>
+  </div>
+  <div class="side"><p>Most clients start with one door, a build or a strategy, and end up walking through both.</p></div>
+</section>
+
+<section class="products" id="products">
+  <div class="container prod-head">
+    <p class="kicker">Our products</p>
+    <h2 class="sec">When the Right Tool Doesn't Exist, We Build It</h2>
+    <p class="lead">Alongside client work, we look for gaps in a market, places where nothing on offer does the whole job, and build the product that fills them.</p>
+  </div>
+
+  <div class="container screen-grid">
+    <div class="screen-copy">
+      <p class="kicker">Event software</p>
+      <h3 class="prod-name">Soventro</h3>
+      <p class="gap"><b>The gap:</b> event teams were stitching together separate tools for registration, payments, hotels, emails and check-in. No single platform did all of it.</p>
+      <p class="body">Soventro is the event operating system: event website, registration, payments and invoices, agenda and speakers, attendee emails, hotel room blocks, onsite check-in and reporting. Attendees get their own app for the agenda, their schedule and their check-in code.</p>
+      <a class="arrow-link" href="https://soventro.com" target="_blank" rel="noopener">Visit soventro.com</a>
+    </div>
+    <div class="devices">
+      <div class="laptop"><div class="bar"><i></i><i></i><i></i></div><img class="mono-img" src="img/soventro.webp" alt="Soventro organizer dashboard with launch checklist and items needing attention"></div>
+      <div class="phone"><img src="img/soventro-app.webp" alt="Soventro attendee app showing the event agenda"></div>
+    </div>
+  </div>
+
+  <div class="container screen-grid flip">
+    <div class="screen-copy">
+      <p class="kicker">AI search visibility</p>
+      <h3 class="prod-name">howismy.site</h3>
+      <p class="gap"><b>The gap:</b> companies moving budget from SEO to AI answers had no way to see how ChatGPT, Perplexity and Google AI describe them.</p>
+      <p class="body">howismy.site audits how a business shows up across AI answer engines. It's white-label, so agencies can resell it or embed it on their own site.</p>
+      <a class="arrow-link" href="https://howismy.site" target="_blank" rel="noopener">Visit howismy.site</a>
+    </div>
+    <div class="devices solo">
+      <div class="laptop"><div class="bar"><i></i><i></i><i></i></div><img class="mono-img" src="img/howismy.png" alt="howismy.site audit page"></div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="how-head"><h2 class="sec">Four Steps, Measured in Weeks</h2></div>
+  <div class="how-grid">
+    <div class="how-copy">
+      <p class="lead">We scope tightly on purpose, so you get something usable fast.</p>
+      <ol class="steps">
+        <li><b>01</b><div><h3>Diagnose</h3><p>We map where time, money or people are getting stuck, and why.</p></div></li>
+        <li><b>02</b><div><h3>Design</h3><p>We scope the smallest solution or strategy that solves the real problem.</p></div></li>
+        <li><b>03</b><div><h3>Build or advise</h3><p>Custom software gets built. Strategy gets a roadmap and a team.</p></div></li>
+        <li><b>04</b><div><h3>Operate</h3><p>We stay close after launch, tuning the work as your business changes.</p></div></li>
+      </ol>
+      <a class="arrow-link" href="#contact">Talk to us</a>
+    </div>
+    <div class="how-pic" role="img" aria-label="A hand sketching a process flowchart"></div>
+  </div>
+</section>
+
+<section class="work" id="work">
+  <div class="work-side"><div>
+    <h2 class="sec">Client Work</h2>
+    <p>Builds and strategy work for clients. Client identities are withheld.</p>
+    <a class="arrow-link" href="#contact">Discuss a project</a>
+  </div></div>
+  <div class="work-list" id="worklist"></div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="faq-grid">
+    <div><div class="faq-band"></div></div>
+    <div>
+      <div class="faq-band"></div>
+      <div class="faq-copy">
+        <h2 class="sec">Questions We Hear Most</h2>
+        <details><summary>Do we need an AI strategy if we just need an app built?</summary><p>No. Plenty of engagements are pure build: you know what tool you need, we build it. Strategy work only comes in when the question is bigger than one piece of software.</p></details>
+        <details><summary>How long does a typical build take?</summary><p>Most custom tools ship in 6 to 12 weeks depending on scope. We scope tightly on purpose, so you get something usable fast rather than waiting a year for a perfect system.</p></details>
+        <details><summary>Do you work with our existing team, or replace them?</summary><p>We work alongside your team. On the build side we hand off clean, documented software. On the strategy side we help you hire and structure an AI team if you don't have one yet.</p></details>
+        <details><summary>What if we don't know what we need yet?</summary><p>That's normal, and it's exactly what the first conversation is for. We'll help you figure out whether the real issue is a missing tool or a missing strategy before we scope anything.</p></details>
+        <details><summary>Can we do both a custom build and a strategy engagement?</summary><p>Yes, and most clients end up doing both. They often start on one side and realize the other is needed to make the first investment pay off.</p></details>
       </div>
     </div>
   </div>
 </section>
 
-<section id="ai-strategy" data-screen-label="AI Strategy" style="padding: 120px 48px;">
-  <div style="max-width: 1120px; margin: 0 auto;">
-    <div style="display: flex; gap: 56px; flex-wrap: wrap; margin-bottom: 56px;">
-      <div style="flex: 1 1 380px;">
-        <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.62 0.11 82); margin-bottom: 18px;">AI Strategy &amp; Consulting</div>
-        <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.15; margin: 0;">A clear roadmap for what AI actually changes in your business.</h2>
-      </div>
-      <div style="flex: 1 1 380px; display: flex; align-items: center;">
-        <p style="font-size: 18px; line-height: 1.65; color: oklch(0.42 0.02 60); margin: 0;">We help leadership teams cut through the noise: where AI genuinely helps, where it doesn't, and what it takes to build a team that can run it well. Strategy first, tools second.</p>
-      </div>
+<section class="strip" id="contact">
+  <div class="container strip-inner">
+    <h2>Tell Us What's<br>Slowing You Down</h2>
+    <form id="form" novalidate>
+      <input name="email" type="email" placeholder="Your email" aria-label="Your email" autocomplete="email">
+      <input name="msg" placeholder="Your message" aria-label="What's slowing you down">
+      <button type="submit">Send</button>
+    </form>
+    <p class="note" id="note">We reply within a couple of business days.</p>
+  </div>
+</section>
+
+<dialog class="viewer" id="viewer" aria-label="Screenshot">
+  <button type="button" class="viewer-close" id="viewerClose" aria-label="Close">×</button>
+  <img id="viewerImg" alt="">
+  <p id="viewerCap"></p>
+</dialog>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="fspace"></div>
+    <div class="fcol">
+      <a class="lbl" href="mailto:hello@gatehousestrategic.com">hello@gatehousestrategic.com</a>
+      <span class="lbl" style="margin-top:6px">Toms River, New Jersey</span>
     </div>
-    <div style="width: 100%; height: 420px;">
-      <image-slot id="ai-strategy-hero" shape="rect" fit="cover" placeholder="Drop an image for AI Strategy &amp; Consulting"></image-slot>
+    <div class="fcol">
+      <span class="lbl">Services</span>
+      <h3>Custom Solutions</h3>
+      <span class="lbl">Applications · Tools · Integrations</span>
+      <h3 style="margin-top:22px">AI Strategy</h3>
+      <span class="lbl">Roadmaps · Guardrails · Teams</span>
     </div>
-  </div>
-</section>
-
-<section id="case-studies" data-screen-label="Case Studies" style="padding: 120px 48px; background: oklch(0.955 0.01 75);">
-  <div style="max-width: 1120px; margin: 0 auto;">
-    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.15; margin: 0 0 20px;">Case studies.</h2>
-    <p style="font-size: 18px; line-height: 1.65; color: oklch(0.42 0.02 60); max-width: 680px; margin: 0 0 56px;">A mix of custom builds and strategy work, across both tracks. Client identities are withheld; some are ours to show.</p>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 24px;">
-      <sc-for list="{{ caseStudies }}" as="cs" hint-placeholder-count="4">
-        <div style="background: oklch(0.99 0.008 75); border: 1px solid oklch(0.88 0.012 70); overflow: hidden;">
-          <sc-if value="{{ cs.hasImage }}" hint-placeholder-val="{{ true }}">
-            <div style="position: relative; width: 100%; height: 220px; color: oklch(0.55 0.02 60);">
-              <image-slot id="cs-shot-{{ cs.slotId }}" shape="rect" fit="cover" placeholder="Drop an anonymized screenshot of the tool"></image-slot>
-            </div>
-          </sc-if>
-          <div style="padding: 36px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-            <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.5 0.13 35);">{{ cs.industry }}</span>
-            <span style="font-size: 11px; font-weight: 600; color: oklch(0.55 0.02 60); background: oklch(0.9 0.01 70); padding: 4px 9px; border-radius: 2px;">{{ cs.tag }}</span>
-          </div>
-          <h4 style="font-size: 19px; font-weight: 700; margin: 0 0 12px; line-height: 1.35;">{{ cs.problem }}</h4>
-          <p style="font-size: 15.5px; line-height: 1.6; color: oklch(0.42 0.02 60); margin: 0 0 18px;">{{ cs.outcome }}</p>
-          <sc-if value="{{ cs.link }}" hint-placeholder-val="{{ false }}">
-            <a href="{{ cs.link }}" target="_blank" style="font-size: 22px; font-family: Newsreader, serif; font-style: italic; color: oklch(0.5 0.13 35); text-decoration: underline;">{{ cs.metric }} ↗</a>
-          </sc-if>
-          <sc-if value="{{ cs.noLink }}" hint-placeholder-val="{{ true }}">
-            <div style="font-size: 22px; font-family: Newsreader, serif; font-style: italic; color: oklch(0.2 0.02 60);">{{ cs.metric }}</div>
-          </sc-if>
-          <p style="font-size: 13px; color: oklch(0.55 0.02 60); margin: 16px 0 0;">{{ cs.note }}</p>
-          </div>
-        </div>
-      </sc-for>
+    <div class="fcol">
+      <a class="lbl" href="#services">Services</a><a class="lbl" href="#work">Our work</a><a class="lbl" href="#how">How we work</a><a class="lbl" href="#faq">Questions</a><a class="lbl" href="#contact">Contact</a>
     </div>
-    <sc-if value="{{ hasMoreCaseStudies }}" hint-placeholder-val="{{ false }}">
-      <div style="display: flex; justify-content: center; margin-top: 40px;">
-        <button onClick="{{ toggleCaseStudiesExpanded }}" style="font-size: 15px; font-weight: 600; color: oklch(0.2 0.02 60); background: transparent; border: 1px solid oklch(0.8 0.012 70); padding: 14px 28px; border-radius: 2px; cursor: pointer;">{{ caseStudiesToggleLabel }}</button>
-      </div>
-    </sc-if>
-  </div>
-</section>
-
-<section id="process" data-screen-label="Process" style="padding: 120px 48px; background: oklch(0.15 0.02 48);">
-  <div style="max-width: 1120px; margin: 0 auto;">
-    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); color: oklch(0.96 0.015 78); margin: 0 0 64px;">How we work.</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 40px;">
-      <sc-for list="{{ processSteps }}" as="step" hint-placeholder-count="4">
-        <div>
-          <div style="font-family: Newsreader, serif; font-style: italic; font-size: 34px; color: oklch(0.75 0.07 82); margin-bottom: 16px;">{{ step.n }}</div>
-          <h3 style="font-size: 19px; font-weight: 700; color: oklch(0.96 0.015 78); margin: 0 0 10px;">{{ step.title }}</h3>
-          <p style="font-size: 15.5px; line-height: 1.6; color: oklch(0.8 0.015 75); margin: 0;">{{ step.body }}</p>
-        </div>
-      </sc-for>
+    <div class="fcol">
+      <a class="big" href="https://soventro.com" target="_blank" rel="noopener">Soventro ↗</a>
+      <a class="big" href="https://howismy.site" target="_blank" rel="noopener">howismy.site ↗</a>
     </div>
+    <div class="fspace"></div>
   </div>
-</section>
-
-<section id="about" data-screen-label="About" style="padding: 120px 48px;">
-  <div style="max-width: 760px; margin: 0 auto;">
-    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); margin: 0 0 32px;">Who we are.</h2>
-    <p style="font-size: 19px; line-height: 1.7; color: oklch(0.35 0.02 60); margin: 0 0 20px;">Gatehouse Strategic is an AI development and consulting practice built for mid-size companies that need more than off-the-shelf software or a generic AI pitch deck.</p>
-    <p style="font-size: 19px; line-height: 1.7; color: oklch(0.35 0.02 60); margin: 0;">We work in two modes: as engineers who build the specific tool your team needs, and as advisors who help leadership figure out where AI genuinely fits and how to staff for it. Most clients start with one and end up needing both.</p>
-  </div>
-</section>
-
-<section id="faq" data-screen-label="FAQ" style="padding: 120px 48px; background: oklch(0.955 0.01 75);">
-  <div style="max-width: 760px; margin: 0 auto;">
-    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); margin: 0 0 48px;">Questions.</h2>
-    <sc-for list="{{ faqItems }}" as="item" hint-placeholder-count="5">
-      <div style="border-bottom: 1px solid oklch(0.85 0.012 70);">
-        <div onClick="{{ item.toggle }}" style="display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 26px 0; cursor: pointer;">
-          <span style="font-size: 18px; font-weight: 600;">{{ item.q }}</span>
-          <span style="font-size: 22px; color: oklch(0.55 0.02 60); flex-shrink: 0;">{{ item.symbol }}</span>
-        </div>
-        <sc-if value="{{ item.open }}" hint-placeholder-val="{{ false }}">
-          <p style="font-size: 16px; line-height: 1.65; color: oklch(0.42 0.02 60); margin: 0 0 26px;">{{ item.a }}</p>
-        </sc-if>
-      </div>
-    </sc-for>
-  </div>
-</section>
-
-<section id="contact" data-screen-label="Contact" style="padding: 120px 48px; background: oklch(0.15 0.02 48); position: relative; overflow: hidden;">
-  <div style="position: absolute; top: -30%; right: -10%; width: 50%; height: 120%; background: radial-gradient(ellipse at center, oklch(0.85 0.08 80 / 0.18), transparent 70%); filter: blur(60px); pointer-events: none;"></div>
-  <div style="max-width: 640px; margin: 0 auto; position: relative; z-index: 1;">
-    <h2 style="font-family: Newsreader, serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); color: oklch(0.96 0.015 78); margin: 0 0 16px;">Talk to us.</h2>
-    <p style="font-size: 17px; line-height: 1.6; color: oklch(0.8 0.015 75); margin: 0 0 44px;">Tell us what's slowing you down. We'll tell you honestly whether it's a build problem or a strategy problem.</p>
-
-    <sc-if value="{{ formSubmitted }}" hint-placeholder-val="{{ false }}">
-      <div style="padding: 40px; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.1);">
-        <p style="font-size: 19px; color: oklch(0.96 0.015 78); margin: 0;">Thanks, that's on its way. We'll get back to you within a couple of business days.</p>
-      </div>
-    </sc-if>
-    <sc-if value="{{ formNotSubmitted }}" hint-placeholder-val="{{ true }}">
-      <form onSubmit="{{ handleSubmit }}" style="display: flex; flex-direction: column; gap: 18px;">
-        <input name="name" type="text" placeholder="Name" required="{{ true }}" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78);"></input>
-        <input name="email" type="email" placeholder="Email" required="{{ true }}" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78);"></input>
-        <input name="company" type="text" placeholder="Company" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78);"></input>
-        <select name="interest" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78);">
-          <option value="">What are you looking for?</option>
-          <option value="custom">Custom Solutions</option>
-          <option value="strategy">AI Strategy &amp; Consulting</option>
-          <option value="unsure">Not sure yet</option>
-        </select>
-        <textarea name="message" placeholder="What's the bottleneck?" rows="4" style="padding: 16px; font-size: 16px; font-family: Manrope, sans-serif; background: oklch(0.24 0.03 52); border: 1px solid oklch(1 0 0 / 0.15); color: oklch(0.96 0.015 78); resize: vertical;"></textarea>
-        <button type="submit" style="padding: 18px; font-size: 16px; font-weight: 600; background: oklch(0.85 0.08 80); color: oklch(0.15 0.02 48); border: none; cursor: pointer; margin-top: 10px;">Send it over</button>
-      </form>
-    </sc-if>
-  </div>
-</section>
-
-<footer style="padding: 40px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; background: oklch(0.16 0.02 50);">
-  <span style="font-family: Newsreader, serif; font-style: italic; font-size: 16px; color: oklch(0.75 0.015 75);">Gatehouse Strategic</span>
-  <span style="font-size: 13px; color: oklch(0.6 0.015 70);">hello@gatehousestrategic.com</span>
+  <p class="legal">© <span id="yr">2026</span> FlintSky Ventures, LLC d/b/a Gatehouse Strategic</p>
 </footer>
 
-</div>
+<script>
+(function () {
+  document.getElementById("yr").textContent = new Date().getFullYear();
+  var nav = document.getElementById("nav"), burger = document.getElementById("burger");
+  burger.addEventListener("click", function () { var o = nav.classList.toggle("open"); burger.setAttribute("aria-expanded", o); });
+  nav.addEventListener("click", function (e) { if (e.target.closest(".cell")) { nav.classList.remove("open"); burger.setAttribute("aria-expanded", "false"); } });
 
-</x-dc>
-<script type="text/x-dc" data-dc-script>
-class Component extends DCLogic {
-  state = {
-    faqOpen: null,
-    formSubmitted: false,
-    customExpanded: false,
-    scrolled: false,
-    isMobileNav: false,
-    mobileMenuOpen: false,
-    navHeight: 80,
-  };
+  var work = [
+    ["om-builder.png", "Real estate", "Offering memorandum builder", "Revisions: days to minutes"],
+    ["sales-intel.png", "Sales intelligence", "Contact warmth scoring engine", "Every contact, ranked"],
+    ["prospecting.png", "B2B services", "Cold lead-hunting tool", "Fit-scored leads, sourced cold"],
+    ["snf-marketplace.png", "Healthcare · Marketplace", "Skilled nursing facility marketplace", "Broker fees eliminated"],
+    ["lead-hunter-membership.png", "B2B services", "Self-serve prospecting membership", "Self-serve, on demand"],
+    ["utility-audit.png", "Utilities · Confidential", "Internal audit automation", "Audit time cut significantly"],
+    ["benefits-app.png", "Government / healthcare · Confidential", "Guided benefits application", "Fewer errors, faster submissions"],
+    [null, "Manufacturing · Strategy", "12-month AI roadmap and team", "First AI hire in 45 days", null, "45"],
+    [null, "Professional services · Strategy", "Company-wide AI guardrails", "6 use cases prioritized", null, "6"]
+  ];
+  var list = document.getElementById("worklist");
+  work.forEach(function (w) {
+    var el = document.createElement(w[4] ? "a" : "div");
+    el.className = "wrow";
+    if (w[4]) { el.href = w[4]; el.target = "_blank"; el.rel = "noopener"; }
+    el.innerHTML = (w[0] ? '<button type="button" class="thumb" data-full="img/' + w[0] + '" data-title="' + w[2] + '" aria-label="View larger screenshot: ' + w[2] + '" style="background-image:url(img/' + w[0] + ')"></button>' : '<div class="thumb plain"><span>' + w[5] + '</span></div>') +
+      '<div><p class="meta">' + w[1] + '</p><h3>' + w[2] + '</h3><p class="out">' + w[3] + '</p></div>' +
+      (w[4] ? '<span class="go">Visit</span>' : '<span></span>');
+    list.appendChild(el);
+  });
 
-  componentDidMount() {
-    this._onScroll = () => this.setState(s => (s.scrolled !== window.scrollY > 8 ? { scrolled: window.scrollY > 8 } : null));
-    this._onResize = () => this.setState(s => (s.isMobileNav !== window.innerWidth < 1100 ? { isMobileNav: window.innerWidth < 1100, mobileMenuOpen: window.innerWidth < 1100 ? s.mobileMenuOpen : false } : null));
-    window.addEventListener('scroll', this._onScroll, { passive: true });
-    window.addEventListener('resize', this._onResize);
-    this._onScroll();
-    this._onResize();
-  }
+  var viewer = document.getElementById("viewer"), vImg = document.getElementById("viewerImg"), vCap = document.getElementById("viewerCap");
+  list.addEventListener("click", function (e) {
+    var t = e.target.closest("button.thumb"); if (!t) return;
+    vImg.src = t.dataset.full; vImg.alt = "Screenshot: " + t.dataset.title; vCap.textContent = t.dataset.title;
+    if (viewer.showModal) viewer.showModal(); else viewer.setAttribute("open", "");
+  });
+  document.getElementById("viewerClose").addEventListener("click", function () { viewer.close(); });
+  viewer.addEventListener("click", function (e) { if (e.target === viewer) viewer.close(); });
 
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this._onScroll);
-    window.removeEventListener('resize', this._onResize);
-    if (this._ro) this._ro.disconnect();
-  }
-
-  setNavRef = (el) => {
-    if (!el) return;
-    this._navEl = el;
-    if (!this._ro) {
-      this._ro = new ResizeObserver(() => {
-        const h = this._navEl.getBoundingClientRect().height;
-        this.setState(s => (s.navHeight !== h ? { navHeight: h } : null));
-      });
-      this._ro.observe(el);
-    }
-    const h = el.getBoundingClientRect().height;
-    this.setState(s => (s.navHeight !== h ? { navHeight: h } : null));
-  };
-
-  toggleFaq(i) {
-    this.setState(s => ({ faqOpen: s.faqOpen === i ? null : i }));
-  }
-
-  handleSubmit(e) {
+  var form = document.getElementById("form"), note = document.getElementById("note");
+  form.addEventListener("submit", function (e) {
     e.preventDefault();
-    this.setState({ formSubmitted: true });
-  }
-
-  renderVals() {
-    const rawFaq = [
-      { q: "Do we need an AI strategy if we just need an app built?", a: "No. Plenty of engagements are pure build: you know what tool you need, we build it. Strategy work only comes in when the question is bigger than one piece of software." },
-      { q: "How long does a typical build take?", a: "Most custom tools ship in 6 to 12 weeks depending on scope. We scope tightly on purpose, so you get something usable fast rather than waiting a year for a perfect system." },
-      { q: "Do you work with our existing team, or replace them?", a: "We work alongside your team. On the build side we hand off clean, documented software. On the strategy side we help you hire and structure an AI team if you don't have one yet." },
-      { q: "What if we don't know what we need yet?", a: "That's normal, and it's exactly what the first conversation is for. We'll help you figure out whether the real issue is a missing tool or a missing strategy before we scope anything." },
-      { q: "Can we do both a custom build and a strategy engagement?", a: "Yes, and most clients end up doing both. They often start on one side and realize the other is needed to make the first investment pay off." },
-    ];
-    const faqItems = rawFaq.map((item, i) => ({
-      ...item,
-      open: this.state.faqOpen === i,
-      symbol: this.state.faqOpen === i ? "−" : "+",
-      toggle: () => this.toggleFaq(i),
-    }));
-
-    const customCaseStudies = [
-      { slotId: "howismy", industry: "Our own product", urlLabel: "howismy.site", tag: "Our company", problem: "Companies shifting spend from SEO to AEO had no way to see how they show up in AI answers.", outcome: "Built howismy.site: a white-label platform agencies can resell or embed directly on their own site.", metric: "howismy.site", link: "https://howismy.site", note: "This one's ours." },
-      { slotId: "om-builder", industry: "Real Estate", urlLabel: "app.client-portal.io/om-builder", tag: "Anonymized", problem: "Paying a designer for every offering memorandum, and again for every number change.", outcome: "Built a custom OM builder that generates offering memoranda and reflows every number perfectly on demand, no designer required.", metric: "Revisions: days to minutes", note: "Client identity withheld." },
-      { slotId: "sales-intel", industry: "Sales Intelligence", urlLabel: "app.client-portal.io/lead-scoring", tag: "Anonymized", problem: "A sales team sitting on a massive contact list with no way to tell who to reach out to.", outcome: "Built a scoring engine that ranks every contact by warmth, pulled from signals scraped across many sources.", metric: "Every contact, ranked", note: "Client identity withheld." },
-      { slotId: "prospecting", industry: "B2B Services", urlLabel: "app.client-portal.io/prospecting", tag: "Anonymized", problem: "No existing contact list, just a target market to go find.", outcome: "Built a lead-hunting tool that surfaces companies matching the target profile, explains the fit, and identifies who to contact.", metric: "Fit-scored leads, sourced cold", note: "Client identity withheld." },
-      { slotId: "utility-audit", industry: "Utilities", urlLabel: "confidential", tag: "Confidential", problem: "A manual audit process that didn't scale.", outcome: "Built an internal auditing tool to automate the review. Both the client and the tool's workings are confidential by agreement.", metric: "Audit time cut significantly", note: "Company and tool details withheld." },
-      { slotId: "benefits-app", industry: "Government / Healthcare", urlLabel: "confidential", tag: "Confidential", problem: "Applicants struggling with a complex, error-prone application process.", outcome: "Built a guided application tool to reduce errors and speed up submissions. Details withheld by agreement.", metric: "Fewer errors, faster submissions", note: "Company and tool details withheld." },
-      { slotId: "snf-marketplace", industry: "Marketplace", urlLabel: "confidential", tag: "Anonymized", problem: "Selling or buying a skilled nursing facility meant broker fees on both sides, with no way to vet a counterparty before sharing sensitive details.", outcome: "Built a membership marketplace where owners and buyers list and vet each other with built-in NDAs, and generate the OM directly on the platform, no broker required.", metric: "Broker fees eliminated", note: "Client identity withheld." },
-      { slotId: "lead-hunter-membership", industry: "B2B Services", urlLabel: "confidential", tag: "Anonymized", problem: "Prospecting tools were either too generic or too expensive to justify for a single team.", outcome: "Built a membership version of our lead-hunting engine: set your target parameters and run searches on demand.", metric: "Self-serve, on demand", note: "Client identity withheld." },
-      { slotId: "strategy-manufacturing", industry: "Manufacturing", tag: "Anonymized", problem: "Leadership wanted an AI plan but had no one who could own it.", outcome: "Delivered a 12-month AI roadmap and helped hire and structure a two-person AI team to run it.", metric: "First AI hire in 45 days", note: "Client identity withheld." },
-      { slotId: "strategy-prof-services", industry: "Professional Services", tag: "Anonymized", problem: "Teams were experimenting with AI tools with no shared direction.", outcome: "Ran a strategy engagement that set clear guardrails, use cases, and ownership across departments.", metric: "6 use cases prioritized", note: "Client identity withheld." },
-    ].map(cs => ({ ...cs, noLink: !cs.link, hasImage: !cs.slotId.startsWith('strategy-') }));
-    const allCaseStudies = customCaseStudies;
-    const caseStudiesExpanded = this.state.customExpanded;
-    const visibleCaseStudies = caseStudiesExpanded ? allCaseStudies : allCaseStudies.slice(0, 4);
-    const hasMoreCaseStudies = allCaseStudies.length > 4;
-    const caseStudiesToggleLabel = caseStudiesExpanded ? "Show fewer" : "Show " + (allCaseStudies.length - 4) + " more";
-
-    const processSteps = [
-      { n: "01", title: "Diagnose", body: "We map where time, money, or people are getting stuck, and why." },
-      { n: "02", title: "Design", body: "We scope the smallest solution or strategy that solves the real problem." },
-      { n: "03", title: "Build or Advise", body: "Custom software gets built. Strategy gets a roadmap and a team." },
-      { n: "04", title: "Operate", body: "We stay close after launch, tuning the work as your business changes." },
-    ];
-
-    const navPadding = (this.state.scrolled ? '12px ' : '20px ') + (this.state.isMobileNav ? '20px' : '48px');
-    return {
-      navPadding,
-      navHeight: this.state.navHeight,
-      mobileMenuTop: this.state.navHeight + 'px',
-      mobileMenuMaxHeight: 'calc(100vh - ' + this.state.navHeight + 'px)',
-      isMobileNav: this.state.isMobileNav,
-      isDesktopNav: !this.state.isMobileNav,
-      mobileMenuOpen: this.state.mobileMenuOpen,
-      toggleMobileMenu: () => this.setState(s => ({ mobileMenuOpen: !s.mobileMenuOpen })),
-      closeMobileMenu: () => this.setState({ mobileMenuOpen: false }),
-      setNavRef: this.setNavRef,
-      faqItems,
-      caseStudies: visibleCaseStudies,
-      hasMoreCaseStudies,
-      caseStudiesExpanded,
-      caseStudiesToggleLabel,
-      toggleCaseStudiesExpanded: () => this.setState(s => ({ customExpanded: !s.customExpanded })),
-      processSteps,
-      formSubmitted: this.state.formSubmitted,
-      formNotSubmitted: !this.state.formSubmitted,
-      handleSubmit: (e) => this.handleSubmit(e),
-    };
-  }
-}
+    var email = form.email.value.trim(), msg = form.msg.value.trim();
+    if (!email || !form.email.checkValidity()) { note.textContent = "Please add a valid email."; return; }
+    location.href = "mailto:hello@gatehousestrategic.com?subject=" + encodeURIComponent("Project inquiry") + "&body=" + encodeURIComponent("From: " + email + "\n\n" + msg);
+    note.textContent = "Opening your email app. If nothing happens, email hello@gatehousestrategic.com.";
+  });
+})();
 </script>
 </body>
 </html>
