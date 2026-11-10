@@ -9,18 +9,21 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Azeret+Mono:wght@400;500;600&display=swap">
 <style>
-/* Layout: same race-telemetry system as the proposal. Tab bar on top, a meta rail per section, ruled tables, one answer form at the end. */
+/* Layout: the scope is a race route. Hero = route map with eight checkpoints (the sections). Each section leads with a drawing: the donation form redrawn, jerseys, a site tree, a data-years timeline, a finish line. Tables only where lookup is the point. */
 :root{
-  --bg:#F1F2EF; --surface:#FFFFFF; --ink:#0F1113; --muted:#5C6268; --line:#D6D9D3; --accent:#2433F5; --good:#10915A; --bad:#D1262E;
+  --bg:#F1F2EF; --surface:#FFFFFF; --ink:#0F1113; --muted:#5C6268; --line:#D6D9D3; --soft:#E6E8E3; --accent:#2433F5; --good:#10915A; --bad:#D1262E;
+  --j-yellow:#E5AE00; --j-green:#10915A; --j-red:#D1262E; --j-orange:#E05A16; --j-teal:#0B8585; --j-white:#FFFFFF; --j-ink:#0F1113;
   --display:"Archivo", "Arial Narrow", Arial, sans-serif;
   --body:"Archivo", "Helvetica Neue", Arial, sans-serif;
   --mono:"Azeret Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0C0E10; --surface:#15181B; --ink:#ECEEEA; --muted:#979DA3; --line:#2A2E33; --accent:#7380FF; --good:#3CC489; --bad:#F06A70; color-scheme:dark}}
+  --bg:#0C0E10; --surface:#15181B; --ink:#ECEEEA; --muted:#979DA3; --line:#2A2E33; --soft:#1E2226; --accent:#7380FF; --good:#3CC489; --bad:#F06A70;
+  --j-white:#ECEEEA; --j-ink:#ECEEEA; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0C0E10; --surface:#15181B; --ink:#ECEEEA; --muted:#979DA3; --line:#2A2E33; --accent:#7380FF; --good:#3CC489; --bad:#F06A70; color-scheme:dark}
+  --bg:#0C0E10; --surface:#15181B; --ink:#ECEEEA; --muted:#979DA3; --line:#2A2E33; --soft:#1E2226; --accent:#7380FF; --good:#3CC489; --bad:#F06A70;
+  --j-white:#ECEEEA; --j-ink:#ECEEEA; color-scheme:dark}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -30,10 +33,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font
 a{color:inherit;text-underline-offset:3px}
 .label{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
-h2{font-size:clamp(30px,4.6vw,54px);line-height:.98;font-weight:850;font-variation-settings:"wdth" 118;letter-spacing:-.01em;text-transform:uppercase}
+h2{font-size:clamp(30px,4.6vw,56px);line-height:.96;font-weight:850;font-variation-settings:"wdth" 118;letter-spacing:-.01em;text-transform:uppercase}
 h3{font-size:19px;font-weight:700;font-variation-settings:"wdth" 108;line-height:1.2}
-p{margin:0;max-width:66ch}
+p{margin:0;max-width:64ch}
 .muted{color:var(--muted)}
+.big{font-family:var(--display);font-variation-settings:"wdth" 115;font-weight:850;line-height:1}
 
 /* Tabs */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
@@ -46,61 +50,194 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
 
 /* Hero */
-.hero{padding-block:56px 0}
-.hero h1{font-size:clamp(44px,8.6vw,118px);line-height:.88;font-weight:900;font-variation-settings:"wdth" 125;text-transform:uppercase;letter-spacing:-.02em}
+.hero{padding-block:52px 0}
+.hero h1{font-size:clamp(44px,8.6vw,118px);line-height:.88;font-weight:900;font-variation-settings:"wdth" 125;text-transform:uppercase;letter-spacing:-.02em;margin-top:14px}
 .hero h1 em{font-style:normal;color:var(--accent)}
-.hero-foot{display:grid;grid-template-columns:1.4fr 1fr;gap:40px;margin-top:34px;border-top:2px solid var(--ink);padding-top:22px}
-.hero-foot > *{min-width:0}
-.lede{font-size:20px;line-height:1.5}
-.jump{display:grid;gap:0;align-content:start}
-.jump a{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);text-decoration:none;font-size:15.5px}
-.jump a span{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.jump a:hover{color:var(--accent)}
+.lede{font-size:20px;line-height:1.5;margin-top:22px;max-width:60ch}
+.route{display:block;width:100%;height:auto;margin-top:30px}
+.route .ln{fill:none;stroke:var(--ink);stroke-width:1.8}
+.route .area{fill:var(--accent);opacity:.08}
+.route a{cursor:pointer}
+.route a rect{fill:var(--bg);stroke:var(--ink);stroke-width:1.8;transition:fill .15s}
+.route a:hover rect,.route a:focus rect{fill:var(--ink)}
+.route a.finish rect{fill:var(--accent);stroke:var(--accent)}
+.route .num{font-family:var(--mono);font-size:12px;fill:var(--muted);letter-spacing:.08em}
+.route .nm{font-family:var(--display);font-size:17px;font-weight:700;fill:var(--ink);font-variation-settings:"wdth" 108}
+.route a:hover .nm{fill:var(--accent)}
+.route a.finish rect.fin{fill:url(#checker);stroke:var(--ink);stroke-width:1.2}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);border-top:2px solid var(--ink);margin-top:4px}
+.stats > div{padding:14px 14px 0 0;min-width:0}
+.stats > div + div{padding-left:14px;border-left:1px solid var(--line)}
+.stats b{display:block;font-size:clamp(26px,3.2vw,40px);margin-top:6px}
+.jump{display:none}
 
 /* Sections */
-section{padding-block:96px 0;scroll-margin-top:70px}
-.sec-head{display:grid;grid-template-columns:220px 1fr;gap:32px;margin-bottom:34px}
+section{padding-block:110px 0;scroll-margin-top:70px}
+.sec-head{display:grid;grid-template-columns:220px 1fr;gap:32px;margin-bottom:40px}
 .sec-head > *{min-width:0}
-.sec-head .label{padding-top:12px;border-top:2px solid var(--ink)}
+.cp{display:flex;align-items:center;gap:12px;padding-top:12px;border-top:2px solid var(--ink);align-self:start}
+.cp i{width:30px;height:30px;border:1.8px solid var(--ink);display:grid;place-items:center;font-style:normal;font-family:var(--mono);font-size:12px;flex:none}
 .sec-head .copy{display:grid;gap:16px}
-.body{display:grid;grid-template-columns:220px 1fr;gap:32px}
-.body > *{min-width:0}
-.body > .main{grid-column:2;display:grid;gap:26px}
+
+/* Current site: page grid */
+.pages{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.pages a{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 16px 18px;display:grid;gap:6px;align-content:start;text-decoration:none;min-width:0;transition:background .15s}
+.pages a:hover{background:var(--surface)}
+.pages b{font-family:var(--display);font-variation-settings:"wdth" 110;font-weight:750;font-size:17px;display:flex;align-items:center;gap:8px}
+.pages b::before{content:"";width:9px;height:9px;background:var(--ink);flex:none}
+.pages a.up b::before{background:var(--accent)}
+.pages span{font-size:14.5px;color:var(--muted);line-height:1.45}
+.legend{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{width:9px;height:9px;display:inline-block}
+
+/* Donation form drawing */
+.split{display:grid;grid-template-columns:minmax(0,420px) 1fr;gap:48px;align-items:start}
+.split > *{min-width:0}
+.formdraw{background:var(--surface);border:1px solid var(--line);padding:22px;display:grid;gap:16px;position:relative}
+.formdraw::before{content:"Today's form, redrawn";position:absolute;top:-10px;left:16px;background:var(--bg);padding:0 8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.fd-tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--ink)}
+.fd-tabs span{text-align:center;padding:8px 4px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.fd-tabs span.on{background:var(--ink);color:var(--bg)}
+.fd-amts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fd-amts span{border:1px solid var(--line);text-align:center;padding:10px 4px;font-family:var(--mono);font-size:14px}
+.fd-amts span.on{border:2px solid var(--accent);color:var(--accent);font-weight:600}
+.fd-row{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:14px}
+.fd-cur{display:inline-grid;grid-template-columns:1fr 1fr;border:1px solid var(--line)}
+.fd-cur span{padding:4px 10px;font-family:var(--mono);font-size:11.5px}
+.fd-cur span.on{background:var(--ink);color:var(--bg)}
+.fd-check{display:flex;gap:10px;align-items:center;font-size:14px}
+.fd-check i{width:16px;height:16px;border:1.5px solid var(--ink);display:grid;place-items:center;font-style:normal;font-size:12px;line-height:1}
+.fd-field{border-bottom:1px solid var(--ink);padding:6px 0;font-size:14px;color:var(--muted)}
+.fd-pay{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fd-pay span{border:1px solid var(--line);padding:9px 6px;font-size:12.5px;text-align:center;font-weight:600}
+.fd-btn{background:var(--ink);color:var(--bg);text-align:center;padding:12px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.facts{display:grid;border-top:2px solid var(--ink)}
+.facts div{display:grid;grid-template-columns:170px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+.facts div > *{min-width:0}
+.facts b{font-weight:650}
+
+/* Jerseys */
+.jerseys{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.jersey{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 18px 20px;display:grid;grid-template-rows:auto auto 1fr auto;gap:8px;min-width:0}
+.jersey svg{width:44px;height:44px}
+.jersey svg path{stroke:var(--ink);stroke-width:1.3}
+.jersey p{font-size:15px;color:var(--muted)}
+.jersey .hist{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-top:1px dashed var(--line);padding-top:9px}
+.jersey .hist.y{color:var(--accent)}
+
+/* Homepage strip mock */
+.strip{margin-top:46px;background:var(--ink);color:var(--bg);padding:24px 24px 26px;position:relative}
+.strip-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline;margin-bottom:18px}
+.strip-head h3{font-size:24px;font-variation-settings:"wdth" 118;text-transform:uppercase;font-weight:850}
+.strip-head .label{color:color-mix(in srgb,var(--bg) 60%,transparent)}
+.leaders{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:color-mix(in srgb,var(--bg) 18%,transparent)}
+.leaders > div{background:var(--ink);padding:14px 14px 16px;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;min-width:0}
+.leaders svg{width:34px;height:34px}
+.leaders svg path{stroke:var(--bg);stroke-width:1.4}
+.leaders .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.leaders .nm{font-family:var(--display);font-variation-settings:"wdth" 108;font-weight:700;font-size:16px;line-height:1.2}
+.leaders .nm span{display:block;width:70%;height:9px;background:color-mix(in srgb,var(--bg) 30%,transparent);margin-top:6px}
+
+/* In-page leaderboards */
+.boards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:46px}
+.board{border:1px solid var(--line);background:var(--surface);padding:18px;display:grid;gap:12px;align-content:start;min-width:0}
+.board .tt{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.board ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.board li{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.board li i{height:9px;background:var(--soft);display:block;font-style:normal}
+.board li.first i{background:var(--accent)}
+.board .chipset{display:flex;gap:0;border:1px solid var(--line);flex-wrap:wrap}
+.board .chipset span{flex:1;text-align:center;padding:5px 2px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-right:1px solid var(--line)}
+.board .chipset span:last-child{border-right:0}
+.board .chipset span.on{background:var(--ink);color:var(--bg)}
+.board p{font-size:14.5px;color:var(--muted)}
+
+/* Site tree */
+.tree{display:grid;justify-items:center}
+.tree .root{border:2px solid var(--ink);background:var(--surface);padding:14px 26px;text-align:center}
+.tree .root b{display:block;font-family:var(--display);font-variation-settings:"wdth" 115;font-weight:850;font-size:22px;text-transform:uppercase}
+.tree .root span{font-size:14px;color:var(--muted)}
+.tree .stem{width:2px;height:26px;background:var(--ink)}
+.branches{display:grid;grid-template-columns:repeat(8,1fr);width:100%;border-top:2px solid var(--ink)}
+.branches > div{position:relative;padding:26px 8px 0;display:grid;gap:8px;align-content:start;min-width:0}
+.branches > div::before{content:"";position:absolute;top:0;left:50%;width:2px;height:20px;background:var(--ink)}
+.branches b{display:block;border:1.5px solid var(--ink);background:var(--surface);padding:9px 6px;text-align:center;font-family:var(--display);font-variation-settings:"wdth" 105;font-weight:700;font-size:15px}
+.branches .new b{border-color:var(--accent);background:var(--accent);color:#fff}
+.branches ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.branches li{font-size:13px;color:var(--muted);padding:4px 0 4px 10px;border-left:1px solid var(--line)}
+.behind{margin-top:26px;border:1px dashed var(--muted);padding:12px 16px;font-size:14.5px;color:var(--muted);text-align:center;width:100%}
+.reqs{margin-top:44px}
+
+/* Giving */
+.give{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.give > div{border-top:2px solid var(--ink);padding-top:16px;display:grid;gap:12px;align-content:start;min-width:0}
+.give p{font-size:15.5px}
+.splitbar{display:flex;height:34px;border:1px solid var(--ink)}
+.splitbar span{display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:#fff;background:var(--accent);border-right:2px solid var(--surface)}
+.splitbar span:nth-child(2){background:color-mix(in srgb,var(--accent) 70%,var(--surface))}
+.splitbar span:nth-child(3){background:color-mix(in srgb,var(--accent) 45%,var(--surface));border-right:0}
+.btnmock{display:inline-flex;align-self:start;background:var(--ink);color:var(--bg);padding:10px 16px;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase}
+.soldrow{display:grid;gap:6px}
+.soldrow div{display:flex;justify-content:space-between;gap:10px;font-size:14px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.soldrow em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.soldrow em.s{color:var(--muted);text-decoration:line-through}
+.soldrow em.o{color:var(--good);font-weight:600}
+.matrix{margin-top:44px;overflow-x:auto}
+.matrix table{min-width:560px}
 
 /* Tables */
 .tbl{overflow-x:auto;border-top:2px solid var(--ink)}
 table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.5;min-width:620px}
 th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;text-align:left;padding:12px 18px 10px 0;border-bottom:1px solid var(--line)}
 td{padding:13px 18px 13px 0;border-bottom:1px solid var(--line);vertical-align:top}
-td:first-child{font-weight:650;font-variation-settings:"wdth" 104;width:210px}
-td .yes{color:var(--good);font-weight:600} td .no{color:var(--bad);font-weight:600}
+td:first-child{font-weight:650;width:230px}
+.mk{font-family:var(--display);font-size:20px;font-weight:800;line-height:1}
+.mk.y{color:var(--good)} .mk.n{color:var(--bad)}
+td small{display:block;color:var(--muted);font-size:13.5px}
 
-ul.list,ol.list{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
-ul.list li,ol.list li{padding:11px 0 11px 26px;border-bottom:1px solid var(--line);position:relative;font-size:16px;max-width:none}
-ul.list li::before{content:"";position:absolute;left:2px;top:20px;width:8px;height:8px;background:var(--ink)}
-ol.list{counter-reset:s}
-ol.list li{counter-increment:s;padding-left:40px}
-ol.list li::before{content:counter(s);position:absolute;left:0;top:10px;font-family:var(--display);font-variation-settings:"wdth" 120;font-weight:850;font-size:20px;color:var(--accent)}
-.sub{font-family:var(--display);font-variation-settings:"wdth" 108;font-weight:700;font-size:19px}
+/* Data timeline */
+.years{border-top:2px solid var(--ink);padding-top:10px;overflow-x:auto}
+.yr-grid{min-width:640px;display:grid;grid-template-columns:200px repeat(17,1fr);row-gap:10px;align-items:center}
+.yr-grid .yl{font-family:var(--mono);font-size:10.5px;color:var(--muted);text-align:center}
+.yr-grid .rl{font-size:14.5px;font-weight:650;padding-right:10px}
+.yr-grid .rl small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.yr-grid .bar{height:16px;background:var(--ink)}
+.yr-grid .bar.hon{background:var(--accent)}
+.admin{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);margin-top:46px}
+.admin > div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 16px 18px;display:grid;gap:6px;align-content:start;min-width:0}
+.admin p{font-size:14.5px;color:var(--muted)}
+.integr{margin-top:46px;display:grid;border-top:2px solid var(--ink)}
+.integr div{display:grid;grid-template-columns:200px 1fr 28px 1fr;gap:12px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}
+.integr div > *{min-width:0}
+.integr b{font-weight:650}
+.integr .ar{color:var(--accent);font-family:var(--mono)}
+.integr .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 
-/* Sitemap */
-.map{display:grid;gap:14px}
-.map .home{border:1px solid var(--ink);padding:16px 18px;max-width:420px;justify-self:center;text-align:center;background:var(--surface)}
-.map .home b{display:block;font-family:var(--display);font-variation-settings:"wdth" 112;font-weight:800;font-size:20px}
-.map .stem{width:1px;height:22px;background:var(--ink);justify-self:center}
-.grid8{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
-.grid8 > div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 16px 18px;display:grid;gap:6px;align-content:start;min-width:0}
-.grid8 b{font-family:var(--display);font-variation-settings:"wdth" 110;font-weight:750;font-size:17px}
-.grid8 span{font-size:14.5px;color:var(--muted)}
-.grid8 .new{background:var(--surface);box-shadow:inset 0 0 0 2px var(--accent)}
-.grid8 .new b::after{content:"  New";font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
-.behind{border:1px dashed var(--line);padding:12px 16px;font-size:14.5px;color:var(--muted);text-align:center}
+/* Phasing route */
+.stages{position:relative;display:grid;grid-template-columns:repeat(6,1fr) 120px;gap:0;padding-top:34px}
+.stages::before{content:"";position:absolute;left:0;right:120px;top:48px;height:2px;background:var(--ink)}
+.stage{position:relative;padding-right:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.stage .dot{width:30px;height:30px;background:var(--bg);border:2px solid var(--ink);display:grid;place-items:center;font-family:var(--mono);font-size:12px;position:relative;z-index:1}
+.stage b{font-family:var(--display);font-variation-settings:"wdth" 110;font-weight:750;font-size:16.5px;line-height:1.2;margin-top:6px}
+.stage p{font-size:14px;color:var(--muted)}
+.finish{position:relative;display:grid;gap:8px;align-content:start}
+.finish .flag{height:58px;width:22px;margin-top:-14px;background:repeating-conic-gradient(var(--ink) 0 25%, var(--bg) 0 50%) 0 0/11px 11px;border:1px solid var(--ink)}
+.finish b{font-family:var(--display);font-variation-settings:"wdth" 115;font-weight:850;font-size:17px;line-height:1.15;color:var(--accent)}
+.finish p{font-size:13.5px;color:var(--muted)}
 
 /* Form */
-.qform{display:grid;gap:0;border-top:2px solid var(--ink)}
+.qwrap{display:grid;grid-template-columns:220px 1fr;gap:32px}
+.qwrap > *{min-width:0}
+.meter{position:sticky;top:80px;align-self:start;display:grid;gap:10px}
+.meter b{font-size:56px}
+.meter .track{height:8px;background:var(--soft)}
+.meter .fill{height:8px;background:var(--accent);width:0;transition:width .25s}
+.qform{display:grid;border-top:2px solid var(--ink)}
 .q{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:20px 0;border-bottom:1px solid var(--line)}
 .q > *{min-width:0}
-.q .n{font-family:var(--display);font-variation-settings:"wdth" 120;font-weight:850;font-size:22px;color:var(--accent);line-height:1.2}
+.q .n{font-family:var(--display);font-variation-settings:"wdth" 120;font-weight:850;font-size:22px;color:var(--muted);line-height:1.2;transition:color .2s}
+.q.done .n{color:var(--accent)}
 .q label{display:block;font-weight:650;font-size:16.5px;margin-bottom:4px}
 .q .hint{font-size:14px;color:var(--muted);margin-bottom:10px}
 textarea,input[type=text],input[type=email]{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:0;padding:11px 12px}
@@ -119,25 +256,53 @@ button.send[disabled]{opacity:.5;cursor:default}
 
 footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
-@media (max-width:860px){
-  .grid8{grid-template-columns:repeat(2,1fr)}
-  .who{grid-template-columns:1fr}
+@media (max-width:1000px){
+  .pages,.jerseys,.leaders{grid-template-columns:repeat(2,1fr)}
+  .boards,.give{grid-template-columns:1fr}
+  .branches{grid-template-columns:repeat(4,1fr);border-top:0;row-gap:20px}
+  .branches > div::before{display:none}
+  .admin{grid-template-columns:repeat(2,1fr)}
+  .stages{grid-template-columns:1fr;padding-top:0;gap:0}
+  .stages::before{left:14px;right:auto;top:0;bottom:0;width:2px;height:auto}
+  .stage,.finish{grid-template-columns:30px 1fr;column-gap:18px;padding:0 0 22px}
+  .stage .dot,.finish .flag{grid-row:span 2}
+  .stage b,.finish b{margin-top:4px}
+  .finish .flag{margin:0 4px;height:40px}
 }
 @media (max-width:760px){
   body{font-size:16px}
-  .hero{padding-block:36px 0}
-  .hero-foot,.sec-head,.body{grid-template-columns:1fr}
-  .body > .main{grid-column:1}
-  .sec-head{gap:14px;margin-bottom:24px}
-  section{padding-block:64px 0}
+  .hero{padding-block:34px 0}
   .lede{font-size:18px}
+  .route text{display:none}
+  .jump{display:grid;margin-top:8px;border-top:1px solid var(--line)}
+  .jump a{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);text-decoration:none;font-size:15.5px}
+  .jump a span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stats > div{padding:14px 0 8px!important;border-left:0!important}
+  .sec-head,.split,.qwrap{grid-template-columns:1fr}
+  .sec-head{gap:16px;margin-bottom:28px}
+  .meter{position:static;grid-template-columns:auto 1fr;align-items:end;column-gap:16px}
+  .meter b{font-size:40px}
+  section{padding-block:72px 0}
+  .who{grid-template-columns:1fr}
+  .branches{grid-template-columns:repeat(2,1fr)}
+  .facts div,.integr div{grid-template-columns:1fr;gap:2px}
+  .integr .ar,.integr .hd.x{display:none}
   .tabs{gap:20px}
 }
-@media (max-width:440px){ .grid8{grid-template-columns:1fr} .q{grid-template-columns:30px 1fr;gap:10px} }
+@media (max-width:440px){ .pages,.jerseys,.leaders,.admin{grid-template-columns:1fr} .q{grid-template-columns:30px 1fr;gap:10px} }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="jersey" viewBox="0 0 48 48"><path d="M17 5 L8 9 L2 19 L9 23 L12 19 L12 44 L36 44 L36 19 L39 23 L46 19 L40 9 L31 5 C29.5 8.5 26.8 10 24 10 C21.2 10 18.5 8.5 17 5 Z"/></symbol>
+    <pattern id="polka" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="var(--j-white)"/><circle cx="3.5" cy="3.5" r="1.9" fill="var(--j-red)"/></pattern>
+    <pattern id="hoops" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--j-teal)"/><rect y="5" width="8" height="3" fill="var(--j-white)"/></pattern>
+  </defs>
+</svg>
 
 <nav class="tabbar" aria-label="Bike4Chai pages">
   <div class="wrap">
@@ -152,279 +317,307 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
 <main>
 <div class="wrap hero">
   <span class="label">Scope · November 2026 · Nothing built yet</span>
-  <h1 style="margin-top:14px">The new<br><em>Bike4Chai</em><br>website</h1>
-  <div class="hero-foot">
-    <p class="lede">The new site does everything bike4chai.com does today, and adds eight fundraising honors, each with its own public leaderboard. The leader of each honor is named on the homepage, and every rider and team page keeps its own leaderboard. The last section holds the questions only Bike4Chai can answer; please fill in what you know.</p>
-    <div class="jump">
-      <a href="#current">The current site <span>01</span></a>
-      <a href="#donations-today">Donations today <span>02</span></a>
-      <a href="#honors">Honors and leaderboards <span>03</span></a>
-      <a href="#sitemap">Sitemap and pages <span>04</span></a>
-      <a href="#giving">Donations and sponsor-a-rider <span>05</span></a>
-      <a href="#admin">Admin, data, integrations <span>06</span></a>
-      <a href="#phasing">Phasing <span>07</span></a>
-      <a href="#questions"><b>Questions for Bike4Chai</b> <span>08</span></a>
-    </div>
+  <h1>The new<br><em>Bike4Chai</em><br>website</h1>
+  <p class="lede">Everything bike4chai.com does today, plus eight fundraising honors with their own leaderboards, the leader of each named on the homepage. Follow the route below; the finish line holds questions only Bike4Chai can answer.</p>
+
+  <svg class="route" viewBox="0 0 1180 230" role="navigation" aria-label="Sections of this scope">
+    <defs><pattern id="checker" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="var(--bg)"/><rect width="5" height="5" fill="var(--ink)"/><rect x="5" y="5" width="5" height="5" fill="var(--ink)"/></pattern></defs>
+    <path class="area" d="M0 200 L80 188 L150 198 L220 166 L290 176 L360 140 L430 150 L500 112 L570 126 L640 96 L710 116 L780 130 L850 120 L920 150 L1000 140 L1080 162 L1180 168 L1180 230 L0 230 Z"/>
+    <path class="ln" d="M0 200 L80 188 L150 198 L220 166 L290 176 L360 140 L430 150 L500 112 L570 126 L640 96 L710 116 L780 130 L850 120 L920 150 L1000 140 L1080 162 L1180 168"/>
+    <a href="#current"><rect x="73" y="181" width="14" height="14"/><text class="num" x="80" y="146" text-anchor="middle">01</text><text class="nm" x="80" y="166" text-anchor="middle">Today</text></a>
+    <a href="#donations-today"><rect x="213" y="159" width="14" height="14"/><text class="num" x="220" y="124" text-anchor="middle">02</text><text class="nm" x="220" y="144" text-anchor="middle">Donations</text></a>
+    <a href="#honors"><rect x="353" y="133" width="14" height="14"/><text class="num" x="360" y="98" text-anchor="middle">03</text><text class="nm" x="360" y="118" text-anchor="middle">Honors</text></a>
+    <a href="#sitemap"><rect x="493" y="105" width="14" height="14"/><text class="num" x="500" y="70" text-anchor="middle">04</text><text class="nm" x="500" y="90" text-anchor="middle">Sitemap</text></a>
+    <a href="#giving"><rect x="633" y="89" width="14" height="14"/><text class="num" x="640" y="54" text-anchor="middle">05</text><text class="nm" x="640" y="74" text-anchor="middle">Giving</text></a>
+    <a href="#admin"><rect x="773" y="123" width="14" height="14"/><text class="num" x="780" y="88" text-anchor="middle">06</text><text class="nm" x="780" y="108" text-anchor="middle">Admin &amp; data</text></a>
+    <a href="#phasing"><rect x="913" y="143" width="14" height="14"/><text class="num" x="920" y="108" text-anchor="middle">07</text><text class="nm" x="920" y="128" text-anchor="middle">Phasing</text></a>
+    <a href="#questions" class="finish"><rect class="fin" x="1072" y="118" width="16" height="44"/><rect x="1073" y="155" width="14" height="14"/><text class="num" x="1080" y="88" text-anchor="middle">FINISH</text><text class="nm" x="1080" y="108" text-anchor="middle">Questions</text></a>
+  </svg>
+  <nav class="jump" aria-label="Sections">
+    <a href="#current">The current site <span>01</span></a>
+    <a href="#donations-today">Donations today <span>02</span></a>
+    <a href="#honors">Honors and leaderboards <span>03</span></a>
+    <a href="#sitemap">Sitemap <span>04</span></a>
+    <a href="#giving">Giving <span>05</span></a>
+    <a href="#admin">Admin and data <span>06</span></a>
+    <a href="#phasing">Phasing <span>07</span></a>
+    <a href="#questions"><b>Questions for Bike4Chai</b> <span>Finish</span></a>
+  </nav>
+
+  <div class="stats">
+    <div><span class="label">Raised 2026</span><b class="big">$13.06M</b></div>
+    <div><span class="label">Donations</span><b class="big">28,006</b></div>
+    <div><span class="label">Riders</span><b class="big">712</b></div>
+    <div><span class="label">Ways to pay</span><b class="big">6</b></div>
+    <div><span class="label">Seasons of history</span><b class="big">17</b></div>
   </div>
 </div>
 
 <section class="wrap" id="current">
   <div class="sec-head">
-    <span class="label">01 · Today</span>
+    <span class="cp"><i>01</i><span class="label">Today</span></span>
     <div class="copy">
       <h2>The current site,<br>page by page</h2>
-      <p>bike4chai.com runs on Neon Fundraise (formerly RallyBound), with 13 menu items, a search box and a separate merch store. Everything below carries over or is dropped on purpose.</p>
+      <p>bike4chai.com runs on Neon Fundraise (formerly RallyBound). These are its pages. Blue ones get upgraded; the rest carry over as they are.</p>
     </div>
   </div>
-  <div class="body"><div class="main">
-    <div class="tbl"><table>
-      <thead><tr><th>Page</th><th>What it does today</th></tr></thead>
-      <tbody>
-        <tr><td><a href="https://www.bike4chai.com/">Homepage</a></td><td>2027 save-the-date (August 18 to 19); Donate and Register buttons; live totals ($13,058,207 raised, 28,006 donations, 712 riders); Today's Top Fundraiser; Top 5 Teams with total and average per rider; Century Donor Club (riders with 100+ donors); the club ladder from $2 Million Club down to 7.5K Club with dollars and donors per rider; five most recent donations; yearly totals 2017 to 2025; Instagram and Strava feeds; sponsor logos</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/about">About</a></td><td>Mission, event summary, founding director, history since 2009</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/Itinerary">Itinerary</a></td><td>Registration night, Day 1 and Day 2 routes, rest stops every 20 miles, SAG and medical support</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/staff">Staff</a></td><td>Founding board and advisory committee</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/riders">Riders</a></td><td>All 712 riders: name, location, riding since, raised, donors, Donate. Search by rider or city; filter by 13 clubs and by first year (2010 to 2026)</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/eligreengart">Rider page</a></td><td>Custom short URL; name and city; story; goal and progress; Rider Map; Donate box with presets; donor list; team; fundraising history by year with lifetime total; photo gallery by year</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/Teams">Teams</a></td><td>All teams with captains, raised and average per rider; event total and 602 team members</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/TeamCentralJersey">Team page</a></td><td>Story and goal; roster with each rider's total; Donate box; team donors; history since 2016. Giving to several riders at once means calling the office</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/Join">Join</a></td><td>Registration closed; 2027 waitlist (name, email, city, state, cell, date of birth with an 18+ check, referred by); link to the Toronto ride for Canadian riders</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/Donate">Donate</a></td><td>One form for event, rider or team gifts (next section)</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/Pictures">Pictures</a>, <a href="https://www.bike4chai.com/Videos">Videos</a></td><td>Galleries for every year 2010 to 2026; videos by year 2014 to 2025 on Vimeo</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/SponsorshipOpportunities">Sponsorship</a></td><td>Eleven levels from $7.5K to $250K with named items (Finish Line, Pasta Party, Bib Shorts) marked SOLD with the buyer; 2026 brochure as a PDF; no online purchase</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/CorporateSponsors">Corporate sponsors</a></td><td>Logos in five tiers, Platinum to Bronze, linked to sponsor sites</td></tr>
-        <tr><td><a href="https://merch.bike4chai.com/">Merch</a></td><td>Separate store with cart: bags at $360, jerseys and bib shorts at $180, sizes 2XS to 5XL</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/Forms/Volunteer-Application-Request">Volunteer</a>, <a href="https://www.bike4chai.com/Forms/Contact">Contact</a></td><td>Simple forms (name, email, phone, city, message or preferred job)</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/Static/faq">FAQs</a></td><td>15 questions on donating, checks, receipts, fees, Canadian gifts, dedications, matching, SMS terms</td></tr>
-        <tr><td><a href="https://www.bike4chai.com/Account/LogOn">Login</a></td><td>Email login, keep me logged in, forgot password, Facebook and Google login</td></tr>
-      </tbody>
-    </table></div>
-    <p class="muted" style="font-size:15px">Riders earn gear at fixed levels: $5,000 bib shorts; $7,500 (Roadies) bib shorts and gloves; $10K, $18K, $36K, $54K and $100K clubs each earn a plaque, recognition and that club's bib shorts. Tracking: Google Analytics, Google Ads, three Meta pixels.</p>
-  </div></div>
+  <div class="pages">
+    <a class="up" href="https://www.bike4chai.com/"><b>Homepage</b><span>Live totals, today's top fundraiser, top 5 teams, Century Donor Club, the full club ladder, recent gifts, yearly totals since 2017</span></a>
+    <a class="up" href="https://www.bike4chai.com/riders"><b>Riders</b><span>All 712 riders with location, first year, raised and donors; search and filter by club or year</span></a>
+    <a class="up" href="https://www.bike4chai.com/eligreengart"><b>Rider page</b><span>Story, goal, Rider Map, donor list, team, history by year, photo gallery, short custom URL</span></a>
+    <a class="up" href="https://www.bike4chai.com/Teams"><b>Teams</b><span>Every team with captains, total and average per rider</span></a>
+    <a class="up" href="https://www.bike4chai.com/TeamCentralJersey"><b>Team page</b><span>Story, goal, roster with totals, team donors, history since 2016</span></a>
+    <a class="up" href="https://www.bike4chai.com/Donate"><b>Donate</b><span>One form for event, rider or team gifts</span></a>
+    <a class="up" href="https://www.bike4chai.com/SponsorshipOpportunities"><b>Sponsorship</b><span>11 levels, $7.5K to $250K, items marked SOLD; PDF brochure, no online purchase</span></a>
+    <a href="https://www.bike4chai.com/Join"><b>Join</b><span>2027 waitlist with an 18+ check; Toronto ride link</span></a>
+    <a href="https://www.bike4chai.com/CorporateSponsors"><b>Corporate sponsors</b><span>Logos in five tiers, Platinum to Bronze</span></a>
+    <a href="https://www.bike4chai.com/about"><b>About</b><span>Mission, founding story since 2009</span></a>
+    <a href="https://www.bike4chai.com/Itinerary"><b>Itinerary</b><span>Registration night, Day 1 and Day 2 routes, support</span></a>
+    <a href="https://www.bike4chai.com/staff"><b>Staff</b><span>Founding board and advisory committee</span></a>
+    <a href="https://www.bike4chai.com/Pictures"><b>Pictures and videos</b><span>Galleries 2010 to 2026, videos 2014 to 2025</span></a>
+    <a href="https://merch.bike4chai.com/"><b>Merch</b><span>Separate store: bags $360, jerseys and bibs $180</span></a>
+    <a href="https://www.bike4chai.com/Static/faq"><b>FAQs</b><span>15 questions on giving, receipts, matching, SMS</span></a>
+    <a href="https://www.bike4chai.com/Forms/Contact"><b>Volunteer, contact, login</b><span>Simple forms; email, Facebook or Google login</span></a>
+  </div>
+  <div class="legend label"><span><i style="background:var(--accent)"></i>Upgraded in the new site</span><span><i style="background:var(--ink)"></i>Carries over</span></div>
 </section>
 
 <section class="wrap" id="donations-today">
   <div class="sec-head">
-    <span class="label">02 · Today</span>
+    <span class="cp"><i>02</i><span class="label">Today</span></span>
     <div class="copy">
-      <h2>Donations today</h2>
-      <p>One form handles gifts to the event, a rider or a team. The new site has to match every part of it.</p>
+      <h2>The donation form<br>we have to match</h2>
+      <p>One form handles every gift. The new site keeps every part of it, then adds splitting a gift across riders and monthly giving.</p>
     </div>
   </div>
-  <div class="body"><div class="main">
-    <div class="tbl"><table>
-      <thead><tr><th>Part of the form</th><th>What it does today</th></tr></thead>
-      <tbody>
-        <tr><td>Who gets it</td><td>General, Rider (search by name) or Team (search by name)</td></tr>
-        <tr><td>Amount</td><td>Presets $180, $250, $500, $1,000, $1,800, $5,000, or any amount</td></tr>
-        <tr><td>Currency</td><td>USD or CAD, receipt in the currency chosen</td></tr>
-        <tr><td>Processing fee</td><td>Checkbox to cover the card fee; the page shows only the intended amount</td></tr>
-        <tr><td>Honor scroll name</td><td>The name on the rider's Honor Roll, which can be a dedication ("in memory of Aunt Jane")</td></tr>
-        <tr><td>Message and display</td><td>Optional message; show my name, anonymous, or a different name</td></tr>
-        <tr><td>Payment</td><td>Credit card, PayPal, Apple Pay, Google Pay, donor-advised funds through Chariot, donor account cards</td></tr>
-        <tr><td>Receipt</td><td>Email always, mailed on request</td></tr>
-        <tr><td>Employer match</td><td>Double the Donation lookup, plus a follow-up email</td></tr>
-        <tr><td>Offline gifts</td><td>Checks to Chai Lifeline with the rider in the memo; mailed pledges in monthly installments, receipted each month</td></tr>
-      </tbody>
-    </table></div>
-  </div></div>
+  <div class="split">
+    <div class="formdraw" aria-hidden="true">
+      <div class="fd-tabs"><span>General</span><span class="on">Rider</span><span>Team</span></div>
+      <div class="fd-row"><span class="label">Donation amount</span><span class="fd-cur"><span class="on">USD</span><span>CAD</span></span></div>
+      <div class="fd-amts"><span class="on">$180</span><span>$250</span><span>$500</span><span>$1,000</span><span>$1,800</span><span>$5,000</span></div>
+      <div class="fd-check"><i>✓</i>Cover the card processing fee</div>
+      <div class="fd-field">Honor scroll name, e.g. in memory of Aunt Jane</div>
+      <div class="fd-row"><span>Display</span><span class="muted">My name · Anonymous · Other name</span></div>
+      <div class="fd-pay"><span>Card</span><span>PayPal</span><span>Apple Pay</span><span>Google Pay</span><span>Chariot DAF</span><span>Donor account</span></div>
+      <div class="fd-btn">Donate now</div>
+    </div>
+    <div class="facts">
+      <div><b>Who gets it</b><span>Event, rider or team, with search by name</span></div>
+      <div><b>Amounts</b><span>Six presets from $180 to $5,000, or any amount</span></div>
+      <div><b>Currency</b><span>USD or CAD; receipt in that currency</span></div>
+      <div><b>Fees</b><span>Donor can cover the fee; the page shows only the intended gift</span></div>
+      <div><b>Recognition</b><span>Honor scroll name, message, and name, anonymous or a different name</span></div>
+      <div><b>Payment</b><span>Card, PayPal, Apple Pay, Google Pay, donor-advised funds through Chariot, donor account cards</span></div>
+      <div><b>Receipts</b><span>Email always; mailed on request</span></div>
+      <div><b>Employer match</b><span>Double the Donation lookup and follow-up email</span></div>
+      <div><b>Offline</b><span>Checks credited to riders; mailed pledges paid monthly</span></div>
+    </div>
+  </div>
 </section>
 
 <section class="wrap" id="honors">
   <div class="sec-head">
-    <span class="label">03 · New</span>
+    <span class="cp"><i>03</i><span class="label">New</span></span>
     <div class="copy">
-      <h2>Honors and<br>leaderboards</h2>
-      <p>Eight honors each get a public leaderboard, and the leader of each is named on the homepage. The dollar clubs and their gear stay as they are.</p>
+      <h2>Eight honors,<br>eight leaderboards</h2>
+      <p>Each honor has its own public leaderboard, and its leader is named on the homepage. The dollar clubs and their gear stay as they are. Four honors need past seasons, which is why the history has to come across.</p>
     </div>
   </div>
-  <div class="body"><div class="main">
-    <div class="tbl"><table>
-      <thead><tr><th>Honor</th><th>Ranks riders by</th><th>Needs past years</th><th>Homepage shows</th></tr></thead>
-      <tbody>
-        <tr><td>Top Fundraiser</td><td>Dollars raised this season</td><td>No</td><td>Name, photo, dollars</td></tr>
-        <tr><td>Community Builder</td><td>Unique donors this season</td><td>No</td><td>Name, donor count</td></tr>
-        <tr><td>New Faces</td><td>Donors new to Bike4Chai</td><td>Yes, every past donor</td><td>Name, new donors</td></tr>
-        <tr><td>Climber</td><td>Growth over own last season, $2,500 minimum base</td><td>Yes, last season</td><td>Name, percent growth</td></tr>
-        <tr><td>Streak</td><td>Seasons in a row, then seasons of growth in a row</td><td>Yes, all seasons</td><td>Name, years</td></tr>
-        <tr><td>Keeper</td><td>Share of last season's donors who gave again</td><td>Yes, last season's donors</td><td>Name, percent returned</td></tr>
-        <tr><td>Rookie</td><td>Best first-season rider, by donors</td><td>No</td><td>Name, donor count</td></tr>
-        <tr><td>Goal Crusher</td><td>Riders at 100% of their own goal, no cap</td><td>No</td><td>Riders at goal, newest to get there</td></tr>
-      </tbody>
-    </table></div>
-    <div><p class="sub">Every leaderboard page</p></div>
-    <ul class="list">
-      <li>Full ranked list with photo, team and the honor's number, searchable by name or city</li>
-      <li>Filters by team and by season, so past years stay viewable</li>
-      <li>A plain explanation of how the honor is counted</li>
-      <li>A Sponsor button on every row</li>
-    </ul>
-    <div><p class="sub">Leaderboards inside pages</p></div>
-    <ul class="list">
-      <li><b>Rider page:</b> the rider's own donor leaderboard, first believer marked, plus the rider's rank on each honor</li>
-      <li><b>Team page:</b> the team's riders ranked on any of the eight honors, plus the team's donor leaderboard</li>
-      <li><b>Teams page:</b> teams ranked by dollars, donors per rider, riders at goal and new donors</li>
-    </ul>
-    <p class="muted" style="font-size:15px">Leaders update within a minute of each gift. Ties go to whoever reached the number first.</p>
-  </div></div>
+  <div class="jerseys">
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-yellow)"/></svg><h3>Top Fundraiser</h3><p>Dollars raised this season</p><span class="hist">This season only</span></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-green)"/></svg><h3>Community Builder</h3><p>Unique donors this season</p><span class="hist">This season only</span></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--accent)"/></svg><h3>New Faces</h3><p>Donors new to Bike4Chai</p><span class="hist y">Needs every past donor</span></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="url(#polka)"/></svg><h3>Climber</h3><p>Growth over own last season, $2,500 minimum base</p><span class="hist y">Needs last season</span></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-orange)"/></svg><h3>Streak</h3><p>Seasons in a row, then seasons of growth in a row</p><span class="hist y">Needs every season</span></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="url(#hoops)"/></svg><h3>Keeper</h3><p>Share of last season's donors who gave again</p><span class="hist y">Needs last season's donors</span></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-white)"/></svg><h3>Rookie</h3><p>Best first-season rider, ranked by donors</p><span class="hist">This season only</span></article>
+    <article class="jersey"><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-ink)"/></svg><h3>Goal Crusher</h3><p>Every rider who reaches their own goal</p><span class="hist">This season only</span></article>
+  </div>
+
+  <div class="strip" aria-label="Sketch of the homepage leaders band">
+    <div class="strip-head"><h3>This season's leaders</h3><span class="label">Homepage band · layout sketch</span></div>
+    <div class="leaders">
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-yellow)"/></svg><div><div class="h">Top Fundraiser</div><div class="nm">Rider name<span></span></div></div></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-green)"/></svg><div><div class="h">Community Builder</div><div class="nm">Rider name<span></span></div></div></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--accent)"/></svg><div><div class="h">New Faces</div><div class="nm">Rider name<span></span></div></div></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="url(#polka)"/></svg><div><div class="h">Climber</div><div class="nm">Rider name<span></span></div></div></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-orange)"/></svg><div><div class="h">Streak</div><div class="nm">Rider name<span></span></div></div></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="url(#hoops)"/></svg><div><div class="h">Keeper</div><div class="nm">Rider name<span></span></div></div></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-white)"/></svg><div><div class="h">Rookie</div><div class="nm">Rider name<span></span></div></div></div>
+      <div><svg viewBox="0 0 48 48"><use href="#jersey" fill="var(--j-ink)"/></svg><div><div class="h">Goal Crusher</div><div class="nm">Riders at goal<span></span></div></div></div>
+    </div>
+  </div>
+
+  <div class="boards">
+    <div class="board">
+      <div class="tt"><h3>Rider page</h3><span class="label">Donor board</span></div>
+      <ol><li class="first"><span>1</span><i style="width:100%"></i></li><li><span>2</span><i style="width:74%"></i></li><li><span>3</span><i style="width:58%"></i></li><li><span>4</span><i style="width:41%"></i></li><li><span>5</span><i style="width:30%"></i></li></ol>
+      <p>The rider's donors, biggest first, with the first believer marked. Plus the rider's rank on all eight honors.</p>
+    </div>
+    <div class="board">
+      <div class="tt"><h3>Team page</h3><span class="label">Rider board</span></div>
+      <div class="chipset"><span class="on">$</span><span>Donors</span><span>New</span><span>Climb</span></div>
+      <ol><li><span>1</span><i style="width:92%"></i></li><li><span>2</span><i style="width:80%"></i></li><li><span>3</span><i style="width:61%"></i></li><li><span>4</span><i style="width:47%"></i></li></ol>
+      <p>The team's riders, re-ranked on any of the eight honors, plus the team's own donor board.</p>
+    </div>
+    <div class="board">
+      <div class="tt"><h3>Teams page</h3><span class="label">Team board</span></div>
+      <div class="chipset"><span class="on">$</span><span>Per rider</span><span>At goal</span><span>New</span></div>
+      <ol><li><span>1</span><i style="width:100%"></i></li><li><span>2</span><i style="width:66%"></i></li><li><span>3</span><i style="width:52%"></i></li><li><span>4</span><i style="width:34%"></i></li></ol>
+      <p>Teams ranked four ways, so a deep team can beat a team built around one star.</p>
+    </div>
+  </div>
 </section>
 
 <section class="wrap" id="sitemap">
   <div class="sec-head">
-    <span class="label">04 · New</span>
+    <span class="cp"><i>04</i><span class="label">New</span></span>
     <div class="copy">
-      <h2>Sitemap and pages</h2>
+      <h2>The new site map</h2>
       <p>Today's menu stays, with one new section, Honors. Rider and team pages gain leaderboards; Donate and Sponsors gain online checkout.</p>
     </div>
   </div>
-  <div class="body"><div class="main">
-    <div class="map" aria-label="Sitemap">
-      <div class="home"><b>Homepage</b><span class="muted" style="font-size:14.5px">Eight honor leaders by name · live totals · top teams · Donate</span></div>
-      <div class="stem"></div>
-      <div class="grid8">
-        <div><b>Riders</b><span>All riders · rider page · donor leaderboard</span></div>
-        <div><b>Teams</b><span>Four rankings · team page · rider leaderboard</span></div>
-        <div class="new"><b>Honors</b><span>Eight leaderboards · how honors count</span></div>
-        <div><b>Donate</b><span>Event, rider or team · split across riders · monthly</span></div>
-        <div><b>Join</b><span>Registration · waitlist · Toronto ride link</span></div>
-        <div><b>Sponsors</b><span>Levels with SOLD status · corporate checkout · logos</span></div>
-        <div><b>About</b><span>Mission and history · itinerary · staff · FAQs</span></div>
-        <div><b>Media and more</b><span>Pictures · videos · merch · volunteer · contact</span></div>
-      </div>
-      <div class="behind">Behind login: rider dashboard · team captain tools · staff admin</div>
+  <div class="tree">
+    <div class="root"><b>Homepage</b><span>Eight honor leaders · live totals · top teams · Donate</span></div>
+    <div class="stem"></div>
+    <div class="branches">
+      <div><b>Riders</b><ul><li>All riders</li><li>Rider page</li><li>Donor board</li></ul></div>
+      <div><b>Teams</b><ul><li>Four rankings</li><li>Team page</li><li>Rider board</li></ul></div>
+      <div class="new"><b>Honors</b><ul><li>Eight boards</li><li>How it counts</li></ul></div>
+      <div><b>Donate</b><ul><li>Event, rider, team</li><li>Split a gift</li><li>Monthly</li></ul></div>
+      <div><b>Join</b><ul><li>Registration</li><li>Waitlist</li><li>Toronto link</li></ul></div>
+      <div><b>Sponsors</b><ul><li>Live SOLD status</li><li>Checkout</li><li>Logos</li></ul></div>
+      <div><b>About</b><ul><li>Mission</li><li>Itinerary</li><li>Staff, FAQs</li></ul></div>
+      <div><b>Media</b><ul><li>Pictures</li><li>Videos</li><li>Merch, contact</li></ul></div>
     </div>
-    <div class="tbl"><table>
-      <thead><tr><th>Page</th><th>New site requirement</th></tr></thead>
-      <tbody>
-        <tr><td>Homepage</td><td>Countdown to August 18, 2027; live totals; leader of each honor by name and photo, linked to its board; top teams; recent donations; yearly totals; Instagram and Strava; sponsor logos</td></tr>
-        <tr><td>Riders</td><td>Today's table plus each honor rank; filter by club, team, first year and honor</td></tr>
-        <tr><td>Rider page</td><td>Everything today plus honors earned, rank on each honor, and a donor leaderboard; Sponsor button</td></tr>
-        <tr><td>Teams</td><td>Teams ranked four ways: dollars, donors per rider, riders at goal, new donors</td></tr>
-        <tr><td>Team page</td><td>Today's roster and history plus a rider leaderboard across all eight honors and a donor leaderboard</td></tr>
-        <tr><td>Honors</td><td>One page per honor: full leaderboard, filters, how it counts</td></tr>
-        <tr><td>Donate</td><td>Today's form plus splitting one gift across riders and monthly giving</td></tr>
-        <tr><td>Join</td><td>Registration when open, waitlist when closed, Toronto link</td></tr>
-        <tr><td>Sponsors</td><td>Live SOLD status, online reservation and payment, logos by tier</td></tr>
-        <tr><td>Content pages</td><td>About, Itinerary, Staff, FAQs, Pictures, Videos, Volunteer and Contact, edited by staff</td></tr>
-        <tr><td>Rider dashboard</td><td>Edit page and goal, see donors, send thank-yous, see own honor ranks</td></tr>
-      </tbody>
-    </table></div>
-  </div></div>
+    <div class="behind">Behind login: rider dashboard · team captain tools · staff admin</div>
+  </div>
+  <div class="tbl reqs"><table>
+    <thead><tr><th>Page</th><th>What the new site adds</th></tr></thead>
+    <tbody>
+      <tr><td>Homepage</td><td>Countdown to August 18, 2027; the leader of each honor by name and photo, linked to its board</td></tr>
+      <tr><td>Riders</td><td>Each honor rank as a column; filters by club, team, first year and honor</td></tr>
+      <tr><td>Rider page</td><td>Honors earned, rank on each honor, a donor board, a Sponsor button</td></tr>
+      <tr><td>Teams and team pages</td><td>Four team rankings; rider board across all eight honors</td></tr>
+      <tr><td>Honors</td><td>One page per honor with the full board, filters and how it counts</td></tr>
+      <tr><td>Donate and Sponsors</td><td>Split gifts, monthly giving, online sponsorship checkout</td></tr>
+      <tr><td>Rider dashboard</td><td>Edit page and goal, see donors, send thank-yous, see own honor ranks</td></tr>
+    </tbody>
+  </table></div>
 </section>
 
 <section class="wrap" id="giving">
   <div class="sec-head">
-    <span class="label">05 · New</span>
+    <span class="cp"><i>05</i><span class="label">New</span></span>
     <div class="copy">
-      <h2>Donations and<br>sponsor-a-rider</h2>
-      <p>The new form keeps every option the current one has, and adds giving to several riders in one checkout.</p>
+      <h2>Sponsor a rider,<br>three ways</h2>
+      <p>Today, giving to several riders at once means calling the office. The new site makes it one checkout, and lets companies buy sponsorships online.</p>
     </div>
   </div>
-  <div class="body"><div class="main">
-    <div><p class="sub">Sponsor a rider</p></div>
-    <ul class="list">
-      <li>A Sponsor button on every rider page and leaderboard row opens the form with that rider chosen</li>
-      <li>One gift can be split across several riders, with one payment and one receipt</li>
-      <li>A donor can sponsor a whole team</li>
-      <li>Monthly giving until ride day, each payment credited to the same rider</li>
-    </ul>
-    <div><p class="sub">Corporate sponsorship online</p></div>
-    <ul class="list">
-      <li>Each sponsorship item ($7.5K to $250K) shows live SOLD status</li>
-      <li>A company reserves an item online and pays by card or asks for an invoice</li>
-      <li>The logo appears in its tier once payment clears</li>
-    </ul>
-    <div><p class="sub">Counting rules for every honor</p></div>
-    <div class="tbl"><table>
-      <thead><tr><th>Gift type</th><th>Counts toward dollars</th><th>Counts as a donor</th></tr></thead>
-      <tbody>
-        <tr><td>Individual gift, $18 or more</td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span>, once per rider</td></tr>
-        <tr><td>Gift under $18</td><td><span class="yes">Yes</span></td><td><span class="no">No</span></td></tr>
-        <tr><td>Corporate gift</td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span>, one company is one donor per rider</td></tr>
-        <tr><td>Employer match</td><td><span class="yes">Yes</span></td><td><span class="no">No</span>, the person and the match are one donor</td></tr>
-        <tr><td>Anonymous gift</td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td></tr>
-        <tr><td>Rider's own or household gift</td><td><span class="yes">Yes</span></td><td><span class="no">No</span></td></tr>
-        <tr><td>Gift split across riders</td><td>Each rider gets their share</td><td><span class="yes">Yes</span>, for each rider</td></tr>
-      </tbody>
-    </table></div>
-  </div></div>
+  <div class="give">
+    <div>
+      <span class="btnmock" aria-hidden="true">Sponsor this rider</span>
+      <h3>One tap from anywhere</h3>
+      <p>A Sponsor button on every rider page and every leaderboard row opens the form with that rider already chosen. Monthly giving until ride day is an option.</p>
+    </div>
+    <div>
+      <div class="splitbar" aria-hidden="true"><span style="width:50%">Rider A</span><span style="width:30%">B</span><span style="width:20%">C</span></div>
+      <h3>One gift, several riders</h3>
+      <p>Split a gift across riders or a whole team, with one payment and one receipt. Each rider gets their share and counts the donor.</p>
+    </div>
+    <div>
+      <div class="soldrow" aria-hidden="true"><div><span>Finish Line · $180K</span><em class="o">Available</em></div><div><span>Pasta Party · $250K</span><em class="s">Sold</em></div><div><span>Water Bottle · $100K</span><em class="s">Sold</em></div></div>
+      <h3>Sponsorships online</h3>
+      <p>Each item shows live SOLD status. A company reserves online and pays by card or invoice; the logo appears in its tier when payment clears.</p>
+    </div>
+  </div>
+  <div class="tbl matrix"><table>
+    <thead><tr><th>Counting rule</th><th>Adds to dollars</th><th>Counts as a donor</th></tr></thead>
+    <tbody>
+      <tr><td>Individual gift, $18 or more</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span><small>Once per rider</small></td></tr>
+      <tr><td>Gift under $18</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span></td></tr>
+      <tr><td>Corporate gift</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span><small>One company, one donor per rider</small></td></tr>
+      <tr><td>Employer match</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span><small>The person and the match count once</small></td></tr>
+      <tr><td>Anonymous gift</td><td><span class="mk y">✓</span></td><td><span class="mk y">✓</span></td></tr>
+      <tr><td>Rider's own or household gift</td><td><span class="mk y">✓</span></td><td><span class="mk n">✕</span></td></tr>
+      <tr><td>Gift split across riders</td><td><span class="mk y">✓</span><small>Each rider's share</small></td><td><span class="mk y">✓</span><small>For each rider</small></td></tr>
+    </tbody>
+  </table></div>
 </section>
 
 <section class="wrap" id="admin">
   <div class="sec-head">
-    <span class="label">06 · New</span>
+    <span class="cp"><i>06</i><span class="label">New</span></span>
     <div class="copy">
-      <h2>Admin, data and<br>integrations</h2>
-      <p>Staff run the event without a developer, and the history back to 2010 comes across so the honors work in year one.</p>
+      <h2>Seventeen seasons<br>come across</h2>
+      <p>The honors only work in year one if Neon Fundraise hands over the history. Blue bars are the data the honors depend on.</p>
     </div>
   </div>
-  <div class="body"><div class="main">
-    <div><p class="sub">Admin tools</p></div>
-    <ul class="list">
-      <li>Riders and teams: approve, edit, merge duplicates, move riders, set captains</li>
-      <li>Donations: enter checks and pledges, refund, reassign, mark self or household, link a match to its gift</li>
-      <li>Donors: merge duplicates, mark companies, see full history</li>
-      <li>Honors: preview boards, hide a rider, override one gift's counting with a note</li>
-      <li>Sponsorships, content and galleries edited by staff</li>
-      <li>Spreadsheet exports for the Chai Lifeline finance team</li>
-    </ul>
-    <div><p class="sub">Data to bring over from Neon Fundraise</p></div>
-    <div class="tbl"><table>
-      <thead><tr><th>Data</th><th>Back to</th><th>Why it matters</th></tr></thead>
-      <tbody>
-        <tr><td>Every donation</td><td>2010</td><td>New Faces, Keeper, Climber, Streak</td></tr>
-        <tr><td>Riders and yearly totals</td><td>2010</td><td>Streak, rider history</td></tr>
-        <tr><td>Teams and yearly totals</td><td>2016</td><td>Team history</td></tr>
-        <tr><td>Rider stories, photos, short URLs</td><td>Current</td><td>Shared links keep working</td></tr>
-        <tr><td>Galleries and video links</td><td>2010</td><td>Media pages</td></tr>
-      </tbody>
-    </table></div>
-    <div><p class="sub">Integrations</p></div>
-    <div class="tbl"><table>
-      <thead><tr><th>Need</th><th>Today</th><th>New site</th></tr></thead>
-      <tbody>
-        <tr><td>Cards, Apple Pay, Google Pay</td><td>Neon Fundraise</td><td>A card processor such as Stripe</td></tr>
-        <tr><td>PayPal</td><td>Yes</td><td>Yes</td></tr>
-        <tr><td>Donor-advised funds</td><td>Chariot</td><td>Chariot</td></tr>
-        <tr><td>Donor account cards</td><td>Yes</td><td>Same providers, to confirm</td></tr>
-        <tr><td>Employer matching</td><td>Double the Donation</td><td>Double the Donation</td></tr>
-        <tr><td>SMS updates</td><td>Yes</td><td>Yes</td></tr>
-        <tr><td>Social and tracking</td><td>Instagram, Strava, Google, Meta</td><td>Same</td></tr>
-        <tr><td>Merch, Toronto ride</td><td>Separate sites</td><td>Linked, as today</td></tr>
-      </tbody>
-    </table></div>
-  </div></div>
+  <div class="years" role="img" aria-label="Data to migrate by year, 2010 to 2026">
+    <div class="yr-grid">
+      <span></span><span class="yl">'10</span><span class="yl">'11</span><span class="yl">'12</span><span class="yl">'13</span><span class="yl">'14</span><span class="yl">'15</span><span class="yl">'16</span><span class="yl">'17</span><span class="yl">'18</span><span class="yl">'19</span><span class="yl">'20</span><span class="yl">'21</span><span class="yl">'22</span><span class="yl">'23</span><span class="yl">'24</span><span class="yl">'25</span><span class="yl">'26</span>
+      <span class="rl">Every donation<small>New Faces, Keeper, Climber</small></span><span class="bar hon" style="grid-column:2 / 19"></span>
+      <span class="rl">Riders by season<small>Streak, rider history</small></span><span class="bar hon" style="grid-column:2 / 19"></span>
+      <span class="rl">Teams by season<small>Team history</small></span><span class="bar" style="grid-column:8 / 19"></span>
+      <span class="rl">Photo galleries<small>Pictures page</small></span><span class="bar" style="grid-column:2 / 19"></span>
+      <span class="rl">Videos<small>Videos page</small></span><span class="bar" style="grid-column:6 / 18"></span>
+      <span class="rl">Rider pages and URLs<small>Shared links keep working</small></span><span class="bar" style="grid-column:18 / 19"></span>
+    </div>
+  </div>
+
+  <div class="admin">
+    <div><h3>Riders and teams</h3><p>Approve, edit, merge duplicates, move riders, set captains</p></div>
+    <div><h3>Donations</h3><p>Enter checks and pledges, refund, reassign, link a match to its gift</p></div>
+    <div><h3>Donors</h3><p>Merge duplicates, mark companies, see full giving history</p></div>
+    <div><h3>Honors</h3><p>Preview boards, hide a rider, override one gift's counting with a note</p></div>
+    <div><h3>Content</h3><p>Homepage, pages, galleries and sponsorship items, edited by staff</p></div>
+    <div><h3>Exports</h3><p>Spreadsheets of donors, riders, teams and gifts for finance</p></div>
+  </div>
+
+  <div class="integr">
+    <div><span class="hd">Need</span><span class="hd x">Today</span><span class="hd x"></span><span class="hd x">New site</span></div>
+    <div><b>Cards and wallets</b><span>Neon Fundraise</span><span class="ar">→</span><span>A card processor such as Stripe</span></div>
+    <div><b>PayPal</b><span>Yes</span><span class="ar">→</span><span>Yes</span></div>
+    <div><b>Donor-advised funds</b><span>Chariot</span><span class="ar">→</span><span>Chariot</span></div>
+    <div><b>Donor account cards</b><span>Yes</span><span class="ar">→</span><span>Same providers, to confirm</span></div>
+    <div><b>Employer matching</b><span>Double the Donation</span><span class="ar">→</span><span>Double the Donation</span></div>
+    <div><b>SMS, social, tracking</b><span>SMS, Instagram, Strava, Google, Meta</span><span class="ar">→</span><span>Same</span></div>
+    <div><b>Merch, Toronto ride</b><span>Separate sites</span><span class="ar">→</span><span>Linked, as today</span></div>
+  </div>
 </section>
 
 <section class="wrap" id="phasing">
   <div class="sec-head">
-    <span class="label">07 · Plan</span>
+    <span class="cp"><i>07</i><span class="label">Plan</span></span>
     <div class="copy">
-      <h2>Phasing</h2>
-      <p>The site goes live before 2027 registration opens, so riders see their streak and history on day one.</p>
+      <h2>Six stages to<br>the start line</h2>
+      <p>The site goes live before 2027 registration opens, so every returning rider sees their streak and history on day one.</p>
     </div>
   </div>
-  <div class="body"><div class="main">
-    <ol class="list">
-      <li>Export the data from Neon Fundraise and review the history</li>
-      <li>Donation form, rider pages, team pages and riders list, matching today's site</li>
-      <li>Honors, leaderboards and homepage leaders</li>
-      <li>Registration, rider dashboard and admin tools</li>
-      <li>Corporate sponsorship checkout and split gifts</li>
-      <li>Test with last year's data, then switch the domain before registration opens</li>
-    </ol>
-  </div></div>
+  <div class="stages">
+    <div class="stage"><span class="dot">1</span><b>Export the history</b><p>Every gift, rider and team from Neon Fundraise, checked against known totals</p></div>
+    <div class="stage"><span class="dot">2</span><b>Match today's site</b><p>Donation form, rider pages, team pages, riders list</p></div>
+    <div class="stage"><span class="dot">3</span><b>Honors go in</b><p>Eight boards and the homepage leaders</p></div>
+    <div class="stage"><span class="dot">4</span><b>Riders and staff</b><p>Registration, rider dashboard, admin tools</p></div>
+    <div class="stage"><span class="dot">5</span><b>New ways to give</b><p>Split gifts and sponsorship checkout</p></div>
+    <div class="stage"><span class="dot">6</span><b>Dress rehearsal</b><p>Run last season's data through it, then switch the domain</p></div>
+    <div class="finish"><span class="flag" aria-hidden="true"></span><b>Registration opens</b><p>Ride: Aug 18–19, 2027</p></div>
+  </div>
 </section>
 
 <section class="wrap" id="questions">
   <div class="sec-head">
-    <span class="label">08 · For Bike4Chai</span>
+    <span class="cp"><i style="background:var(--accent);border-color:var(--accent);color:#fff">✓</i><span class="label">Finish · For Bike4Chai</span></span>
     <div class="copy">
       <h2>Questions only<br>you can answer</h2>
-      <p>Answer whichever questions you know and leave the rest blank. Several people can each send their own answers, and you can come back and send more later. Your typing is kept on this device until you send it.</p>
+      <p>Answer whichever questions you know and leave the rest blank. Several people can each send answers, and you can come back and send more later. What you type is kept on this device until you send it.</p>
     </div>
   </div>
-  <div class="body"><div class="main">
+  <div class="qwrap">
+    <div class="meter" aria-live="polite">
+      <b class="big" id="m-count">0</b>
+      <div><span class="label">of 15 answered</span><div class="track"><div class="fill" id="m-fill"></div></div></div>
+    </div>
     <form id="qform" class="qform" novalidate>
       <div class="who">
         <div><label for="f-name">Your name</label><input type="text" id="f-name" autocomplete="name" required maxlength="120"></div>
@@ -438,7 +631,7 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
         <span id="status" role="status"></span>
       </div>
     </form>
-  </div></div>
+  </div>
 </section>
 </main>
 
@@ -478,9 +671,11 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
   });
   var ids=['f-name','f-role','f-email'].concat(Q.map(function(_,i){return 'q'+(i+1);}));
   function els(){return ids.map(function(id){return document.getElementById(id);});}
+  function meter(){var n=0;Q.forEach(function(_,i){var t=document.getElementById('q'+(i+1));var on=!!t.value.trim();t.closest('.q').classList.toggle('done',on);if(on)n++;});document.getElementById('m-count').textContent=n;document.getElementById('m-fill').style.width=(n/Q.length*100)+'%';}
   try{var saved=JSON.parse(localStorage.getItem(KEY)||'{}');els().forEach(function(e){if(saved[e.id])e.value=saved[e.id];});}catch(e){}
+  meter();
   function save(){try{var o={};els().forEach(function(e){o[e.id]=e.value;});localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
-  document.getElementById('qform').addEventListener('input',save);
+  document.getElementById('qform').addEventListener('input',function(){save();meter();});
 
   var form=document.getElementById('qform'),btn=document.getElementById('send'),st=document.getElementById('status');
   function say(t,c){st.textContent=t;st.className=c||'';}
@@ -501,6 +696,7 @@ footer{margin-top:110px;border-top:1px solid var(--line);padding-block:26px 40px
       say('Sent '+count+' answer'+(count===1?'':'s')+'. Thank you. You can add more and send again any time.','ok');
       try{localStorage.removeItem(KEY);}catch(e){}
       Q.forEach(function(_,i){document.getElementById('q'+(i+1)).value='';});
+      meter();
     })
     .catch(function(){btn.disabled=false;say('Your answers could not be sent. Check your connection and try again; what you typed is still here.','err');});
   });

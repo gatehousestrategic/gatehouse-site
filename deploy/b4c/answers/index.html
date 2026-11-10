@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Bike4Chai Answers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Azeret+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: private reading room in the proposal's system. Passcode gate, then a summary rail and answers grouped by question or by person. */
+:root{
+  --bg:#F1F2EF; --surface:#FFFFFF; --ink:#0F1113; --muted:#5C6268; --line:#D6D9D3; --accent:#2433F5; --bad:#D1262E;
+  --display:"Archivo", "Arial Narrow", Arial, sans-serif;
+  --body:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono:"Azeret Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C0E10; --surface:#15181B; --ink:#ECEEEA; --muted:#979DA3; --line:#2A2E33; --accent:#7380FF; --bad:#F06A70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C0E10; --surface:#15181B; --ink:#ECEEEA; --muted:#979DA3; --line:#2A2E33; --accent:#7380FF; --bad:#F06A70; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+a{color:inherit;text-underline-offset:3px}
+.label{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,84px);line-height:.9;font-weight:900;font-variation-settings:"wdth" 125;text-transform:uppercase;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--accent)}
+p{margin:0;max-width:64ch}
+.top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:20px;border-bottom:1px solid var(--line)}
+.hero{padding-block:48px 28px;display:grid;gap:16px}
+
+.gate{border-top:2px solid var(--ink);padding-top:24px;display:grid;gap:12px;max-width:460px}
+.gate label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;gap:0}
+input[type=password]{flex:1;min-width:0;font:inherit;font-size:17px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-right:0;border-radius:0;padding:12px 14px}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+button{font:inherit;font-family:var(--mono);font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--bg);border:0;border-radius:0;padding:13px 22px;cursor:pointer}
+button:hover{background:var(--accent);color:#fff}
+button.ghost{background:none;color:var(--ink);border:1px solid var(--ink);padding:10px 16px}
+button.ghost:hover{background:var(--ink);color:var(--bg)}
+.err{color:var(--bad);font-size:15px}
+
+.bar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-top:2px solid var(--ink);padding-top:18px}
+.stats{display:flex;gap:36px;flex-wrap:wrap}
+.stats b{display:block;font-family:var(--display);font-variation-settings:"wdth" 115;font-weight:850;font-size:34px;line-height:1}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-grid;grid-template-columns:1fr 1fr;border:1px solid var(--ink)}
+.seg button{background:none;color:var(--ink);padding:10px 14px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+.list{margin-top:30px;display:grid}
+.item{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:22px 0;border-bottom:1px solid var(--line)}
+.item > *{min-width:0}
+.item .n{font-family:var(--display);font-variation-settings:"wdth" 120;font-weight:850;font-size:22px;color:var(--accent);line-height:1.2}
+.item h3{font-size:18px;font-variation-settings:"wdth" 104;margin-bottom:10px}
+.ans{border-left:2px solid var(--line);padding:4px 0 4px 14px;margin-top:10px}
+.ans .who{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--muted);margin-bottom:3px}
+.ans p{white-space:pre-wrap;overflow-wrap:anywhere}
+.none{color:var(--muted);font-size:15px;font-style:italic}
+.empty{padding:40px 0;color:var(--muted)}
+footer{margin-top:80px;border-top:1px solid var(--line);padding-block:22px 36px}
+@media (max-width:600px){ .item{grid-template-columns:30px 1fr;gap:10px} .stats{gap:22px} .stats b{font-size:28px} }
+</style>
+</head>
+<body>
+<header class="wrap top">
+  <span class="label">Bike4Chai · Private · Gatehouse Strategic</span>
+  <a class="label" href="../scope/#questions">Open the questions form</a>
+</header>
+<main class="wrap">
+  <div class="hero">
+    <span class="label">Website scope</span>
+    <h1>Answers from<br><em>Bike4Chai</em></h1>
+  </div>
+
+  <form class="gate" id="gate">
+    <label for="pass">Passcode</label>
+    <div class="row"><input type="password" id="pass" autocomplete="current-password" required><button type="submit">Show answers</button></div>
+    <p class="err" id="gate-err" role="alert"></p>
+  </form>
+
+  <div id="view" hidden>
+    <div class="bar">
+      <div class="stats">
+        <div><span class="label">Submissions</span><b id="s-subs">0</b></div>
+        <div><span class="label">People</span><b id="s-people">0</b></div>
+        <div><span class="label">Questions answered</span><b id="s-q">0 / 15</b></div>
+        <div><span class="label">Latest</span><b id="s-latest" style="font-size:22px;padding-top:8px">None</b></div>
+      </div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Group answers">
+          <button type="button" id="by-q" aria-pressed="true">By question</button>
+          <button type="button" id="by-p" aria-pressed="false">By person</button>
+        </div>
+        <button type="button" class="ghost" id="copy">Copy all</button>
+        <button type="button" class="ghost" id="refresh">Refresh</button>
+      </div>
+    </div>
+    <p class="err" id="view-err" role="status"></p>
+    <div class="list" id="list"></div>
+  </div>
+</main>
+<footer class="wrap"><span class="label">Answers come from the form on the scope page</span></footer>
+
+<script>
+(function(){
+  var URL_='https://hlohdnjxemwpnnkxnhqx.supabase.co/rest/v1/rpc/b4c_scope_answers_list';
+  var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhsb2hkbmp4ZW13cG5ua3huaHF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzU5NzYsImV4cCI6MjA5NzcxMTk3Nn0.WcwZ3VpLwwo4aDUMyrz4pwQBN1jBkKQrLBLp7mKFA-U';
+  var Q=["When does 2027 registration open?","What is the registration fee?","What is the fundraising minimum, and by what date?","What happens if a rider ends up below the minimum?","How are teams created and joined, and who can be a captain?","What do riders use in their dashboard today?","How do riders choose their route distance?","Can Neon Fundraise export every donation back to 2010?","Which donor account card providers do you accept today?","Does Chai Lifeline's CRM or finance system need gifts sent to it automatically? Which system?","What does the Rider Map show today, and do you want live tracking on ride day?","Should a rider be able to hide from the honor leaderboards?","Who approves the counting rules, and who can override how a single gift is counted?","Should the Toronto ride be part of the new site, or stay on Chai Lifeline Canada's site?","Anything we missed?"];
+  var $=function(id){return document.getElementById(id);};
+  var rows=[],mode='q',pass='';
+
+  function fmt(d){var x=new Date(d);return x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+', '+x.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});}
+  function num(k){var m=/^(\d+)\./.exec(k);return m?+m[1]:0;}
+  function who(r){return r.name+(r.role?' · '+r.role:'')+' · '+fmt(r.created_at);}
+  function el(t,c,txt){var e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
+
+  function load(p){
+    return fetch(URL_,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify({passcode:p})})
+      .then(function(r){ if(!r.ok){ return r.json().catch(function(){return {};}).then(function(j){ var e=new Error(j.message||r.status); e.wrong=/passcode/i.test(j.message||''); throw e; }); } return r.json(); });
+  }
+
+  function render(){
+    var people={},answered={},latest=null;
+    rows.forEach(function(r){people[r.name.trim().toLowerCase()]=1;Object.keys(r.answers||{}).forEach(function(k){answered[num(k)]=1;});if(!latest||r.created_at>latest)latest=r.created_at;});
+    $('s-subs').textContent=rows.length;$('s-people').textContent=Object.keys(people).length;
+    $('s-q').textContent=Object.keys(answered).length+' / '+Q.length;$('s-latest').textContent=latest?fmt(latest):'None';
+    var list=$('list');list.innerHTML='';
+    if(!rows.length){list.appendChild(el('p','empty','No answers yet. They appear here as soon as someone sends the form.'));return;}
+    if(mode==='q'){
+      Q.forEach(function(q,i){
+        var it=el('div','item'),body=el('div');
+        it.appendChild(el('span','n',String(i+1)));body.appendChild(el('h3',null,q));
+        var any=false;
+        rows.slice().reverse().forEach(function(r){Object.keys(r.answers||{}).forEach(function(k){if(num(k)===i+1){any=true;var a=el('div','ans');a.appendChild(el('div','who',who(r)));a.appendChild(el('p',null,r.answers[k]));body.appendChild(a);}});});
+        if(!any)body.appendChild(el('p','none','No answer yet'));
+        it.appendChild(body);list.appendChild(it);
+      });
+    } else {
+      rows.forEach(function(r){
+        var it=el('div','item'),body=el('div');
+        it.appendChild(el('span','n','·'));body.appendChild(el('h3',null,r.name+(r.role?', '+r.role:'')));
+        var meta=el('div','who',fmt(r.created_at)+(r.email?' · '+r.email:''));meta.className='label';body.appendChild(meta);
+        Object.keys(r.answers||{}).sort(function(a,b){return num(a)-num(b);}).forEach(function(k){var a=el('div','ans');a.appendChild(el('div','who',k));a.appendChild(el('p',null,r.answers[k]));body.appendChild(a);});
+        it.appendChild(body);list.appendChild(it);
+      });
+    }
+  }
+
+  function show(p){
+    $('gate-err').textContent='';
+    return load(p).then(function(d){
+      rows=d||[];pass=p;try{sessionStorage.setItem('b4c-pass',p);}catch(e){}
+      $('gate').hidden=true;$('view').hidden=false;render();
+    });
+  }
+
+  $('gate').addEventListener('submit',function(e){
+    e.preventDefault();var p=$('pass').value;if(!p)return;
+    show(p).catch(function(err){$('gate-err').textContent=err.wrong?'That passcode is not right. Try again.':'Could not reach the answers. Check your connection and try again.';});
+  });
+  $('by-q').addEventListener('click',function(){mode='q';this.setAttribute('aria-pressed','true');$('by-p').setAttribute('aria-pressed','false');render();});
+  $('by-p').addEventListener('click',function(){mode='p';this.setAttribute('aria-pressed','true');$('by-q').setAttribute('aria-pressed','false');render();});
+  $('refresh').addEventListener('click',function(){$('view-err').textContent='';load(pass).then(function(d){rows=d||[];render();}).catch(function(){$('view-err').textContent='Could not refresh. Try again in a moment.';});});
+  $('copy').addEventListener('click',function(){
+    var out=Q.map(function(q,i){var lines=[(i+1)+'. '+q];rows.slice().reverse().forEach(function(r){Object.keys(r.answers||{}).forEach(function(k){if(num(k)===i+1)lines.push('   '+r.name+(r.role?' ('+r.role+')':'')+': '+r.answers[k]);});});if(lines.length===1)lines.push('   (no answer yet)');return lines.join('\n');}).join('\n\n');
+    var b=this;navigator.clipboard.writeText(out).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy all';},1600);}).catch(function(){$('view-err').textContent='Copy was blocked by the browser. Select the answers and copy them instead.';});
+  });
+  try{var p=sessionStorage.getItem('b4c-pass');if(p)show(p).catch(function(){});}catch(e){}
+})();
+</script>
+</body>
+</html>
