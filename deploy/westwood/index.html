@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2b2a26">
+<title>Westwood Tenant Directory</title>
+<link rel="icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Montserrat:wght@400;500;600;700&display=swap">
+<style>
+/* Westwood brand: charcoal, cream and bronze, taken from westwoodtr.com.
+   The filled gold is used for one thing only: a Westwood discount. */
+:root{
+  --char:#2b2a26; --char-2:#3a3833; --cream:#f4eae1; --bronze:#7c6854; --tan:#b09672; --sand:#d2b287;
+  --surface:#ffffff; --ink:#2b2a26; --muted:#70675d; --line:#e3d6c8; --soft:#faf5ef;
+  --gold:#d2b287; --gold-2:#e2c9a4; --gold-ink:#2b2416; --gold-soft:#fbf2e4; --bad:#a8321f;
+  --serif:"Gilda Display", "Bodoni MT", Didot, Georgia, serif;
+  --sans:"Montserrat", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --gutter:max(20px, env(safe-area-inset-left,0px));
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 var(--gutter)}
+a{color:inherit;text-underline-offset:3px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--tan);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+svg{flex:none}
+img{display:block;max-width:100%}
+
+/* ---------- Hero ---------- */
+.hero{background:var(--char);color:var(--cream);position:relative;overflow:hidden;isolation:isolate;padding-bottom:92px}
+.hero::before{content:"";position:absolute;z-index:-1;width:70vmax;height:70vmax;left:-30vmax;bottom:-46vmax;border-radius:50%;background:radial-gradient(circle, rgba(176,150,114,.28), rgba(176,150,114,0) 62%);pointer-events:none}
+
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 0}
+.brand{display:flex;align-items:center;gap:16px;text-decoration:none}
+.brand img{height:28px;width:auto}
+.brand span{color:rgba(244,234,225,.7);font-size:14.5px;padding-left:16px;border-left:1px solid rgba(244,234,225,.25);line-height:1.2}
+.nav-right{display:flex;align-items:center;gap:22px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;border:1px solid transparent;padding:12px 20px;border-radius:8px;cursor:pointer;white-space:nowrap;text-decoration:none;transition:transform .18s var(--ease), background .18s, box-shadow .18s, border-color .18s, color .18s}
+.btn:active{transform:scale(.98)}
+.btn.bronze{background:var(--bronze);color:#fff}
+.btn.bronze:hover{background:#8d7862}
+.btn.light{background:var(--cream);color:var(--char)}
+.btn.light:hover{background:#fff}
+.btn.primary{background:var(--char);color:var(--cream)}
+.btn.primary:hover{background:var(--bronze);color:#fff}
+.btn.ghost{background:transparent;border-color:#cdbdab;color:var(--ink)}
+.btn.ghost:hover{background:var(--soft)}
+.btn[disabled]{opacity:.6;cursor:default}
+
+.hero-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);gap:clamp(28px,5vw,64px);align-items:center;padding:clamp(22px,4vw,48px) 0 clamp(26px,4vw,44px)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(42px,6.6vw,80px);line-height:1.04;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--sand)}
+.lede{margin-top:22px;font-size:clamp(16px,1.6vw,18px);color:rgba(244,234,225,.8);max-width:44ch}
+.stats{display:flex;gap:clamp(22px,4vw,48px);margin-top:clamp(26px,3.6vw,40px);flex-wrap:wrap}
+.stat .n{font-family:var(--serif);font-size:clamp(34px,4.2vw,46px);line-height:1;font-variant-numeric:tabular-nums}
+.stat .l{color:rgba(244,234,225,.66);font-size:14px;margin-top:8px}
+.stat.gold .n{color:var(--sand)}
+.photo{position:relative;margin:0}
+.photo img{width:100%;aspect-ratio:4/3.1;object-fit:cover;border-radius:4px}
+.photo::after{content:"";position:absolute;inset:0;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(244,234,225,.14);pointer-events:none}
+.intro-on .photo img{animation:reveal 1.1s var(--ease) both}
+@keyframes reveal{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+
+/* ---------- Search ---------- */
+.searchwrap{margin-top:-36px;position:relative;z-index:3}
+.search{display:flex;align-items:center;gap:14px;height:72px;padding:0 20px 0 22px;background:#fff;border-radius:12px;border:1px solid rgba(43,42,38,.1);box-shadow:0 24px 60px -18px rgba(43,42,38,.5), 0 2px 6px rgba(43,42,38,.08);transition:box-shadow .2s, border-color .2s}
+.search:focus-within{border-color:var(--tan);box-shadow:0 24px 60px -18px rgba(43,42,38,.55), 0 0 0 4px rgba(176,150,114,.3)}
+.search svg{color:var(--bronze)}
+.search input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;font:inherit;font-size:clamp(16px,2vw,19px);color:var(--ink)}
+.search input::placeholder{color:#9a8f83}
+.search input::-webkit-search-cancel-button{display:none}
+kbd{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:2px 8px;background:var(--soft)}
+.xbtn{border:0;background:var(--soft);width:34px;height:34px;border-radius:8px;cursor:pointer;display:grid;place-items:center;color:var(--muted)}
+.xbtn:hover{background:var(--line);color:var(--ink)}
+
+/* ---------- Filters ---------- */
+.filters{position:sticky;top:0;z-index:2;background:rgba(244,234,225,.86);-webkit-backdrop-filter:saturate(1.3) blur(14px);backdrop-filter:saturate(1.3) blur(14px);border-bottom:1px solid transparent;transition:border-color .2s;margin-top:8px}
+.filters.stuck{border-bottom-color:var(--line)}
+.frow{display:flex;align-items:center;gap:12px;padding:14px 0;flex-wrap:wrap}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:9px;padding:3px}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted);transition:background .18s,color .18s}
+.seg button[aria-pressed=true]{background:var(--char);color:var(--cream)}
+.dtoggle{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;transition:background .18s,border-color .18s,box-shadow .18s}
+.dtoggle svg{color:var(--tan)}
+.dtoggle:hover{border-color:var(--tan)}
+.dtoggle[aria-pressed=true]{background:linear-gradient(180deg,var(--gold-2),var(--gold));border-color:var(--tan);color:var(--gold-ink);box-shadow:0 6px 18px -8px rgba(124,104,84,.8)}
+.dtoggle[aria-pressed=true] svg{color:var(--gold-ink)}
+.count{margin-left:auto;color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(90deg,#000 calc(100% - 40px),transparent)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid transparent;background:transparent;padding:6px 11px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap;transition:background .18s,color .18s}
+.tab:hover{background:#fff;color:var(--ink)}
+.tab i{font-style:normal;opacity:.6;margin-left:5px;font-variant-numeric:tabular-nums}
+.tab[aria-pressed=true]{background:#fff;border-color:var(--line);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(43,42,38,.06)}
+
+.notice{background:var(--gold-soft);border:1px solid #e5cfae;border-radius:8px;padding:10px 14px;font-size:14px;margin-top:18px}
+.linkbtn{background:none;border:0;padding:0;color:var(--bronze);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+/* ---------- Cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:22px 0 76px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s}
+.card:hover{transform:translateY(-3px);box-shadow:0 22px 44px -22px rgba(43,42,38,.4);border-color:#d3c2af}
+.card.deal{border-color:var(--tan);box-shadow:0 0 0 1px var(--tan)}
+.card.deal:hover{box-shadow:0 0 0 1px var(--tan), 0 22px 44px -22px rgba(124,104,84,.6)}
+.ribbon{display:flex;align-items:center;gap:10px;padding:10px 20px;background:linear-gradient(90deg,var(--gold-2),var(--gold));color:var(--gold-ink);font-size:14.5px;line-height:1.3}
+.ribbon b{font-weight:700;white-space:nowrap}
+.ribbon span{font-weight:500}
+.ribbon .sep{opacity:.45}
+.cbody{padding:20px;display:flex;flex-direction:column;gap:12px;flex:1}
+.ctop{display:flex;gap:14px;align-items:center}
+.mono{width:50px;height:50px;border-radius:8px;display:grid;place-items:center;background:var(--char);color:var(--sand);font-family:var(--serif);font-size:20px;letter-spacing:.02em;flex:none}
+.card h2{font-size:18px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+.where{color:var(--muted);font-size:14px;margin-top:3px}
+.where b{color:var(--bronze);font-weight:600}
+.desc{color:#45413b;overflow-wrap:anywhere}
+.person{color:var(--muted);font-size:14px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:4px}
+.act{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;background:var(--soft);border:1px solid var(--line);color:var(--ink);max-width:100%;transition:background .18s,border-color .18s,color .18s}
+.act span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act svg{color:var(--bronze)}
+.act:hover{background:var(--char);border-color:var(--char);color:var(--cream)}
+.act:hover svg{color:var(--sand)}
+mark{background:#efd9b4;color:inherit;border-radius:3px;padding:0 1px}
+
+.intro .card{animation:rise .6s var(--ease) both;animation-delay:calc(var(--i,0) * 55ms)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+::view-transition-group(*){animation-duration:.32s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-old(*),::view-transition-new(*){animation-duration:.22s}
+
+.skel{height:210px;border-radius:12px;background:linear-gradient(100deg,#eadccd 30%,#f6eee6 50%,#eadccd 70%);background-size:300% 100%;animation:shim 1.3s linear infinite}
+@keyframes shim{to{background-position:-150% 0}}
+.empty{grid-column:1/-1;text-align:center;padding:64px 20px;color:var(--muted)}
+.empty h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink);margin-bottom:8px}
+.empty .btn{margin-top:18px}
+
+/* ---------- Logos and click-through ---------- */
+.logo{width:50px;height:50px;border-radius:8px;flex:none;background:#fff;border:1px solid var(--line);object-fit:contain;padding:4px}
+.card{position:relative}
+.open{color:inherit;text-decoration:none}
+.open::after{content:"";position:absolute;inset:0;z-index:1}
+.open:focus-visible{outline:0}
+.card:has(.open:focus-visible){outline:2px solid var(--tan);outline-offset:2px}
+.card .acts{position:relative;z-index:2;align-items:center;pointer-events:none}
+.card .acts .act{pointer-events:auto}
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.go{margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:var(--bronze);font-weight:600;font-size:14px;white-space:nowrap;transition:gap .2s var(--ease)}
+.card:hover .go{gap:10px}
+
+dialog.detail{margin:auto;width:min(680px,calc(100vw - 24px));height:fit-content;max-height:calc(100dvh - 24px);border-radius:14px;box-shadow:0 40px 100px rgba(43,42,38,.5)}
+dialog.detail[open]{animation:pop .3s var(--ease)}
+@keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.detail .ribbon{padding:12px 28px;font-size:15.5px}
+.dhead{display:flex;gap:18px;align-items:center;padding:28px 28px 0}
+.dhead .mono,.dhead .logo{width:84px;height:84px;font-size:32px;border-radius:10px}
+.dhead .logo{padding:6px}
+.dhead h2{font-family:var(--serif);font-weight:400;font-size:clamp(26px,4vw,34px);line-height:1.1;overflow-wrap:anywhere}
+.dhead .where{font-size:15px;margin-top:6px}
+.dhead .xbtn{margin-left:auto;align-self:flex-start}
+.dbody{padding:22px 28px 28px;display:grid;gap:22px}
+.dbody h3{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.dtext{white-space:pre-line;color:#45413b;overflow-wrap:anywhere}
+.dtext + .dtext{margin-top:12px}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:9px 22px;margin:0;font-size:15px}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+.dl a{color:var(--bronze)}
+.dacts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.dacts .linkbtn{margin-left:auto;font-size:14px}
+.logorow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logorow .btn{padding:9px 14px;font-size:14px}
+
+.dacts .linkbtn + .linkbtn{margin-left:0}
+.danger{color:var(--bad)}
+.linkbox{display:grid;gap:10px;justify-items:start;width:100%;padding:16px;border:1px solid #e5cfae;background:var(--gold-soft);border-radius:10px}
+.linkbox input{font-size:13.5px}
+
+/* ---------- Footer ---------- */
+footer{background:var(--char);color:rgba(244,234,225,.66);font-size:13.5px}
+.fine{display:flex;justify-content:space-between;align-items:center;gap:6px 24px;flex-wrap:wrap;padding-top:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.gh{display:flex;align-items:center;gap:14px;flex-wrap:wrap;color:var(--cream)}
+.gh .btn{padding:7px 12px;font-size:13.5px;border-radius:7px}
+
+/* ---------- Add-a-listing sheet ---------- */
+dialog{border:0;padding:0;margin:0 0 0 auto;width:min(560px,100vw);height:100dvh;max-height:100dvh;color:var(--ink);background:var(--surface);box-shadow:-30px 0 80px rgba(43,42,38,.4);overflow:auto}
+dialog[open]{animation:slide .34s var(--ease)}
+dialog::backdrop{background:rgba(43,42,38,.6);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:fade .3s}
+@keyframes slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}}
+.form{display:grid;gap:16px;padding:26px 26px 0}
+.fhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.fhead h2,.done h2{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.1}
+.hint{color:var(--muted);font-size:14px;margin-top:6px}
+.field > span{display:block;font-size:13px;font-weight:600;color:#514a42;margin-bottom:5px}
+.req{color:var(--bad);font-style:normal}
+input[type=text],input[type=email],input[type=tel],select,textarea{font:inherit;color:var(--ink);background:#fff;border:1px solid #cfc0af;border-radius:8px;padding:10px 12px;width:100%;min-height:44px;transition:border-color .15s, box-shadow .15s}
+textarea{min-height:96px;resize:vertical}
+.form input:focus,.form select:focus,.form textarea:focus{outline:0;border-color:var(--tan);box-shadow:0 0 0 3px rgba(176,150,114,.3)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.check{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:600}
+.check input{width:19px;height:19px;accent-color:var(--bronze);margin:0;flex:none}
+.discbox{border:1px solid #e5cfae;border-radius:10px;padding:14px;display:grid;gap:12px;background:var(--gold-soft)}
+.pv{background:var(--cream);border-radius:12px;padding:14px;display:grid;gap:8px}
+.pv > small{font-size:13px;font-weight:600;color:var(--muted)}
+.pv .card:hover{transform:none}
+.err{color:var(--bad);font-weight:600;font-size:14px}
+.actions{position:sticky;bottom:0;display:flex;gap:10px;justify-content:flex-end;padding:14px 0 calc(18px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(255,255,255,0),#fff 28%)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.done{padding:26px;display:grid;gap:14px;justify-items:start;align-content:center;min-height:60dvh}
+
+@media (max-width:860px){
+  .grid{grid-template-columns:1fr}
+  .count{width:100%;margin-left:0;order:9}
+  .hero-body{grid-template-columns:1fr}
+  .photo img{aspect-ratio:16/9}
+}
+@media (max-width:560px){
+  .brand span{display:none}
+  .brand img{height:24px}
+  .btn{padding:11px 16px}
+  .hero{padding-bottom:72px}
+  .search{height:62px;padding:0 14px 0 16px}
+  .search kbd{display:none}
+  .row{grid-template-columns:1fr}
+  .form{padding:20px 18px 0}
+  .dhead{padding:20px 18px 0;gap:14px}
+  .dhead .mono,.dhead .logo{width:64px;height:64px;font-size:25px}
+  .dbody{padding:18px 18px 22px}
+  .detail .ribbon{padding:11px 18px}
+  .dacts .btn{flex:1}
+  .dacts .linkbtn{margin-left:0;flex-basis:100%;text-align:left}
+  .seg button{padding:7px 10px}
+  .ribbon{flex-wrap:wrap;gap:4px 10px;padding:10px 16px}
+  .ribbon .sep{display:none}
+  .ribbon span:last-child{flex-basis:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<section class="hero intro-on">
+  <div class="wrap">
+    <nav class="nav" aria-label="Top">
+      <a class="brand" href="./"><img src="img/westwood-logo.svg" alt="Westwood" width="224" height="28"><span>Tenant Directory</span></a>
+      <div class="nav-right">
+        <button class="btn bronze" id="addBtn" type="button">Add your business</button>
+      </div>
+    </nav>
+    <div class="hero-body">
+     <div>
+      <h1>Find it <em>down the hall.</em></h1>
+      <p class="lede">Every business at Westwood One and Westwood Two, in one place. Search by name or by what you need, and see who gives fellow tenants a discount.</p>
+      <div class="stats" id="stats" hidden>
+        <div class="stat"><div class="n" id="sBiz">0</div><div class="l">Businesses</div></div>
+        <div class="stat"><div class="n" id="sInd">0</div><div class="l">Industries</div></div>
+        <div class="stat gold"><div class="n" id="sDeal">0</div><div class="l">Westwood discounts</div></div>
+      </div>
+     </div>
+     <figure class="photo"><img src="img/gallery.webp" alt="The Westwood lobby, seen from the upper gallery" width="1080" height="720"></figure>
+    </div>
+  </div>
+</section>
+
+<div class="wrap searchwrap">
+  <label class="search" role="search">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+    <input type="search" id="q" placeholder="Search a business name, industry or service" autocomplete="off" aria-label="Search the directory">
+    <kbd id="slash" title="Press / to search">/</kbd>
+    <button class="xbtn" id="qx" type="button" aria-label="Clear search" hidden>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </label>
+  <div class="notice" id="previewNote" hidden>Preview only: these are made-up sample listings, and new listings are not saved yet.</div>
+  <div class="notice" id="loadErr" hidden>The directory could not be loaded. Check your connection and <button class="linkbtn" type="button" id="retry">try again</button>.</div>
+</div>
+
+<div class="filters" id="filters">
+  <div class="wrap">
+    <div class="frow">
+      <div class="seg" id="fBuilding" role="group" aria-label="Building">
+        <button type="button" data-v="" aria-pressed="true">Both</button>
+        <button type="button" data-v="Westwood One" aria-pressed="false">Westwood One</button>
+        <button type="button" data-v="Westwood Two" aria-pressed="false">Westwood Two</button>
+      </div>
+      <button class="dtoggle" id="fDiscount" type="button" aria-pressed="false">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h6.6a1.5 1.5 0 0 1 1.06.44l8.4 8.4a1.5 1.5 0 0 1 0 2.12l-6.6 6.6a1.5 1.5 0 0 1-2.12 0l-8.4-8.4A1.5 1.5 0 0 1 3 11.1V4.5Zm4.75 1.75a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg>
+        Westwood discounts
+      </button>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div class="tabs" id="tabs" role="group" aria-label="Industry"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="grid intro" id="grid"></div>
+</main>
+
+<footer>
+  <div class="wrap fine">
+    <span>Listings are provided by tenants. To change or remove yours, use the private link you were given when you added it.</span>
+    <span class="gh">Built by Gatehouse Strategic
+      <a class="btn light" href="https://gatehousestrategic.com/" target="_blank" rel="noopener">See what we build
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </span>
+  </div>
+</footer>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <form class="form" id="form" novalidate>
+    <div class="fhead">
+      <div>
+        <h2 id="dlgTitle">Add your business</h2>
+        <p class="hint" id="dlgHint">Takes about a minute. Everything here is shown to other Westwood tenants.</p>
+      </div>
+      <button class="xbtn" type="button" id="cancelX" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="pv" aria-hidden="true"><small>How your listing will look</small><div id="pv"></div></div>
+
+    <label class="field"><span>Business name <i class="req">*</i></span>
+      <input type="text" name="business_name" maxlength="120" required autocomplete="organization">
+    </label>
+
+    <div class="field"><span>Logo</span>
+      <div class="logorow">
+        <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" hidden>
+        <button class="btn ghost" type="button" id="logoPick">Upload logo</button>
+        <button class="linkbtn" type="button" id="logoClear" hidden>Remove</button>
+        <span class="hint" style="margin:0">PNG or JPG. A square logo fits best.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <label class="field"><span>Building <i class="req">*</i></span>
+        <select name="building" required>
+          <option value="">Choose</option>
+          <option>Westwood One</option>
+          <option>Westwood Two</option>
+        </select>
+      </label>
+      <label class="field"><span>Suite</span>
+        <input type="text" name="suite" maxlength="40" placeholder="e.g. 204">
+      </label>
+    </div>
+
+    <label class="field"><span>Industry <i class="req">*</i></span>
+      <select name="industry" required id="industrySelect"><option value="">Choose</option></select>
+    </label>
+
+    <label class="field"><span>What you do <i class="req">*</i></span>
+      <textarea name="description" maxlength="300" required placeholder="A sentence or two, in the words someone would search for."></textarea>
+    </label>
+
+    <label class="field"><span>More about your business</span>
+      <textarea name="details" maxlength="2000" placeholder="Services, who you work with, hours, anything else. Shown when someone opens your listing."></textarea>
+    </label>
+
+    <div class="row">
+      <label class="field"><span>Contact name</span>
+        <input type="text" name="contact_name" maxlength="120" autocomplete="name">
+      </label>
+      <label class="field"><span>Phone</span>
+        <input type="tel" name="phone" maxlength="40" autocomplete="tel">
+      </label>
+    </div>
+    <div class="row">
+      <label class="field"><span>Email</span>
+        <input type="email" name="email" maxlength="200" autocomplete="email">
+      </label>
+      <label class="field"><span>Website</span>
+        <input type="text" name="website" maxlength="300" placeholder="example.com" inputmode="url">
+      </label>
+    </div>
+
+    <div class="discbox">
+      <label class="check"><input type="checkbox" name="offers_discount" id="offers"> We offer a discount to Westwood tenants</label>
+      <label class="field" id="discWrap" hidden><span>What is the discount?</span>
+        <input type="text" name="discount_details" maxlength="300" placeholder="e.g. 10% off for Westwood tenants">
+      </label>
+    </div>
+
+    <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="company_url" tabindex="-1" autocomplete="off"></label></div>
+
+    <p class="err" id="formErr" role="alert" hidden></p>
+    <div class="actions">
+      <button class="linkbtn danger" type="button" id="removeBtn" style="margin-right:auto" hidden>Remove this listing</button>
+      <button class="btn ghost" type="button" id="cancel">Cancel</button>
+      <button class="btn primary" type="submit" id="submit">Send listing</button>
+    </div>
+  </form>
+  <div class="done" id="done" hidden>
+    <h2 id="doneTitle">Thank you.</h2>
+    <p id="doneMsg"></p>
+    <div class="linkbox" id="linkBox" hidden>
+      <b>Keep this private link</b>
+      <p class="hint" style="margin:0">It is the only way to change or remove your listing later. Anyone who has it can edit your listing, so don't share it.</p>
+      <input type="text" id="editLink" readonly aria-label="Your private edit link">
+      <div class="logorow">
+        <button class="btn primary" type="button" id="copyLink">Copy link</button>
+        <a class="btn ghost" id="mailLink" href="#">Email it to myself</a>
+      </div>
+    </div>
+    <button class="btn primary" type="button" id="doneClose">Back to the directory</button>
+  </div>
+</dialog>
+
+<dialog id="detail" class="detail" aria-labelledby="dTitle"></dialog>
+
+<script>
+(function(){
+  /* ---------- Settings ---------- */
+  // The gridaudit Supabase project. This is its public key: the database rules decide what it may do.
+  // Empty SUPABASE_URL to run in preview mode with sample listings.
+  var SUPABASE_URL = 'https://hlohdnjxemwpnnkxnhqx.supabase.co';
+  var ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhsb2hkbmp4ZW13cG5ua3huaHF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzU5NzYsImV4cCI6MjA5NzcxMTk3Nn0.WcwZ3VpLwwo4aDUMyrz4pwQBN1jBkKQrLBLp7mKFA-U';
+  var TABLE = 'westwood_tenants';
+  var BUCKET = 'westwood-logos';
+
+  var INDUSTRIES = [
+    'Accounting & Tax','Architecture & Design','Billing & Back Office','Construction & Trades','Consulting',
+    'E-commerce & Retail','Education & Tutoring','Events & Catering','Financial Services','Healthcare',
+    'Insurance','Legal','Logistics & Shipping','Marketing & Advertising','Mortgage & Lending','Nonprofit',
+    'Photography & Video','Printing & Signage','Real Estate','Software','Staffing & HR','Technology & IT',
+    'Title & Escrow','Wholesale & Distribution','Other'
+  ];
+
+  var SAMPLE = [
+    {business_name:'Sample Accounting Group',building:'Westwood One',suite:'204',industry:'Accounting & Tax',description:'Bookkeeping, payroll and tax returns for small businesses.',details:'Monthly bookkeeping, payroll, sales tax filings and year-end returns.\n\nWe work mostly with companies of 5 to 50 people. Open Monday to Thursday 9 to 5, Friday 9 to 1.',contact_name:'Sample Contact',email:'hello@example.com',phone:'(555) 010-0101',website:'example.com',offers_discount:true,discount_details:'15% off the first year for Westwood tenants'},
+    {business_name:'Sample Insurance Agency',building:'Westwood Two',suite:'110',industry:'Insurance',description:'Commercial, property and liability insurance.',contact_name:'Sample Contact',email:'info@example.com',phone:'(555) 010-0102',website:null,offers_discount:false,discount_details:null},
+    {business_name:'Sample IT Services',building:'Westwood Two',suite:'305',industry:'Technology & IT',description:'Office networks, computers, phones and backups.',contact_name:null,email:'support@example.com',phone:null,website:'example.org',offers_discount:true,discount_details:'Free network checkup'},
+    {business_name:'Sample Law Office',building:'Westwood One',suite:'120',industry:'Legal',description:'Contracts, leases and business formation.',contact_name:'Sample Contact',email:null,phone:'(555) 010-0104',website:'example.net',offers_discount:false,discount_details:null},
+    {business_name:'Sample Print Shop',building:'Westwood One',suite:'B2',industry:'Printing & Signage',description:'Business cards, banners, signs and mailers.',details:'Same-day business cards and flyers, large-format banners and office signage. Free delivery to any suite in either building.',contact_name:'Sample Contact',email:'orders@example.com',phone:'(555) 010-0105',website:null,offers_discount:true,discount_details:'10% off all orders'},
+    {business_name:'Sample Title Company',building:'Westwood Two',suite:'212',industry:'Title & Escrow',description:'Title searches and closings for homes and commercial property.',contact_name:'Sample Contact',email:'closings@example.com',phone:'(555) 010-0106',website:'example.com',offers_discount:false,discount_details:null}
+  ];
+
+  var ICON = {
+    phone:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg>',
+    mail:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+    web:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+    arrow:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    close:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+    tag:'<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h6.6a1.5 1.5 0 0 1 1.06.44l8.4 8.4a1.5 1.5 0 0 1 0 2.12l-6.6 6.6a1.5 1.5 0 0 1-2.12 0l-8.4-8.4A1.5 1.5 0 0 1 3 11.1V4.5Zm4.75 1.75a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg>'
+  };
+
+  var live = !!(SUPABASE_URL && ANON_KEY);
+  var rows = [], seq = 0, first = true;
+  var state = {industry:'', building:'', discount:false};
+  var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function(id){ return document.getElementById(id); };
+
+  function el(tag, cls, text){
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function icon(name){ var s = el('span'); s.style.display = 'contents'; s.innerHTML = ICON[name]; return s; }
+
+  /* ---------- Data ---------- */
+  function headers(extra){
+    var h = {apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY};
+    for (var k in extra) h[k] = extra[k];
+    return h;
+  }
+
+  function load(){
+    $('loadErr').hidden = true;
+    if (!live){
+      rows = SAMPLE.slice();
+      $('previewNote').hidden = false;
+      return ready();
+    }
+    var g = $('grid'); g.textContent = '';
+    for (var i = 0; i < 4; i++) g.appendChild(el('div', 'skel'));
+    var cols = 'id,business_name,building,suite,industry,description,details,logo_path,contact_name,email,phone,website,offers_discount,discount_details';
+    fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?select=' + cols + '&approved=eq.true&order=business_name.asc', {headers: headers()})
+      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(data){ rows = data; ready(); })
+      .catch(function(){ g.textContent = ''; $('loadErr').hidden = false; });
+  }
+
+  function ready(){
+    rows.forEach(function(r){ if (!r._k) r._k = ++seq; });
+    rows.sort(function(a,b){ return a.business_name.localeCompare(b.business_name, undefined, {sensitivity:'base'}); });
+    buildTabs();
+    stats();
+    render();
+    route();
+  }
+
+  function stats(){
+    var ind = {}, deals = 0;
+    rows.forEach(function(r){ ind[r.industry] = 1; if (r.offers_discount) deals++; });
+    $('stats').hidden = !rows.length;
+    countUp($('sBiz'), rows.length); countUp($('sInd'), Object.keys(ind).length); countUp($('sDeal'), deals);
+  }
+  function countUp(node, to){
+    if (calm || !first || !window.requestAnimationFrame){ node.textContent = to; return; }
+    var t0 = null, over = false;
+    setTimeout(function(){ over = true; node.textContent = to; }, 1200);
+    requestAnimationFrame(function step(t){
+      if (over) return;
+      if (!t0) t0 = t;
+      var p = Math.min(1, (t - t0) / 900);
+      node.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    });
+  }
+
+  function buildTabs(){
+    var box = $('tabs'), counts = {};
+    rows.forEach(function(r){ counts[r.industry] = (counts[r.industry] || 0) + 1; });
+    if (!counts[state.industry]) state.industry = '';
+    box.textContent = '';
+    box.hidden = !rows.length;
+    function add(value, label, n){
+      var b = el('button', 'tab', label);
+      b.type = 'button'; b.dataset.v = value;
+      b.setAttribute('aria-pressed', String(state.industry === value));
+      b.appendChild(el('i', null, n));
+      box.appendChild(b);
+    }
+    add('', 'All industries', rows.length);
+    Object.keys(counts).sort().forEach(function(name){ add(name, name, counts[name]); });
+  }
+
+  /* ---------- Search ---------- */
+  function words(){
+    var q = $('q').value.trim().toLowerCase();
+    return q ? q.split(/\s+/) : [];
+  }
+  function matches(r, w){
+    if (state.industry && r.industry !== state.industry) return false;
+    if (state.building && r.building !== state.building) return false;
+    if (state.discount && !r.offers_discount) return false;
+    if (!w.length) return true;
+    var hay = [r.business_name, r.industry, r.description, r.details, r.contact_name, r.discount_details].join(' ').toLowerCase();
+    return w.every(function(x){ return hay.indexOf(x) !== -1; });
+  }
+
+  function update(){
+    if (!document.startViewTransition || calm) return render();
+    var t = document.startViewTransition(render), quiet = function(){};
+    // A newer search cancels the one before it; that is expected, not an error.
+    t.ready.catch(quiet); t.finished.catch(quiet);
+  }
+
+  function render(){
+    var w = words();
+    var filtered = !!(w.length || state.industry || state.building || state.discount);
+    var shown = rows.filter(function(r){ return matches(r, w); });
+    var g = $('grid');
+    g.textContent = '';
+    if (!first) g.classList.remove('intro');
+    shown.forEach(function(r, i){
+      var c = card(r, w);
+      c.style.setProperty('--i', Math.min(i, 10));
+      c.style.viewTransitionName = 'card-' + r._k;
+      g.appendChild(c);
+    });
+    first = false;
+
+    $('qx').hidden = !$('q').value; $('slash').hidden = !!$('q').value;
+    $('count').textContent = rows.length ? shown.length + (shown.length === 1 ? ' business' : ' businesses') + (filtered ? ' found' : '') : '';
+
+    if (!shown.length){
+      var e = el('div', 'empty');
+      if (rows.length){
+        e.appendChild(el('h2', null, 'Nobody matches that yet.'));
+        e.appendChild(el('p', null, 'Try a different word, or clear the search to see everyone.'));
+        var b = el('button', 'btn ghost', 'Clear search'); b.type = 'button';
+        b.addEventListener('click', reset); e.appendChild(b);
+      } else {
+        e.appendChild(el('h2', null, 'Be the first one in.'));
+        e.appendChild(el('p', null, 'No businesses are listed yet. Add yours and it will show up here.'));
+        var a = el('button', 'btn primary', 'Add your business'); a.type = 'button';
+        a.addEventListener('click', function(){ openForm(); }); e.appendChild(a);
+      }
+      g.appendChild(e);
+    }
+  }
+
+  function reset(){
+    $('q').value = ''; state.industry = ''; state.building = ''; state.discount = false;
+    press($('fBuilding'), ''); press($('tabs'), ''); $('fDiscount').setAttribute('aria-pressed', 'false');
+    update();
+  }
+  function press(group, value){
+    Array.prototype.forEach.call(group.querySelectorAll('button'), function(b){
+      b.setAttribute('aria-pressed', String(b.dataset.v === value));
+    });
+  }
+
+  // Writes text into a node, marking the parts that match the search words.
+  function hl(node, text, w){
+    if (!w || !w.length){ node.textContent = text; return node; }
+    var re = new RegExp('(' + w.map(function(x){ return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')', 'ig');
+    text.split(re).forEach(function(part, i){
+      if (!part) return;
+      node.appendChild(i % 2 ? el('mark', null, part) : document.createTextNode(part));
+    });
+    return node;
+  }
+
+  function siteUrl(v){
+    if (!v) return null;
+    v = v.trim();
+    if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
+    try { var u = new URL(v); return ((u.protocol === 'http:' || u.protocol === 'https:') && u.hostname.indexOf('.') > 0) ? u : null; }
+    catch(e){ return null; }
+  }
+  function initials(name){
+    var p = (name || '').replace(/[^A-Za-z0-9 ]/g, ' ').trim().split(/\s+/).filter(Boolean);
+    if (!p.length) return '·';
+    return (p[0][0] + (p.length > 1 ? p[1][0] : '')).toUpperCase();
+  }
+  function key(r){ return r.id || (r._k ? 's' + r._k : null); }
+  // A row's logo: one just picked in the form, or the stored file.
+  function logoSrc(r){
+    if (r._logo) return r._logo;
+    return (live && r.logo_path) ? SUPABASE_URL + '/storage/v1/object/public/' + BUCKET + '/' + encodeURIComponent(r.logo_path) : null;
+  }
+  function face(r){
+    var mono = el('div', 'mono', initials(r.business_name)), src = logoSrc(r);
+    if (!src) return mono;
+    var img = el('img', 'logo');
+    img.alt = ''; img.src = src;
+    img.onerror = function(){ img.replaceWith(mono); };
+    return img;
+  }
+  function act(kind, label, href, external){
+    var a = el('a', 'act');
+    a.href = href;
+    if (external){ a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    a.appendChild(icon(kind)); a.appendChild(el('span', null, label));
+    return a;
+  }
+
+  function card(r, w){
+    var c = el('article', 'card' + (r.offers_discount ? ' deal' : ''));
+    if (r.offers_discount){
+      var rib = el('div', 'ribbon');
+      rib.appendChild(icon('tag'));
+      rib.appendChild(el('b', null, 'Westwood discount'));
+      if (r.discount_details){
+        rib.appendChild(el('span', 'sep', '|'));
+        rib.appendChild(hl(el('span'), r.discount_details, w));
+      }
+      c.appendChild(rib);
+    }
+    var body = el('div', 'cbody');
+    var top = el('div', 'ctop');
+    top.appendChild(face(r));
+    var t = el('div'), h = el('h2'), k = key(r);
+    if (k){
+      var open = el('a', 'open'); open.href = '#/b/' + k;
+      h.appendChild(hl(open, r.business_name, w));
+    } else hl(h, r.business_name || 'Your business name', w);
+    t.appendChild(h);
+    var where = el('p', 'where');
+    where.appendChild(hl(el('b'), r.industry || 'Industry', w));
+    where.appendChild(document.createTextNode(' · ' + (r.building || 'Building') + (r.suite ? ', Suite ' + r.suite : '')));
+    t.appendChild(where);
+    top.appendChild(t);
+    body.appendChild(top);
+
+    if (r.description) body.appendChild(hl(el('p', 'desc clamp'), r.description, w));
+
+    var acts = el('div', 'acts');
+    if (r.phone) acts.appendChild(act('phone', r.phone, 'tel:' + r.phone.replace(/[^\d+]/g, '')));
+    if (r.email) acts.appendChild(act('mail', r.email, 'mailto:' + r.email));
+    var u = siteUrl(r.website);
+    if (u) acts.appendChild(act('web', u.host.replace(/^www\./, ''), u.href, true));
+    if (k){ var go = el('span', 'go', 'Details'); go.appendChild(icon('arrow')); acts.appendChild(go); }
+    if (acts.childNodes.length) body.appendChild(acts);
+
+    c.appendChild(body);
+    return c;
+  }
+
+  /* ---------- One listing, opened ---------- */
+  var detail = $('detail');
+  function link(text, href, external){
+    var a = el('a', null, text); a.href = href;
+    if (external){ a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    var dd = el('dd'); dd.appendChild(a); return dd;
+  }
+  function bigBtn(cls, kind, label, href, external){
+    var a = el('a', 'btn ' + cls); a.href = href;
+    if (external){ a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    a.appendChild(icon(kind)); a.appendChild(document.createTextNode(label));
+    return a;
+  }
+  function showDetail(r){
+    detail.textContent = '';
+    if (r.offers_discount){
+      var rib = el('div', 'ribbon');
+      rib.appendChild(icon('tag'));
+      rib.appendChild(el('b', null, 'Westwood discount'));
+      if (r.discount_details){ rib.appendChild(el('span', 'sep', '|')); rib.appendChild(el('span', null, r.discount_details)); }
+      detail.appendChild(rib);
+    }
+    var head = el('div', 'dhead');
+    head.appendChild(face(r));
+    var t = el('div'), h = el('h2', null, r.business_name); h.id = 'dTitle';
+    t.appendChild(h);
+    var where = el('p', 'where');
+    where.appendChild(el('b', null, r.industry));
+    where.appendChild(document.createTextNode(' · ' + r.building + (r.suite ? ', Suite ' + r.suite : '')));
+    t.appendChild(where);
+    head.appendChild(t);
+    var x = el('button', 'xbtn'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.innerHTML = ICON.close;
+    x.addEventListener('click', function(){ detail.close(); });
+    head.appendChild(x);
+    detail.appendChild(head);
+
+    var body = el('div', 'dbody');
+    var about = el('div');
+    about.appendChild(el('h3', null, 'About'));
+    about.appendChild(el('p', 'dtext', r.description));
+    if (r.details) about.appendChild(el('p', 'dtext', r.details));
+    body.appendChild(about);
+
+    var u = siteUrl(r.website), tel = r.phone && 'tel:' + r.phone.replace(/[^\d+]/g, '');
+    var dl = el('dl', 'dl');
+    function add(term, dd){ dl.appendChild(el('dt', null, term)); dl.appendChild(dd); }
+    add('Location', el('dd', null, r.building + (r.suite ? ', Suite ' + r.suite : '')));
+    if (r.contact_name) add('Contact', el('dd', null, r.contact_name));
+    if (r.phone) add('Phone', link(r.phone, tel));
+    if (r.email) add('Email', link(r.email, 'mailto:' + r.email));
+    if (u) add('Website', link(u.host.replace(/^www\./, ''), u.href, true));
+    var reach = el('div');
+    reach.appendChild(el('h3', null, 'Get in touch'));
+    reach.appendChild(dl);
+    body.appendChild(reach);
+
+    var acts = el('div', 'dacts');
+    if (r.phone) acts.appendChild(bigBtn('primary', 'phone', 'Call', tel));
+    if (r.email) acts.appendChild(bigBtn(r.phone ? 'ghost' : 'primary', 'mail', 'Email', 'mailto:' + r.email));
+    if (u) acts.appendChild(bigBtn('ghost', 'web', 'Website', u.href, true));
+    if (navigator.clipboard){
+      var copy = el('button', 'linkbtn', 'Copy link to this listing'); copy.type = 'button';
+      copy.addEventListener('click', function(){
+        navigator.clipboard.writeText(location.href).then(function(){ copy.textContent = 'Link copied'; }, function(){});
+      });
+      acts.appendChild(copy);
+    }
+    if (mine[r.id]){
+      var mineBtn = el('button', 'linkbtn', 'Edit this listing'); mineBtn.type = 'button';
+      mineBtn.addEventListener('click', function(){ location.hash = '#/edit/' + r.id + '.' + mine[r.id]; });
+      acts.appendChild(mineBtn);
+    }
+    body.appendChild(acts);
+    detail.appendChild(body);
+    if (!detail.open) detail.showModal();
+    detail.scrollTop = 0;
+  }
+  // The address decides which listing is open, so a listing can be linked to and Back closes it.
+  function route(){
+    var e = location.hash.match(/^#\/edit\/([0-9a-f-]{36})\.([0-9a-f]{64})$/);
+    if (e) return startEdit(e[1], e[2]);
+    var m = location.hash.match(/^#\/b\/(.+)$/);
+    var r = m && rows.filter(function(x){ return key(x) === m[1]; })[0];
+    if (r) showDetail(r);
+    else if (detail.open) detail.close();
+  }
+  window.addEventListener('hashchange', route);
+  detail.addEventListener('close', function(){
+    if (/^#\/b\//.test(location.hash)) history.pushState(null, '', location.pathname + location.search);
+  });
+  detail.addEventListener('click', function(e){ if (e.target === detail) detail.close(); });
+
+  $('q').addEventListener('input', update);
+  $('qx').addEventListener('click', function(){ $('q').value = ''; update(); $('q').focus(); });
+  $('fBuilding').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    state.building = b.dataset.v; press(this, state.building); update();
+  });
+  $('tabs').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    state.industry = b.dataset.v; press(this, state.industry); update();
+  });
+  $('fDiscount').addEventListener('click', function(){
+    state.discount = !state.discount; this.setAttribute('aria-pressed', String(state.discount)); update();
+  });
+  $('retry').addEventListener('click', load);
+  document.addEventListener('keydown', function(e){
+    if (dlg.open || detail.open) return;
+    var typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+    if (e.key === '/' && !typing){ e.preventDefault(); $('q').focus(); }
+    else if (e.key === 'Escape' && document.activeElement === $('q') && $('q').value){ $('q').value = ''; update(); }
+  });
+  if ('IntersectionObserver' in window){
+    var sentinel = el('div'); $('filters').before(sentinel);
+    new IntersectionObserver(function(en){ $('filters').classList.toggle('stuck', !en[0].isIntersecting && en[0].boundingClientRect.top < 0); }).observe(sentinel);
+  }
+
+  /* ---------- Add a listing ---------- */
+  var dlg = $('dlg'), form = $('form');
+  INDUSTRIES.forEach(function(name){ $('industrySelect').appendChild(el('option', null, name)); });
+
+  // The listing being edited ({id, key, data, logo_path, _logo}), or null when adding a new one.
+  var editing = null, lastWasEdit = false;
+  function openForm(rec){
+    var next = (rec && rec.id && rec.key) ? rec : null;
+    if (next || lastWasEdit){ editing = null; form.reset(); setLogo(null); }
+    editing = next; lastWasEdit = !!next;
+    if (editing){
+      ['business_name','building','suite','industry','description','details','contact_name','phone','email','website','discount_details'].forEach(function(n){
+        form.elements[n].value = editing.data[n] || '';
+      });
+      $('offers').checked = !!editing.data.offers_discount;
+    }
+    $('discWrap').hidden = !$('offers').checked;
+    $('dlgTitle').textContent = editing ? 'Edit your listing' : 'Add your business';
+    $('dlgHint').textContent = editing ? 'Change anything below, then save.' : 'Takes about a minute. Everything here is shown to other Westwood tenants.';
+    $('submit').textContent = editing ? 'Save changes' : 'Send listing';
+    $('removeBtn').hidden = !editing;
+    syncLogo();
+    form.hidden = false; $('done').hidden = true; $('formErr').hidden = true;
+    preview();
+    if (!dlg.open) dlg.showModal();
+    dlg.scrollTop = 0;
+  }
+
+  /* ---------- Private edit links ---------- */
+  // Each listing gets a long random secret when it is created. Only its hash is stored,
+  // and the link that carries the secret is the only way to change or remove the listing.
+  // This browser also remembers the secrets of listings made here, to offer "Edit this listing".
+  var mine = {};
+  try { mine = JSON.parse(localStorage.getItem('westwood-my-listings') || '{}') || {}; } catch(e){}
+  function keep(){ if (live) try { localStorage.setItem('westwood-my-listings', JSON.stringify(mine)); } catch(e){} }
+  function remember(id, secret){ mine[id] = secret; keep(); }
+  function forget(id){ delete mine[id]; keep(); }
+  function byId(id){ return rows.filter(function(r){ return r.id === id; })[0]; }
+  function editUrl(id, secret){ return location.origin + location.pathname + '#/edit/' + id + '.' + secret; }
+  function hex(bytes){
+    var h = '';
+    for (var i = 0; i < bytes.length; i++) h += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16);
+    return h;
+  }
+  function randomHex(n){ return hex(crypto.getRandomValues(new Uint8Array(n))); }
+  function sha256(text){
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function(buf){ return hex(new Uint8Array(buf)); });
+  }
+  function rpc(name, args){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + name, {
+      method: 'POST', headers: headers({'Content-Type': 'application/json'}), body: JSON.stringify(args)
+    }).then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); });
+  }
+  function startEdit(id, secret){
+    // Take the secret out of the address bar straight away.
+    history.replaceState(null, '', location.pathname + location.search);
+    if (detail.open) detail.close();
+    var found = live ? rpc('westwood_listing_get', {p_id: id, p_key: secret})
+                     : Promise.resolve(mine[id] === secret ? byId(id) : null);
+    found.then(function(data){
+      if (!data) throw new Error('no match');
+      remember(id, secret);
+      openForm({id: id, key: secret, data: data, logo_path: data.logo_path || null, _logo: data._logo || null});
+    }).catch(function(){
+      form.hidden = true; $('done').hidden = false; $('linkBox').hidden = true;
+      $('doneTitle').textContent = 'That link did not work.';
+      $('doneMsg').textContent = 'This edit link is not valid, or the listing was removed. Check that you have the whole link.';
+      if (!dlg.open) dlg.showModal();
+    });
+  }
+  $('copyLink').addEventListener('click', function(){
+    var b = this; $('editLink').select();
+    if (navigator.clipboard) navigator.clipboard.writeText($('editLink').value).then(function(){ b.textContent = 'Copied'; }, function(){});
+  });
+  $('editLink').addEventListener('focus', function(){ this.select(); });
+  function closeForm(){ dlg.close(); }
+  $('addBtn').addEventListener('click', function(){ openForm(); });
+  ['cancel','cancelX','doneClose'].forEach(function(id){ $(id).addEventListener('click', closeForm); });
+  dlg.addEventListener('click', function(e){ if (e.target === dlg) closeForm(); });
+  $('offers').addEventListener('change', function(){ $('discWrap').hidden = !this.checked; });
+
+  function val(name){
+    var v = form.elements[name].value.trim();
+    return v === '' ? null : v;
+  }
+  function record(){
+    var offers = $('offers').checked;
+    return {
+      business_name: val('business_name'), building: val('building'), suite: val('suite'),
+      industry: val('industry'), description: val('description'), details: val('details'), contact_name: val('contact_name'),
+      email: val('email'), phone: val('phone'), website: val('website'),
+      offers_discount: offers, discount_details: offers ? val('discount_details') : null
+    };
+  }
+  function preview(){
+    var box = $('pv'); box.textContent = '';
+    var rec = record();
+    rec._logo = logoShown || (editing && editing._logo) || null;
+    if (editing && !logoBlob) rec.logo_path = editing.logo_path;
+    box.appendChild(card(rec));
+  }
+
+  /* ---------- Logo ---------- */
+  var logoBlob = null, logoShown = null;
+  // Every logo is redrawn as a PNG no larger than 512px, so uploads stay small and are always plain images.
+  function shrink(file){
+    return new Promise(function(done, bad){
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function(){
+        var k = Math.min(1, 512 / Math.max(img.naturalWidth, img.naturalHeight));
+        var c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.naturalWidth * k));
+        c.height = Math.max(1, Math.round(img.naturalHeight * k));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(function(b){ b ? done(b) : bad(new Error('encode')); }, 'image/png');
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); bad(new Error('read')); };
+      img.src = url;
+    });
+  }
+  function setLogo(blob){
+    if (logoShown) URL.revokeObjectURL(logoShown);
+    logoBlob = blob; logoShown = blob ? URL.createObjectURL(blob) : null;
+    $('logoFile').value = '';
+    syncLogo();
+    preview();
+  }
+  function syncLogo(){
+    var has = !!(logoBlob || (editing && (editing.logo_path || editing._logo)));
+    $('logoClear').hidden = !has;
+    $('logoPick').textContent = has ? 'Change logo' : 'Upload logo';
+  }
+  $('logoPick').addEventListener('click', function(){ $('logoFile').click(); });
+  $('logoClear').addEventListener('click', function(){
+    if (editing){ editing.logo_path = null; editing._logo = null; }
+    setLogo(null);
+  });
+  $('logoFile').addEventListener('change', function(){
+    var f = this.files[0]; if (!f) return;
+    $('formErr').hidden = true;
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type) || f.size > 15e6) return fail('Choose a PNG or JPG image for the logo.');
+    shrink(f).then(setLogo, function(){ fail('That image could not be read. Try a different file.'); });
+  });
+  function uuid(){
+    if (crypto.randomUUID) return crypto.randomUUID();
+    var b = crypto.getRandomValues(new Uint8Array(16)), h = '';
+    b[6] = b[6] & 15 | 64; b[8] = b[8] & 63 | 128;
+    for (var i = 0; i < 16; i++) h += (b[i] < 16 ? '0' : '') + b[i].toString(16) + (i === 3 || i === 5 || i === 7 || i === 9 ? '-' : '');
+    return h;
+  }
+  function uploadLogo(){
+    if (!logoBlob) return Promise.resolve(null);
+    var name = uuid() + '.png';
+    return fetch(SUPABASE_URL + '/storage/v1/object/' + BUCKET + '/' + name, {
+      method: 'POST', headers: headers({'Content-Type': 'image/png'}), body: logoBlob
+    }).then(function(r){ if (!r.ok) throw new Error(r.status); return name; });
+  }
+  form.addEventListener('input', preview);
+  form.addEventListener('change', preview);
+
+  function fail(msg, field){
+    $('formErr').textContent = msg; $('formErr').hidden = false;
+    if (field) form.elements[field].focus();
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    $('formErr').hidden = true;
+    var rec = record();
+    if (!rec.business_name) return fail('Enter your business name.', 'business_name');
+    if (!rec.building) return fail('Choose your building.', 'building');
+    if (!rec.industry) return fail('Choose an industry.', 'industry');
+    if (!rec.description) return fail('Say what your business does.', 'description');
+    if (!rec.email && !rec.phone) return fail('Add a phone number or an email so tenants can reach you.', 'phone');
+    if (rec.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rec.email)) return fail('That email address does not look right.', 'email');
+    if (rec.website && !siteUrl(rec.website)) return fail('That website address does not look right.', 'website');
+
+    // Bots fill the hidden field; people never see it.
+    if (form.elements.company_url.value) return finish('Thank you.', 'Your listing was sent. It will appear in the directory once it has been checked.');
+
+    var btn = $('submit'), label = btn.textContent;
+    btn.disabled = true; btn.textContent = editing ? 'Saving…' : 'Sending…';
+    (editing ? saveEdit(editing, rec) : saveNew(rec)).catch(function(){
+      fail('That could not be saved. Check your connection and try again.');
+    }).then(function(){ btn.disabled = false; btn.textContent = label; });
+  });
+
+  function saveNew(rec){
+    var secret = randomHex(32);
+    rec.id = uuid();
+    if (!live){
+      if (logoBlob) rec._logo = URL.createObjectURL(logoBlob);
+      remember(rec.id, secret);
+      rows.push(rec); ready();
+      finish('Thank you.', 'Preview mode: your listing was added to this page only and will disappear when you reload.', editUrl(rec.id, secret));
+      return Promise.resolve();
+    }
+    return Promise.all([sha256(secret), uploadLogo()]).then(function(v){
+      rec.edit_key_hash = v[0]; rec.logo_path = v[1];
+      return fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
+        method: 'POST',
+        headers: headers({'Content-Type': 'application/json', Prefer: 'return=minimal'}),
+        body: JSON.stringify(rec)
+      });
+    }).then(function(r){
+      if (!r.ok) throw new Error(r.status);
+      remember(rec.id, secret);
+      finish('Thank you.', 'Your listing was sent. It will appear in the directory once it has been checked.', editUrl(rec.id, secret));
+    });
+  }
+
+  function saveEdit(ed, rec){
+    if (!live){
+      var r = byId(ed.id);
+      if (!r) return Promise.reject(new Error('gone'));
+      for (var k in rec) r[k] = rec[k];
+      r._logo = logoBlob ? URL.createObjectURL(logoBlob) : ed._logo;
+      ready();
+      finish('Saved.', 'Your changes are in the directory.');
+      return Promise.resolve();
+    }
+    return uploadLogo().then(function(path){
+      rec.logo_path = path || ed.logo_path;
+      return rpc('westwood_listing_save', {p_id: ed.id, p_key: ed.key, p: rec});
+    }).then(function(ok){
+      if (!ok) throw new Error('rejected');
+      finish('Saved.', 'Your changes are saved. If your listing is already in the directory, they show there now.');
+      load();
+    });
+  }
+
+  $('removeBtn').addEventListener('click', function(){
+    var ed = editing;
+    if (!ed || !confirm('Remove this listing from the directory? This cannot be undone.')) return;
+    var gone;
+    if (live) gone = rpc('westwood_listing_delete', {p_id: ed.id, p_key: ed.key});
+    else { rows = rows.filter(function(r){ return r.id !== ed.id; }); gone = Promise.resolve(true); }
+    gone.then(function(ok){
+      if (!ok) throw new Error('rejected');
+      forget(ed.id);
+      finish('Removed.', 'Your listing has been removed from the directory.');
+      if (live) load(); else ready();
+    }).catch(function(){ fail('Your listing could not be removed. Check your connection and try again.'); });
+  });
+
+  function finish(title, msg, link){
+    editing = null;
+    form.reset(); $('discWrap').hidden = true; setLogo(null);
+    form.hidden = true; $('done').hidden = false;
+    $('doneTitle').textContent = title; $('doneMsg').textContent = msg;
+    $('linkBox').hidden = !link;
+    if (link){
+      $('editLink').value = link;
+      $('copyLink').textContent = 'Copy link';
+      $('mailLink').href = 'mailto:?subject=' + encodeURIComponent('My Westwood directory edit link') +
+        '&body=' + encodeURIComponent('Use this private link to change or remove my Westwood directory listing:\n\n' + link);
+    }
+    dlg.scrollTop = 0;
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
