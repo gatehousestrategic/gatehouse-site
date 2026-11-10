@@ -141,11 +141,11 @@ footer{margin-top:80px;border-top:1px solid var(--line);padding-block:22px 36px}
     $('s-q').textContent=Object.keys(answered).length+' / '+Q.length;$('s-latest').textContent=latest?fmt(latest):'None';
     var list=$('list');list.innerHTML='';
     if(!rows.length){list.appendChild(el('p','empty','No answers yet. They appear here as soon as someone sends the form.'));return;}
-    var OPTS=['A. Keep Neon, add the honors on top','B. Build our own for everything','C. Start with Neon, decide after 2027','Not sure yet'];
+    var OPTS=['A. Keep Neon, add the honors on top','B. Move to a new system for everything','C. Start with Neon, decide after 2027','Not sure yet'];
     var latestPick={};rows.forEach(function(r){var k=r.name.trim().toLowerCase();var c=(r.answers||{})['Choice: Neon or own site'];if(c&&!latestPick[k])latestPick[k]={r:r,c:c,why:(r.answers||{})['Choice: why']||''};});
     var picks=Object.keys(latestPick).map(function(k){return latestPick[k];});
     var dec=el('div','decision');
-    dec.appendChild(el('h3',null,'Keep Neon, or build your own?'));
+    dec.appendChild(el('h3',null,'Keep Neon, or move to a new system?'));
     dec.appendChild(el('p','label',picks.length?picks.length+' '+(picks.length===1?'person has':'people have')+' picked · latest pick per person':'Nobody has picked yet'));
     OPTS.forEach(function(o){
       var who_=picks.filter(function(p){return p.c===o;});
@@ -194,7 +194,7 @@ footer{margin-top:80px;border-top:1px solid var(--line);padding-block:22px 36px}
   $('refresh').addEventListener('click',function(){$('view-err').textContent='';load(pass).then(function(d){rows=d||[];render();}).catch(function(){$('view-err').textContent='Could not refresh. Try again in a moment.';});});
   $('copy').addEventListener('click',function(){
     var ch=rows.filter(function(r){return (r.answers||{})['Choice: Neon or own site'];}).map(function(r){return '   '+r.name+(r.role?' ('+r.role+')':'')+': '+r.answers['Choice: Neon or own site']+(r.answers['Choice: why']?' — '+r.answers['Choice: why']:'');});
-    var head='Keep Neon, or build your own?\n'+(ch.length?ch.join('\n'):'   (no picks yet)')+'\n\n';
+    var head='Keep Neon, or move to a new system?\n'+(ch.length?ch.join('\n'):'   (no picks yet)')+'\n\n';
     var out=head+Q.map(function(q,i){var lines=[(i+1)+'. '+q];rows.slice().reverse().forEach(function(r){Object.keys(r.answers||{}).forEach(function(k){if(num(k)===i+1)lines.push('   '+r.name+(r.role?' ('+r.role+')':'')+': '+r.answers[k]);});});if(lines.length===1)lines.push('   (no answer yet)');return lines.join('\n');}).join('\n\n');
     var b=this;navigator.clipboard.writeText(out).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy all';},1600);}).catch(function(){$('view-err').textContent='Copy was blocked by the browser. Select the answers and copy them instead.';});
   });
