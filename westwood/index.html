@@ -96,12 +96,9 @@ kbd{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);bo
 .dtoggle[aria-pressed=true]{background:linear-gradient(180deg,var(--gold-2),var(--gold));border-color:var(--tan);color:var(--gold-ink);box-shadow:0 6px 18px -8px rgba(124,104,84,.8)}
 .dtoggle[aria-pressed=true] svg{color:var(--gold-ink)}
 .count{margin-left:auto;color:var(--muted);font-size:14px}
-.tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(90deg,#000 calc(100% - 40px),transparent)}
-.tabs::-webkit-scrollbar{display:none}
-.tab{border:1px solid transparent;background:transparent;padding:6px 11px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap;transition:background .18s,color .18s}
-.tab:hover{background:#fff;color:var(--ink)}
-.tab i{font-style:normal;opacity:.6;margin-left:5px;font-variant-numeric:tabular-nums}
-.tab[aria-pressed=true]{background:#fff;border-color:var(--line);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(43,42,38,.06)}
+.sel{font:inherit;font-weight:600;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:0;width:auto;max-width:100%;cursor:pointer}
+.sel:hover{border-color:var(--tan)}
+.more{grid-column:1/-1;display:flex;justify-content:center;padding-top:6px}
 
 .notice{background:var(--gold-soft);border:1px solid #e5cfae;border-radius:8px;padding:10px 14px;font-size:14px;margin-top:18px}
 .linkbtn{background:none;border:0;padding:0;color:var(--bronze);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
@@ -295,13 +292,17 @@ textarea{min-height:96px;resize:vertical}
         <button type="button" data-v="Westwood One" aria-pressed="false">Westwood One</button>
         <button type="button" data-v="Westwood Two" aria-pressed="false">Westwood Two</button>
       </div>
+      <select class="sel" id="fIndustry" aria-label="Industry"><option value="">All industries</option></select>
       <button class="dtoggle" id="fDiscount" type="button" aria-pressed="false">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h6.6a1.5 1.5 0 0 1 1.06.44l8.4 8.4a1.5 1.5 0 0 1 0 2.12l-6.6 6.6a1.5 1.5 0 0 1-2.12 0l-8.4-8.4A1.5 1.5 0 0 1 3 11.1V4.5Zm4.75 1.75a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg>
         Westwood discounts
       </button>
       <span class="count" id="count" aria-live="polite"></span>
+      <select class="sel" id="fSort" aria-label="Order">
+        <option value="random">Random order</option>
+        <option value="az">A to Z</option>
+      </select>
     </div>
-    <div class="tabs" id="tabs" role="group" aria-label="Industry"></div>
   </div>
 </div>
 
@@ -471,7 +472,8 @@ textarea{min-height:96px;resize:vertical}
 
   var live = !!(SUPABASE_URL && ANON_KEY);
   var rows = [], seq = 0, first = true;
-  var state = {industry:'', building:'', discount:false};
+  var STEP = 6; // businesses shown at first, and added by each press of "More"
+  var state = {industry:'', building:'', discount:false, sort:'random', limit:STEP};
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function(id){ return document.getElementById(id); };
 
@@ -511,7 +513,7 @@ textarea{min-height:96px;resize:vertical}
     // A new random order on every visit, so no business is always first. It holds steady while you search.
     rows.forEach(function(r){ if (r._o == null) r._o = Math.random(); });
     rows.sort(function(a,b){ return a._o - b._o; });
-    buildTabs();
+    buildIndustries();
     stats();
     render();
     route();
@@ -536,21 +538,17 @@ textarea{min-height:96px;resize:vertical}
     });
   }
 
-  function buildTabs(){
-    var box = $('tabs'), counts = {};
+  function buildIndustries(){
+    var sel = $('fIndustry'), counts = {};
     rows.forEach(function(r){ counts[r.industry] = (counts[r.industry] || 0) + 1; });
     if (!counts[state.industry]) state.industry = '';
-    box.textContent = '';
-    box.hidden = !rows.length;
-    function add(value, label, n){
-      var b = el('button', 'tab', label);
-      b.type = 'button'; b.dataset.v = value;
-      b.setAttribute('aria-pressed', String(state.industry === value));
-      b.appendChild(el('i', null, n));
-      box.appendChild(b);
-    }
-    add('', 'All industries', rows.length);
-    Object.keys(counts).sort().forEach(function(name){ add(name, name, counts[name]); });
+    sel.length = 1;
+    Object.keys(counts).sort().forEach(function(name){
+      var o = el('option', null, name + ' (' + counts[name] + ')');
+      o.value = name;
+      sel.appendChild(o);
+    });
+    sel.value = state.industry;
   }
 
   /* ---------- Search ---------- */
@@ -578,6 +576,11 @@ textarea{min-height:96px;resize:vertical}
     var w = words();
     var filtered = !!(w.length || state.industry || state.building || state.discount);
     var shown = rows.filter(function(r){ return matches(r, w); });
+    if (state.sort === 'az') shown.sort(function(a, b){ return a.business_name.localeCompare(b.business_name, undefined, {sensitivity: 'base'}); });
+    // Six at a time, in every view. "More" adds the next six.
+    var total = shown.length;
+    var limited = total > state.limit;
+    if (limited) shown = shown.slice(0, state.limit);
     var g = $('grid');
     g.textContent = '';
     if (!first) g.classList.remove('intro');
@@ -590,7 +593,17 @@ textarea{min-height:96px;resize:vertical}
     first = false;
 
     $('qx').hidden = !$('q').value; $('slash').hidden = !!$('q').value;
-    $('count').textContent = rows.length ? shown.length + (shown.length === 1 ? ' business' : ' businesses') + (filtered ? ' found' : '') + (shown.length > 1 ? ' · shown in random order' : '') : '';
+    var n = total + (total === 1 ? ' business' : ' businesses');
+    $('count').textContent = !rows.length ? '' :
+      (limited ? 'Showing ' + shown.length + ' of ' + n : n) + (filtered ? ' found' : '') +
+      (total < 2 ? '' : state.sort === 'az' ? ' · A to Z' : ' · in random order');
+    if (limited){
+      var more = el('div', 'more'), next = Math.min(STEP, total - shown.length);
+      var btn = el('button', 'btn primary', 'More (next ' + next + ')');
+      btn.type = 'button';
+      btn.addEventListener('click', function(){ state.limit += STEP; update(); });
+      more.appendChild(btn); g.appendChild(more);
+    }
 
     if (!shown.length){
       var e = el('div', 'empty');
@@ -611,8 +624,8 @@ textarea{min-height:96px;resize:vertical}
 
   function reset(){
     $('q').value = ''; state.industry = ''; state.building = ''; state.discount = false;
-    press($('fBuilding'), ''); press($('tabs'), ''); $('fDiscount').setAttribute('aria-pressed', 'false');
-    update();
+    press($('fBuilding'), ''); $('fIndustry').value = ''; $('fDiscount').setAttribute('aria-pressed', 'false');
+    fresh();
   }
   function press(group, value){
     Array.prototype.forEach.call(group.querySelectorAll('button'), function(b){
@@ -796,25 +809,25 @@ textarea{min-height:96px;resize:vertical}
   });
   detail.addEventListener('click', function(e){ if (e.target === detail) detail.close(); });
 
-  $('q').addEventListener('input', update);
-  $('qx').addEventListener('click', function(){ $('q').value = ''; update(); $('q').focus(); });
+  // A new search, filter or order starts again from the first six.
+  function fresh(){ state.limit = STEP; update(); }
+  $('q').addEventListener('input', fresh);
+  $('qx').addEventListener('click', function(){ $('q').value = ''; fresh(); $('q').focus(); });
   $('fBuilding').addEventListener('click', function(e){
     var b = e.target.closest('button'); if (!b) return;
-    state.building = b.dataset.v; press(this, state.building); update();
+    state.building = b.dataset.v; press(this, state.building); fresh();
   });
-  $('tabs').addEventListener('click', function(e){
-    var b = e.target.closest('button'); if (!b) return;
-    state.industry = b.dataset.v; press(this, state.industry); update();
-  });
+  $('fIndustry').addEventListener('change', function(){ state.industry = this.value; fresh(); });
+  $('fSort').addEventListener('change', function(){ state.sort = this.value; fresh(); });
   $('fDiscount').addEventListener('click', function(){
-    state.discount = !state.discount; this.setAttribute('aria-pressed', String(state.discount)); update();
+    state.discount = !state.discount; this.setAttribute('aria-pressed', String(state.discount)); fresh();
   });
   $('retry').addEventListener('click', load);
   document.addEventListener('keydown', function(e){
     if (dlg.open || detail.open) return;
     var typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
     if (e.key === '/' && !typing){ e.preventDefault(); $('q').focus(); }
-    else if (e.key === 'Escape' && document.activeElement === $('q') && $('q').value){ $('q').value = ''; update(); }
+    else if (e.key === 'Escape' && document.activeElement === $('q') && $('q').value){ $('q').value = ''; fresh(); }
   });
   if ('IntersectionObserver' in window){
     var sentinel = el('div'); $('filters').before(sentinel);
