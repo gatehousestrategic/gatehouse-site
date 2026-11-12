@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Preview | Gatehouse Strategic</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --navy: #0d2a4c; --navy-2: #163a63; --blue-light: #a9cdf0; --muted: #66768a; --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { display: flex; flex-direction: column; font: 400 14px/1.4 var(--sans); background: #f3f6fa; color: #34465c; }
+.bar { flex: none; height: 52px; background: var(--navy); color: #fff; display: flex; align-items: stretch; }
+.bar a, .bar button { display: flex; align-items: center; padding: 0 18px; color: #fff; text-decoration: none; background: none; border: 0; border-right: 1px solid rgba(255,255,255,.18); font: 600 13px/1 var(--sans); cursor: pointer; }
+.bar a:hover, .bar button:hover { background: var(--navy-2); }
+.title { display: flex; align-items: center; padding: 0 18px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.title span { color: var(--blue-light); font-weight: 500; margin-left: 10px; }
+.grow { flex: 1; }
+.pages { display: flex; align-items: center; gap: 8px; padding: 0 14px; border-left: 1px solid rgba(255,255,255,.18); }
+.pages select { height: 32px; border: 0; border-radius: 2px; padding: 0 8px; font: 500 13px var(--sans); color: var(--navy); }
+.sizes { display: flex; border-left: 1px solid rgba(255,255,255,.18); }
+.sizes button[aria-pressed="true"] { background: var(--navy-2); box-shadow: inset 0 -3px 0 #3d8bd6; }
+.stage { flex: 1; display: flex; justify-content: center; overflow: auto; }
+iframe { border: 0; width: 100%; height: 100%; background: #fff; display: block; }
+.stage.mobile iframe { width: 390px; margin: 16px 0; height: calc(100% - 32px); box-shadow: 0 10px 40px rgba(13,42,76,.18); }
+.msg { margin: auto; padding: 40px 20px; text-align: center; color: var(--muted); font-size: 16px; }
+@media (max-width: 700px) { .sizes, .title span { display: none; } }
+</style>
+</head>
+<body>
+<header class="bar">
+  <a href="./" id="back">← Dashboard</a>
+  <div class="title" id="title">Loading preview…</div>
+  <div class="grow"></div>
+  <div class="pages"><select id="pages" aria-label="Page"></select></div>
+  <div class="sizes">
+    <button type="button" data-size="desktop" aria-pressed="true">Desktop</button>
+    <button type="button" data-size="mobile" aria-pressed="false">Phone</button>
+  </div>
+</header>
+<div class="stage" id="stage"><p class="msg" id="msg">Loading preview…</p></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="api.js"></script>
+<script>
+// Shows a website preview stored in the private bucket. Every file comes from a
+// short-lived signed link, and the pages run in a sandboxed frame with no access
+// to this page or the portal session.
+(function () {
+  var P = GH_PORTAL;
+  var q = new URLSearchParams(location.search);
+  var itemId = q.get("id");
+  var asAdmin = q.get("admin") === "1";
+  var files = {}, current = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  if (asAdmin) $("back").href = "../admin/";
+
+  function fail(msg) { $("stage").innerHTML = '<p class="msg">' + msg + "</p>"; $("title").textContent = "Preview"; }
+
+  function getLinks() {
+    if (asAdmin) {
+      var sb = supabase.createClient(P.url, P.key);
+      return sb.from("portal_items").select("*").eq("id", itemId).single().then(function (r) {
+        if (r.error || !r.data) throw new Error("not found");
+        var it = r.data, list = JSON.parse(it.body || "[]");
+        return sb.storage.from("portal-files").createSignedUrls(list.map(function (f) { return it.file_path + f; }), 3600).then(function (s) {
+          if (s.error) throw s.error;
+          var map = {}; list.forEach(function (f, i) { map[f] = s.data[i].signedUrl; });
+          return { ok: true, title: it.title, entry: it.url || "index.html", files: map };
+        });
+      });
+    }
+    var token = P.getToken();
+    if (!token) { location.replace("../login/"); return Promise.reject(new Error("no session")); }
+    return P.access(token, itemId).then(function (r) {
+      if (r && r.error === "expired") { P.setToken(null); location.replace("../login/?expired"); }
+      return r;
+    });
+  }
+
+  function resolve(base, rel) {
+    var parts = base.split("/"); parts.pop();
+    rel.split("/").forEach(function (p) {
+      if (p === "..") parts.pop(); else if (p !== "." && p !== "") parts.push(p);
+    });
+    return parts.join("/");
+  }
+  function isLocal(u) { return u && !/^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(u); }
+
+  function rewriteCss(css, base) {
+    return css.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g, function (m, qt, u) {
+      if (!isLocal(u)) return m;
+      var p = resolve(base, u.split(/[?#]/)[0]);
+      return files[p] ? 'url("' + files[p] + '")' : m;
+    });
+  }
+
+  async function show(page) {
+    if (!files[page]) return;
+    current = page;
+    $("pages").value = page;
+    var html = await fetch(files[page]).then(function (r) { return r.text(); });
+    var doc = new DOMParser().parseFromString(html, "text/html");
+
+    // Stylesheets: inline them, with their own url() references signed.
+    var links = Array.prototype.slice.call(doc.querySelectorAll('link[rel~="stylesheet"][href]'));
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute("href");
+      if (!isLocal(href)) continue;
+      var p = resolve(page, href.split(/[?#]/)[0]);
+      if (!files[p]) continue;
+      var css = await fetch(files[p]).then(function (r) { return r.text(); });
+      var st = doc.createElement("style"); st.textContent = rewriteCss(css, p);
+      links[i].replaceWith(st);
+    }
+
+    // Everything else that points at a local file gets a signed link;
+    // links to other pages switch pages inside the viewer.
+    doc.querySelectorAll("[src],[href],[srcset],[poster]").forEach(function (el) {
+      ["src", "href", "poster"].forEach(function (attr) {
+        var v = el.getAttribute(attr);
+        if (!isLocal(v)) return;
+        var clean = v.split("#")[0].split("?")[0];
+        var p = resolve(page, clean || page);
+        if (el.tagName === "A" && /\.html?$/i.test(p) && files[p]) {
+          el.setAttribute("href", "#"); el.setAttribute("data-gh-page", p); el.removeAttribute("target");
+        } else if (files[p]) {
+          el.setAttribute(attr, files[p]);
+        }
+      });
+    });
+    doc.querySelectorAll("[style]").forEach(function (el) { el.setAttribute("style", rewriteCss(el.getAttribute("style"), page)); });
+    doc.querySelectorAll("style").forEach(function (el) { el.textContent = rewriteCss(el.textContent, page); });
+    doc.querySelectorAll('a[href^="http"]').forEach(function (a) { a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener"); });
+
+    var hook = doc.createElement("script");
+    hook.textContent = 'document.addEventListener("click",function(e){var a=e.target.closest("a[data-gh-page]");if(a){e.preventDefault();parent.postMessage({ghPage:a.getAttribute("data-gh-page")},"*");}var f=e.target.closest("form");},true);document.addEventListener("submit",function(e){e.preventDefault();},true);';
+    (doc.body || doc.documentElement).appendChild(hook);
+
+    var frame = document.createElement("iframe");
+    frame.setAttribute("sandbox", "allow-scripts allow-popups allow-popups-to-escape-sandbox");
+    frame.setAttribute("title", "Website preview");
+    frame.srcdoc = "<!doctype html>\n" + doc.documentElement.outerHTML;
+    var stage = $("stage"); stage.innerHTML = ""; stage.appendChild(frame);
+  }
+
+  window.addEventListener("message", function (e) {
+    if (e.data && typeof e.data.ghPage === "string" && files[e.data.ghPage]) show(e.data.ghPage);
+  });
+  $("pages").addEventListener("change", function () { show(this.value); });
+  document.querySelectorAll("[data-size]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("[data-size]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      $("stage").classList.toggle("mobile", b.dataset.size === "mobile");
+    });
+  });
+
+  if (!itemId) return fail("No preview selected.");
+  getLinks().then(function (r) {
+    if (!r || !r.ok) return fail("This preview isn't available. Go back to your dashboard and try again.");
+    files = r.files;
+    $("title").innerHTML = "";
+    $("title").appendChild(document.createTextNode(r.title));
+    var sp = document.createElement("span"); sp.textContent = "Preview"; $("title").appendChild(sp);
+    document.title = r.title + " | Preview";
+    var pages = Object.keys(files).filter(function (f) { return /\.html?$/i.test(f); }).sort(function (a, b) {
+      return a === r.entry ? -1 : b === r.entry ? 1 : a.localeCompare(b);
+    });
+    $("pages").innerHTML = pages.map(function (p) {
+      var label = p.replace(/\.html?$/i, "").replace(/(^|\/)index$/, "$1Home").replace(/[-_]/g, " ");
+      return '<option value="' + p.replace(/"/g, "&quot;") + '">' + label.charAt(0).toUpperCase() + label.slice(1) + "</option>";
+    }).join("");
+    show(files[r.entry] ? r.entry : pages[0]);
+  }).catch(function () { fail("This preview couldn't be loaded. Please try again."); });
+})();
+</script>
+</body>
+</html>

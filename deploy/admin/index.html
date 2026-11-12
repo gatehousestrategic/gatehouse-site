@@ -389,6 +389,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     ]);
     await loadClientsData();
     var msgs = check(r[0]), ups = check(r[1]), logins = check(r[2]);
+    state.ovUploads = ups;
     var unread = state.clients.reduce(function (n, c) { return n + c.newMsgs; }, 0);
     var wrong = r[5].count || 0;
     $("ovStats").innerHTML =
@@ -403,8 +404,8 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     }).join("") : '<p class="placeholder" style="padding:28px 20px">No unread messages.</p>';
 
     $("ovUploads").innerHTML = ups.length ? ups.map(function (f) {
-      return '<a class="fi" href="' + esc(GH_PORTAL.fileUrl(f.file_path)) + '" target="_blank" rel="noopener"><b>' + esc(f.file_name || f.title) +
-        '</b><span class="when">' + ago(f.created_at) + '</span><span class="snip muted">' + esc(clientName(f.client_id)) + (f.file_size ? " · " + size(f.file_size) : "") + " · Download</span></a>";
+      return '<button class="fi" data-dl="' + esc(f.id) + '"><b>' + esc(f.file_name || f.title) +
+        '</b><span class="when">' + ago(f.created_at) + '</span><span class="snip muted">' + esc(clientName(f.client_id)) + (f.file_size ? " · " + size(f.file_size) : "") + " · Download</span></button>";
     }).join("") : '<p class="placeholder" style="padding:28px 20px">No files from clients yet.</p>';
 
     $("ovLogins").innerHTML = logins.length ? logins.map(function (e) {
@@ -493,7 +494,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     var fRows = files.length ? files.map(function (f) {
       var from = f.uploaded_by === "client" ? '<span class="flag on">From client</span>' : '<span class="flag">From Gatehouse</span>';
       return '<tr><td><b>' + esc(f.title) + "</b>" + (f.file_name && f.file_name !== f.title ? '<div class="muted">' + esc(f.file_name) + "</div>" : "") + "</td><td>" + from + '</td><td class="meta hide-sm">' + esc(size(f.file_size)) + '</td><td class="meta hide-sm">' + day(f.created_at) +
-        '</td><td class="acts"><a class="btn ghost small" href="' + esc(GH_PORTAL.fileUrl(f.file_path)) + '" target="_blank" rel="noopener">Download</a>' + editBtns(f) + "</td></tr>";
+        '</td><td class="acts"><button class="btn ghost small" data-act="download" data-id="' + f.id + '">Download</button>' + editBtns(f) + "</td></tr>";
     }).join("") : '<tr class="empty-row"><td colspan="5">No files yet.</td></tr>';
     var fe = editing("file");
     var fileCard = card("Files", "Yours and the client's, newest first",
@@ -503,12 +504,27 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
         (fe ? "<span></span>" : '<label class="f">File<input type="file" id="fFile"></label>') + "</div>" +
         '<div class="acts"><button class="btn" type="submit" id="fBtn">' + (fe ? "Save changes" : "Upload file") + "</button>" + (fe ? '<button class="btn ghost" type="button" data-act="cancel">Cancel</button>' : '<span class="muted">Leave the title empty to use the file name.</span>') + "</div></form>");
 
+    // Website previews (stored privately, shown inside the client dashboard)
+    var sites = state.items.filter(function (i) { return i.kind === "site"; });
+    var sRows = sites.length ? sites.map(function (s) {
+      var n = JSON.parse(s.body || "[]").length;
+      return "<tr><td><b>" + esc(s.title) + '</b><div class="muted">' + n + " files · opens at " + esc(s.url || "index.html") + '</div></td><td class="meta hide-sm">' + day(s.created_at) +
+        '</td><td class="acts"><a class="btn ghost small" href="../portal/view.html?admin=1&id=' + s.id + '" target="_blank" rel="noopener">Preview</a>' + editBtns(s) + "</td></tr>";
+    }).join("") : '<tr class="empty-row"><td colspan="3">No website previews yet.</td></tr>';
+    var se = editing("site");
+    var siteCard = card("Website previews", "Only visible to this client, inside their dashboard",
+      "<table><tbody>" + sRows + "</tbody></table>" +
+      '<form class="sec-form' + (se ? " editing" : "") + '" id="siteForm">' + (se ? '<span class="edit-tag">Renaming a preview</span>' : "") +
+        '<div class="two"><label class="f">Title<input type="text" id="sTitle" maxlength="200" required placeholder="e.g. Website redesign, version 2" value="' + esc(se ? se.title : "") + '"></label>' +
+        (se ? "<span></span>" : '<label class="f">Website folder (with index.html)<input type="file" id="sFolder" webkitdirectory multiple></label>') + "</div>" +
+        '<div class="acts"><button class="btn" type="submit">' + (se ? "Save changes" : "Upload preview") + "</button>" + (se ? '<button class="btn ghost" type="button" data-act="cancel">Cancel</button>' : '<span class="muted" id="sStatus">Pick the whole site folder. Pages, styles, scripts and images are uploaded privately.</span>') + "</div></form>");
+
     // Links
     var lRows = links.length ? links.map(function (l) {
       return "<tr><td><b>" + esc(l.title) + '</b><div class="muted" style="word-break:break-all"><a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.url) + '</a></div></td><td class="meta hide-sm">' + day(l.created_at) + '</td><td class="acts">' + editBtns(l) + "</td></tr>";
     }).join("") : '<tr class="empty-row"><td colspan="3">No links yet.</td></tr>';
     var le = editing("link");
-    var linkCard = card("Links", "Previews, shared folders, anything with an address",
+    var linkCard = card("Links", "Outside addresses, such as a shared folder. Anyone with the address can open it.",
       "<table><tbody>" + lRows + "</tbody></table>" +
       '<form class="sec-form' + (le ? " editing" : "") + '" id="linkForm">' + (le ? '<span class="edit-tag">Editing a link</span>' : "") +
         '<div class="two"><label class="f">Title<input type="text" id="lTitle" maxlength="200" required placeholder="e.g. Website redesign preview" value="' + esc(le ? le.title : "") + '"></label>' +
@@ -554,9 +570,9 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
       '<button class="btn ghost" type="button" data-act="archive">' + (c.archived ? "Restore" : "Archive") + "</button>" +
       '<button class="btn danger" type="button" data-act="delclient">Delete client</button></form></div></div>';
 
-    $("detail").innerHTML = '<div class="detail">' + head + msgCard + fileCard + linkCard + noteCard + codeCard + evCard + "</div>";
+    $("detail").innerHTML = '<div class="detail">' + head + msgCard + fileCard + siteCard + linkCard + noteCard + codeCard + evCard + "</div>";
     var th = $("thread"); th.scrollTop = th.scrollHeight;
-    if (ed) { var f = $(ed.kind === "file" ? "fileForm" : ed.kind === "link" ? "linkForm" : "noteForm"); f.scrollIntoView({ block: "center" }); }
+    if (ed) { var f = $(({ file: "fileForm", link: "linkForm", note: "noteForm", site: "siteForm" })[ed.kind]); f.scrollIntoView({ block: "center" }); }
   }
 
   function evRow(e) {
@@ -567,11 +583,29 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
 
   function rerender() { openClient(state.current.id, true); }
 
+  // Every stored path for an item: one for a file, the whole folder for a preview.
+  function storedPaths(x) {
+    if (x.kind === "file") return [x.file_path];
+    if (x.kind === "site") return JSON.parse(x.body || "[]").map(function (f) { return x.file_path + f; });
+    return [];
+  }
+  async function download(item) {
+    var r = await sb.storage.from("portal-files").createSignedUrl(item.file_path, 300, { download: item.file_name || true });
+    if (r.error) return toast("Couldn't open that file: " + r.error.message);
+    location.href = r.data.signedUrl;
+  }
+  $("ovUploads").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-dl]"); if (!b) return;
+    var it = (state.ovUploads || []).find(function (x) { return x.id === b.dataset.dl; });
+    if (it) download(it);
+  });
+
   $("detail").addEventListener("click", async function (e) {
     var b = e.target.closest("button[data-act]"); if (!b) return;
     var act = b.dataset.act, c = state.current;
     var code = state.codes.find(function (k) { return k.id === b.dataset.id; });
     var it = state.items.find(function (x) { return x.id === b.dataset.id; });
+    if (act === "download") return download(it);
     if (act === "copycode") return copy(code.code, "Code copied");
     if (act === "copyinvite") return copy("Your Gatehouse Strategic client dashboard: go to " + SITE + "/login and enter code " + code.code, "Invite copied");
     if (act === "togglecode") { check(await sb.from("portal_codes").update({ active: !code.active }).eq("id", code.id)); toast(code.active ? "Code turned off" : "Code turned on"); return loadClients(); }
@@ -579,7 +613,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     if (act === "archive") { check(await sb.from("portal_clients").update({ archived: !c.archived }).eq("id", c.id)); toast(c.archived ? "Client restored" : "Client archived. Their codes stop working."); return loadClients(); }
     if (act === "delclient") {
       if (!armed(b, "Deletes codes, files, notes and messages. Click again")) return;
-      var paths = state.items.filter(function (x) { return x.kind === "file"; }).map(function (x) { return x.file_path; });
+      var paths = state.items.reduce(function (a, x) { return a.concat(storedPaths(x)); }, []);
       if (paths.length) await sb.storage.from("portal-files").remove(paths);
       check(await sb.from("portal_clients").delete().eq("id", c.id));
       state.current = null; toast("Client deleted"); return loadClients();
@@ -588,7 +622,8 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     if (act === "cancel") { state.editing = null; return rerender(); }
     if (act === "delitem") {
       if (!armed(b)) return;
-      if (it.kind === "file") await sb.storage.from("portal-files").remove([it.file_path]);
+      var gone = storedPaths(it);
+      if (gone.length) await sb.storage.from("portal-files").remove(gone);
       check(await sb.from("portal_items").delete().eq("id", it.id));
       if (state.editing && state.editing.id === it.id) state.editing = null;
       toast("Removed"); return rerender();
@@ -632,6 +667,33 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
         if (up.error) return toast("Upload failed: " + up.error.message);
         check(await sb.from("portal_items").insert({ client_id: c.id, kind: "file", title: title || f.name, file_path: path, file_name: f.name, file_size: f.size, uploaded_by: "admin" }));
         toast("File added"); return rerender();
+      }
+      if (id === "siteForm") {
+        var stitle = $("sTitle").value.trim();
+        if (ed) {
+          check(await sb.from("portal_items").update({ title: stitle }).eq("id", ed.id));
+          state.editing = null; toast("Saved"); return rerender();
+        }
+        var all = Array.prototype.slice.call($("sFolder").files || []);
+        // Paths inside the chosen folder, without the folder's own name.
+        var list = all.map(function (f) { return { f: f, rel: (f.webkitRelativePath || f.name).split("/").slice(1).join("/") || f.name }; })
+          .filter(function (x) { return !/(^|\/)\./.test(x.rel) && !/\.md$/i.test(x.rel) && !/(^|\/)node_modules\//.test(x.rel); });
+        if (!list.length) return toast("Choose the website's folder first");
+        var entry = list.some(function (x) { return x.rel === "index.html"; }) ? "index.html" : (list.find(function (x) { return /\.html?$/i.test(x.rel); }) || {}).rel;
+        if (!entry) return toast("That folder has no HTML page");
+        var total = list.reduce(function (n, x) { return n + x.f.size; }, 0);
+        if (total > 100 * 1048576) return toast("That folder is over 100 MB");
+        var prefix = "sites/" + randHex(16) + "/";
+        for (var i = 0; i < list.length; i++) {
+          $("sStatus").textContent = "Uploading " + (i + 1) + " of " + list.length + "…";
+          var u = await sb.storage.from("portal-files").upload(prefix + list[i].rel, list[i].f, { contentType: list[i].f.type || "application/octet-stream" });
+          if (u.error) {
+            await sb.storage.from("portal-files").remove(list.slice(0, i).map(function (x) { return prefix + x.rel; }));
+            return toast("Upload failed on " + list[i].rel + ": " + u.error.message);
+          }
+        }
+        check(await sb.from("portal_items").insert({ client_id: c.id, kind: "site", title: stitle, file_path: prefix, url: entry, body: JSON.stringify(list.map(function (x) { return x.rel; })), file_size: total }));
+        toast("Preview uploaded"); return rerender();
       }
       if (id === "linkForm") {
         var lt = $("lTitle").value.trim(), lu = $("lUrl").value.trim();

@@ -17,12 +17,18 @@ window.GH_PORTAL = (function () {
     });
   }
 
-  function fileUrl(path) {
-    return URL_ + "/storage/v1/object/public/portal-files/" + path.split("/").map(encodeURIComponent).join("/");
+  // Files are private. The portal-files function checks the session and
+  // returns short-lived links for one item (a file, or a website preview).
+  function access(token, itemId) {
+    return fetch(URL_ + "/functions/v1/portal-files", {
+      method: "POST",
+      headers: { apikey: KEY, Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ token: token, item_id: itemId })
+    }).then(function (r) { return r.json(); });
   }
 
   function getToken() { try { return sessionStorage.getItem(STORE); } catch (e) { return null; } }
   function setToken(t) { try { t ? sessionStorage.setItem(STORE, t) : sessionStorage.removeItem(STORE); } catch (e) {} }
 
-  return { url: URL_, key: KEY, rpc: rpc, fileUrl: fileUrl, getToken: getToken, setToken: setToken };
+  return { url: URL_, key: KEY, rpc: rpc, access: access, getToken: getToken, setToken: setToken };
 })();
