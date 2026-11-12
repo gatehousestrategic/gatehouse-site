@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
 
     const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const { data: s } = await db.from("portal_sessions").select("client_id, code_id")
+    const { data: s } = await db.from("portal_sessions").select("client_id, code_id, admin")
       .eq("token", token).gt("expires_at", new Date().toISOString()).maybeSingle();
     if (!s) return json({ ok: false, error: "expired" }, 401);
 
@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
     if (!it) return json({ ok: false, error: "not_found" }, 404);
 
     await db.from("portal_events").insert({
-      kind: "item_open", client_id: s.client_id, code_id: s.code_id, item_id: it.id,
+      kind: "item_open", client_id: s.client_id, code_id: s.code_id, item_id: it.id, admin: !!s.admin,
       detail: (it.kind === "file" ? (viewing ? "Viewed: " : "Downloaded: ") : "") + it.title,
       ip: (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || null,
       user_agent: (req.headers.get("user-agent") || "").slice(0, 300),

@@ -93,7 +93,7 @@ button::after { content: "→"; color: var(--blue-light); }
   </section>
 </main>
 
-<script src="../portal/api.js?v=4"></script>
+<script src="../portal/api.js?v=5"></script>
 <script>
 // Codes are checked by the database (supabase/portal.sql). A match returns a
 // short-lived session, and the client's page opens at /portal/.
@@ -119,7 +119,11 @@ button::after { content: "→"; color: var(--blue-light); }
     var norm = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     if (norm.length < 6) return fail("Please enter the full code.");
     go.disabled = true;
-    GH_PORTAL.rpc("portal_login", { p_code: norm }).then(function (res) {
+    var adminJwt = GH_PORTAL.adminBearer();
+    GH_PORTAL.rpc("portal_login", { p_code: norm }, adminJwt).catch(function (e) {
+      if (adminJwt) return GH_PORTAL.rpc("portal_login", { p_code: norm });
+      throw e;
+    }).then(function (res) {
       if (res && res.ok) {
         GH_PORTAL.setToken(res.token);
         location.href = "../portal/";

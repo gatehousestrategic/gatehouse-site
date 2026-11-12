@@ -257,7 +257,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="../portal/api.js?v=4"></script>
+<script src="../portal/api.js?v=5"></script>
 <script src="../portal/reader.js?v=1"></script>
 <script>
 (function () {
@@ -335,6 +335,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
       return;
     }
     $("whoEmail").textContent = s.user.email;
+    sb.rpc("portal_admin_seen").then(function () {}, function () {});
     await loadClientsData();
     go("overview");
   }
@@ -568,6 +569,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
       '<label class="f grow">Client name<input type="text" id="cName" value="' + esc(c.name) + '" maxlength="120" required></label>' +
       '<label class="f grow">Private note (only you see this)<input type="text" id="cNote" value="' + esc(c.note || "") + '" maxlength="1000"></label>' +
       '<button class="btn ghost" type="submit">Save</button>' +
+      '<a class="btn ghost" href="../portal/?as=' + encodeURIComponent(c.id) + '" target="_blank" rel="noopener">View as client</a>' +
       '<button class="btn ghost" type="button" data-act="archive">' + (c.archived ? "Restore" : "Archive") + "</button>" +
       '<button class="btn danger" type="button" data-act="delclient">Delete client</button></form></div></div>';
 

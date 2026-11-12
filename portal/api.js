@@ -6,10 +6,20 @@ window.GH_PORTAL = (function () {
   var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhsb2hkbmp4ZW13cG5ua3huaHF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzU5NzYsImV4cCI6MjA5NzcxMTk3Nn0.WcwZ3VpLwwo4aDUMyrz4pwQBN1jBkKQrLBLp7mKFA-U";
   var STORE = "gh_portal_session";
 
-  function rpc(name, args) {
+  // If this browser is also signed in to /admin, return that sign-in so a
+  // code login from here is recorded as Gatehouse's own, not the client's.
+  function adminBearer() {
+    try {
+      var s = JSON.parse(localStorage.getItem("sb-hlohdnjxemwpnnkxnhqx-auth-token") || "null");
+      if (s && s.access_token && s.expires_at && s.expires_at * 1000 > Date.now() + 60000) return s.access_token;
+    } catch (e) {}
+    return null;
+  }
+
+  function rpc(name, args, bearer) {
     return fetch(URL_ + "/rest/v1/rpc/" + name, {
       method: "POST",
-      headers: { apikey: KEY, Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
+      headers: { apikey: KEY, Authorization: "Bearer " + (bearer || KEY), "Content-Type": "application/json" },
       body: JSON.stringify(args || {})
     }).then(function (r) {
       if (!r.ok) throw new Error("Request failed (" + r.status + ")");
@@ -30,5 +40,5 @@ window.GH_PORTAL = (function () {
   function getToken() { try { return sessionStorage.getItem(STORE); } catch (e) { return null; } }
   function setToken(t) { try { t ? sessionStorage.setItem(STORE, t) : sessionStorage.removeItem(STORE); } catch (e) {} }
 
-  return { url: URL_, key: KEY, rpc: rpc, access: access, getToken: getToken, setToken: setToken };
+  return { url: URL_, key: KEY, rpc: rpc, adminBearer: adminBearer, access: access, getToken: getToken, setToken: setToken };
 })();

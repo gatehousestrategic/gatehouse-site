@@ -86,6 +86,9 @@ button, input, textarea { font: inherit; color: inherit; }
 
 .drop { display: block; margin: 18px 22px 22px; border: 1.5px dashed var(--line); border-radius: 2px; padding: 26px 18px; text-align: center; cursor: pointer; background: var(--pale-2); }
 .drop:hover, .drop.over { border-color: var(--blue); background: #eaf2fb; }
+.preview-bar { background: #fff6dc; border-bottom: 1px solid #e8d49a; color: #5a4a14; font: 500 14.5px/1.5 var(--sans); }
+.preview-bar .wrap { padding-top: 12px; padding-bottom: 12px; }
+.preview .compose, .preview .drop { opacity: .5; pointer-events: none; }
 .drop b { display: block; color: var(--navy); font-weight: 600; }
 .drop span { font-size: 13px; color: var(--muted); }
 .ups { padding: 0 22px 18px; display: grid; gap: 6px; font-size: 13.5px; }
@@ -116,6 +119,8 @@ button, input, textarea { font: inherit; color: inherit; }
     <button class="out" id="out" type="button">Sign out</button>
   </div>
 </header>
+
+<div class="preview-bar" id="previewBar" hidden><div class="wrap">You are viewing this dashboard as the client sees it. Nothing you do here is logged, and messages and uploads are turned off.</div></div>
 
 <section class="head">
   <div class="wrap">
@@ -171,7 +176,22 @@ button, input, textarea { font: inherit; color: inherit; }
   </div>
 </main>
 
-<script src="api.js?v=4"></script>
+<script src="api.js?v=5"></script>
+<script>
+// "View as client" from /admin: trade the admin sign-in for a preview session.
+(function () {
+  var id = new URLSearchParams(location.search).get("as");
+  if (!id) return;
+  window.GH_PREVIEW_PENDING = true;
+  var jwt = GH_PORTAL.adminBearer();
+  if (!jwt) { location.replace("../admin/"); return; }
+  GH_PORTAL.rpc("portal_admin_session", { p_client: id }, jwt).then(function (r) {
+    if (!r || !r.ok) throw new Error("no");
+    GH_PORTAL.setToken(r.token);
+    location.replace("./");
+  }).catch(function () { document.getElementById("loading").textContent = "Couldn't open the client view. Sign in to the admin page again and retry."; });
+})();
+</script>
 <script src="reader.js?v=1"></script>
 <script>
 (function () {
@@ -181,6 +201,7 @@ button, input, textarea { font: inherit; color: inherit; }
   var $ = function (id) { return document.getElementById(id); };
 
   function toLogin(reason) { P.setToken(null); location.replace("../login/" + (reason ? "?" + reason : "")); }
+  if (window.GH_PREVIEW_PENDING) return;
   if (!token) return toLogin();
 
   function esc(s) {
@@ -203,6 +224,12 @@ button, input, textarea { font: inherit; color: inherit; }
     return P.rpc("portal_open", { p_token: token }).then(function (res) {
       if (!res || !res.ok) return toLogin("expired");
       uploadKey = res.upload_key;
+      if (res.preview) {
+        $("previewBar").hidden = false;
+        $("main").classList.add("preview");
+        $("out").textContent = "Close preview";
+        ["author", "body", "send", "fileIn"].forEach(function (k) { $(k).disabled = true; });
+      }
       $("name").textContent = res.client;
       document.title = res.client + " | Gatehouse Strategic";
       $("loading").hidden = true;
