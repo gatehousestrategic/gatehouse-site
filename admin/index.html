@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Client portal admin | Gatehouse Strategic</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0d2a4c; --navy-2: #163a63; --blue: #3d8bd6; --blue-light: #a9cdf0;
+  --pale: #e3eaf2; --pale-2: #f3f6fa; --line: #9cbde0; --line-soft: #d3dde8; --text: #34465c; --muted: #66768a;
+  --bad: #a8321f; --ok: #1f7a4d;
+  --serif: "Spectral", Georgia, serif;
+  --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--pale-2); color: var(--text); font: 400 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+h1, h2, h3, p { margin: 0; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+.bar { background: var(--navy); color: #fff; }
+.bar-in { height: 72px; display: flex; align-items: stretch; }
+.logo { display: flex; align-items: center; padding: 0 28px; text-decoration: none; font-family: var(--serif); font-size: 21px; line-height: 1; border-right: 1px solid rgba(255,255,255,.18); }
+.logo .mark { width: 36px; height: 36px; margin-right: 10px; }
+.logo small { display: block; font: 600 9px/1 var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--blue-light); margin-top: 5px; }
+.tabs { display: flex; flex: 1; }
+.tab { display: flex; align-items: center; padding: 0 26px; border: 0; border-right: 1px solid rgba(255,255,255,.18); background: none; color: rgba(255,255,255,.75); font: 700 12px/1 var(--sans); letter-spacing: .03em; text-transform: uppercase; cursor: pointer; }
+.tab:hover { background: var(--navy-2); color: #fff; }
+.tab[aria-selected="true"] { color: #fff; box-shadow: inset 0 -3px 0 var(--blue); }
+.who { display: flex; align-items: center; gap: 18px; padding: 0 24px; font-size: 13px; color: var(--blue-light); }
+.who button { background: none; border: 1px solid rgba(255,255,255,.35); color: #fff; height: 34px; padding: 0 14px; border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 13px; }
+.who button:hover { background: var(--navy-2); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 16px; border-radius: 2px; border: 1px solid var(--navy); background: var(--navy); color: #fff; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; text-decoration: none; }
+.btn:hover { background: var(--navy-2); }
+.btn.ghost { background: #fff; color: var(--navy); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--navy); }
+.btn.small { height: 32px; padding: 0 11px; font-size: 13px; }
+.btn.danger { background: #fff; color: var(--bad); border-color: #e4b9b0; }
+.btn.danger:hover { background: var(--bad); color: #fff; border-color: var(--bad); }
+.btn.danger.armed { background: var(--bad); color: #fff; }
+.btn[disabled] { opacity: .55; cursor: progress; }
+input[type=text], input[type=email], input[type=password], input[type=url], input[type=date], select, textarea {
+  height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 2px; background: #fff; width: 100%;
+}
+textarea { height: auto; min-height: 110px; padding: 10px 12px; resize: vertical; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--blue); outline-offset: -1px; border-color: var(--blue); }
+label.f { display: grid; gap: 6px; font-weight: 600; font-size: 13px; color: var(--navy); }
+
+/* sign in */
+.signin { min-height: calc(100vh - 72px); display: grid; place-items: center; padding: 40px 20px; }
+.signin form { width: 100%; max-width: 400px; background: #fff; border: 1px solid var(--line-soft); padding: 36px; display: grid; gap: 18px; }
+.signin h1 { font: 400 30px/1.15 var(--serif); color: var(--navy); }
+.err { color: var(--bad); font-weight: 500; min-height: 20px; }
+
+/* layout */
+.wrap { padding: 28px; }
+.cols { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; }
+.card { background: #fff; border: 1px solid var(--line-soft); }
+.card-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line-soft); }
+.card-h h2 { font: 600 15px/1.2 var(--sans); color: var(--navy); }
+.card-b { padding: 20px; }
+.muted { color: var(--muted); }
+
+.clients { max-height: calc(100vh - 260px); overflow: auto; }
+.client { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line-soft); background: #fff; padding: 14px 20px; cursor: pointer; }
+.client:hover { background: var(--pale-2); }
+.client[aria-current="true"] { background: var(--pale); box-shadow: inset 3px 0 0 var(--blue); }
+.client b { display: block; font-weight: 600; color: var(--navy); }
+.client span { font-size: 13px; color: var(--muted); }
+.client.arch b { color: var(--muted); }
+.newclient { display: flex; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--line-soft); }
+.toggle { display: flex; align-items: center; gap: 8px; padding: 10px 20px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line-soft); }
+
+.detail { display: grid; gap: 24px; }
+.title-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+.title-row .grow { flex: 1; min-width: 220px; }
+.flag { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 2px; background: var(--pale); color: var(--navy); }
+.flag.off { background: #f4e3df; color: var(--bad); }
+.flag.on { background: #dff1e7; color: var(--ok); }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+th { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--pale-2); }
+td.code { font-weight: 700; letter-spacing: .1em; color: var(--navy); white-space: nowrap; }
+td.acts { white-space: nowrap; text-align: right; }
+td.acts .btn + .btn { margin-left: 6px; }
+.row-form { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto; gap: 10px; align-items: end; padding: 16px 20px; border-top: 1px solid var(--line-soft); background: var(--pale-2); }
+.item-form { display: grid; gap: 12px; padding: 16px 20px; border-top: 1px solid var(--line-soft); background: var(--pale-2); }
+.item-form .two { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 10px; }
+.empty-row td { color: var(--muted); padding: 18px 12px; }
+.thread { max-height: 380px; overflow: auto; padding: 18px 20px; display: grid; gap: 12px; }
+.msg { max-width: 80%; padding: 11px 13px; border-radius: 2px; }
+.msg.them { background: var(--pale); justify-self: start; }
+.msg.me { background: var(--navy); color: #fff; justify-self: end; }
+.msg p { white-space: pre-wrap; }
+.msg small { display: block; margin-top: 6px; font-size: 12px; opacity: .72; }
+.ev-fail td:nth-child(3) { color: var(--bad); font-weight: 600; }
+.ev-ok td:nth-child(3) { color: var(--ok); font-weight: 600; }
+
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat { background: #fff; border: 1px solid var(--line-soft); padding: 18px 20px; }
+.stat b { display: block; font: 600 30px/1 var(--sans); color: var(--navy); letter-spacing: -.02em; }
+.stat span { display: block; margin-top: 8px; font-size: 13px; color: var(--muted); }
+.filters { display: flex; gap: 10px; align-items: center; }
+.filters select { width: auto; height: 34px; }
+
+.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; padding: 12px 18px; border-radius: 2px; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,.2); z-index: 50; }
+.placeholder { padding: 60px 20px; text-align: center; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .cols { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row-form { grid-template-columns: minmax(0, 1fr); }
+  .item-form .two { grid-template-columns: minmax(0, 1fr); }
+  .who span { display: none; }
+  .logo span { display: none; }
+  .tab { padding: 0 16px; }
+  .wrap { padding: 16px; }
+  table { font-size: 13px; }
+  .hide-sm { display: none; }
+}
+/* keep wide tables inside their card */
+.detail { grid-template-columns: minmax(0, 1fr); }
+.detail .card { overflow-x: auto; }
+.flag { white-space: nowrap; }
+@media (max-width: 1100px) {
+  .cols { grid-template-columns: minmax(0, 1fr); }
+  .clients { max-height: 260px; }
+}
+@media (max-width: 1300px) {
+  td.acts { white-space: normal; }
+  td.acts .btn { margin: 3px 0 3px 6px; }
+}
+
+/* overview + sections */
+.ov { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.feed a.fi, .feed button.fi { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; width: 100%; text-align: left; padding: 14px 20px; border: 0; border-bottom: 1px solid var(--line-soft); background: #fff; text-decoration: none; cursor: pointer; }
+.feed .fi:hover { background: var(--pale-2); }
+.feed .fi:last-child { border-bottom: 0; }
+.fi b { color: var(--navy); font-weight: 600; }
+.fi .when { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.fi .snip { grid-column: 1 / -1; color: var(--text); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stat.alert b { color: var(--bad); }
+.sec-form { display: grid; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--line-soft); background: var(--pale-2); }
+.sec-form .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 10px; }
+.sec-form .acts { display: flex; gap: 8px; align-items: center; }
+.sec-form.editing { background: #fff8e8; }
+.edit-tag { font-size: 13px; font-weight: 600; color: #8a5a00; }
+.links-top { display: flex; gap: 10px; align-items: center; }
+td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.note-body { white-space: pre-wrap; color: var(--text); margin-top: 4px; font-size: 14px; }
+@media (max-width: 900px) {
+  .ov { grid-template-columns: minmax(0, 1fr); }
+  .sec-form .two { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <a class="logo" href="../" aria-label="Gatehouse Strategic home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 49V29a11 11 0 0 1 22 0v20" fill="none" stroke="#ffffff" stroke-width="4.5"/><path d="M15 49.5h34" stroke="#3d8bd6" stroke-width="4.5"/></svg><span>Gatehouse<small>Client portal</small></span></a>
+    <nav class="tabs" id="tabs" hidden>
+      <button class="tab" data-tab="overview" aria-selected="true">Overview</button>
+      <button class="tab" data-tab="clients" aria-selected="false">Clients</button>
+      <button class="tab" data-tab="activity" aria-selected="false">Activity</button>
+    </nav>
+    <div class="who" id="who" hidden><span id="whoEmail"></span><button id="signout" type="button">Sign out</button></div>
+  </div>
+</header>
+
+<!-- sign in -->
+<section class="signin" id="signinView" hidden>
+  <form id="signinForm">
+    <h1>Admin sign in</h1>
+    <label class="f">Email<input type="email" id="email" autocomplete="username" required></label>
+    <label class="f">Password<input type="password" id="password" autocomplete="current-password" required></label>
+    <p class="err" id="signinErr" role="alert"></p>
+    <button class="btn" type="submit" id="signinBtn">Sign in</button>
+  </form>
+</section>
+
+<!-- overview -->
+<section class="wrap" id="overviewView" hidden>
+  <div class="stats" id="ovStats"></div>
+  <div class="ov">
+    <div class="card">
+      <div class="card-h"><h2>Unread messages</h2><span class="muted">Opening a client marks them read</span></div>
+      <div class="feed" id="ovMsgs"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Files from clients</h2><span class="muted">Latest 10</span></div>
+      <div class="feed" id="ovUploads"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Recent logins</h2><span class="muted">Latest 10</span></div>
+      <div class="feed" id="ovLogins"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Clients</h2><button class="btn ghost small" type="button" data-go="clients">Manage clients</button></div>
+      <div class="feed" id="ovClients"></div>
+    </div>
+  </div>
+</section>
+
+<!-- clients -->
+<section class="wrap" id="clientsView" hidden>
+  <div class="cols">
+    <div class="card">
+      <div class="card-h"><h2>Clients</h2><span class="muted" id="clientCount"></span></div>
+      <div class="clients" id="clientList"></div>
+      <label class="toggle"><input type="checkbox" id="showArchived"> Show archived</label>
+      <form class="newclient" id="newClientForm">
+        <input type="text" id="newClientName" placeholder="New client name" maxlength="120" required>
+        <button class="btn" type="submit">Add</button>
+      </form>
+    </div>
+    <div id="detail"><div class="card placeholder">Pick a client on the left, or add a new one.</div></div>
+  </div>
+</section>
+
+<!-- activity -->
+<section class="wrap" id="activityView" hidden>
+  <div class="stats" id="stats"></div>
+  <div class="card">
+    <div class="card-h">
+      <h2>Recent activity</h2>
+      <div class="filters">
+        <select id="evFilter">
+          <option value="">All events</option>
+          <option value="login_ok">Successful logins</option>
+          <option value="login_fail">Wrong codes</option>
+          <option value="login_blocked">Blocked attempts</option>
+          <option value="message_sent">Messages from clients</option>
+          <option value="file_uploaded">Client uploads</option>
+          <option value="item_open">Items opened</option>
+          <option value="portal_view">Dashboard views</option>
+          <option value="logout">Sign-outs</option>
+        </select>
+        <button class="btn ghost small" id="evRefresh" type="button">Refresh</button>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>When</th><th>Client</th><th>Event</th><th>Detail</th><th class="hide-sm">IP</th><th class="hide-sm">Device</th></tr></thead>
+      <tbody id="evBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="../portal/api.js"></script>
+<script>
+(function () {
+  var sb = supabase.createClient(GH_PORTAL.url, GH_PORTAL.key);
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { clients: [], current: null, codes: [], items: [], messages: [], showArchived: false, editing: null };
+  var SITE = location.origin;
+
+  /* ---------- helpers ---------- */
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function ago(d) {
+    if (!d) return "Never";
+    var s = (Date.now() - new Date(d).getTime()) / 1000;
+    if (s < 60) return "Just now";
+    if (s < 3600) return Math.floor(s / 60) + " min ago";
+    if (s < 86400) return Math.floor(s / 3600) + " h ago";
+    if (s < 86400 * 7) return Math.floor(s / 86400) + " d ago";
+    return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  }
+  function stamp(d) { return new Date(d).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
+  function day(d) { return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+  function size(n) { if (!n) return ""; return n < 1048576 ? Math.max(1, Math.round(n / 1024)) + " KB" : (n / 1048576).toFixed(1) + " MB"; }
+  function device(ua) {
+    if (!ua) return "";
+    var os = /iPhone|iPad/.test(ua) ? "iOS" : /Android/.test(ua) ? "Android" : /Windows/.test(ua) ? "Windows" : /Mac OS/.test(ua) ? "Mac" : /Linux/.test(ua) ? "Linux" : "";
+    var br = /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome" : /Firefox\//.test(ua) ? "Firefox" : /Safari\//.test(ua) ? "Safari" : "";
+    return [br, os].filter(Boolean).join(" on ");
+  }
+  var EVENT = { login_ok: "Logged in", login_fail: "Wrong code", login_blocked: "Blocked", portal_view: "Viewed dashboard", item_open: "Opened item", logout: "Signed out", message_sent: "Sent message", file_uploaded: "Uploaded file" };
+  var toastT;
+  function toast(msg) { var t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 2600); }
+  function check(res) { if (res.error) { toast(res.error.message || "Something went wrong"); throw res.error; } return res.data; }
+  function newCode() {
+    var A = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", b = new Uint32Array(8), s = "";
+    crypto.getRandomValues(b);
+    for (var i = 0; i < 8; i++) s += A[b[i] % A.length];
+    return s.slice(0, 4) + "-" + s.slice(4);
+  }
+  function copy(text, msg) { navigator.clipboard.writeText(text).then(function () { toast(msg || "Copied"); }, function () { toast("Couldn't copy. Select and copy it manually."); }); }
+  function armed(btn, label) {
+    if (btn.classList.contains("armed")) return true;
+    var orig = btn.textContent;
+    btn.classList.add("armed"); btn.textContent = label || "Click again to confirm";
+    setTimeout(function () { btn.classList.remove("armed"); btn.textContent = orig; }, 3500);
+    return false;
+  }
+  function clientName(id) { var c = state.clients.find(function (x) { return x.id === id; }); return c ? c.name : "—"; }
+  function randHex(n) { return Array.from(crypto.getRandomValues(new Uint8Array(n)), function (x) { return ("0" + x.toString(16)).slice(-2); }).join(""); }
+
+  /* ---------- views and sign-in ---------- */
+  var VIEWS = ["signinView", "overviewView", "clientsView", "activityView"];
+  function show(view) {
+    VIEWS.forEach(function (v) { $(v).hidden = v !== view; });
+    $("tabs").hidden = $("who").hidden = view === "signinView";
+    document.querySelectorAll(".tab").forEach(function (t) { t.setAttribute("aria-selected", (t.dataset.tab + "View") === view ? "true" : "false"); });
+  }
+  function go(tab) {
+    show(tab + "View");
+    if (tab === "overview") loadOverview();
+    if (tab === "clients") loadClients();
+    if (tab === "activity") loadActivity();
+  }
+
+  async function start() {
+    var s = (await sb.auth.getSession()).data.session;
+    if (!s) return show("signinView");
+    if ((await sb.rpc("portal_is_admin")).data !== true) {
+      await sb.auth.signOut();
+      show("signinView");
+      $("signinErr").textContent = "This account isn't set up as a portal admin.";
+      return;
+    }
+    $("whoEmail").textContent = s.user.email;
+    await loadClientsData();
+    go("overview");
+  }
+
+  $("signinForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    $("signinErr").textContent = "";
+    $("signinBtn").disabled = true;
+    var r = await sb.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+    $("signinBtn").disabled = false;
+    if (r.error) { $("signinErr").textContent = "Email or password didn't match."; return; }
+    $("password").value = "";
+    start();
+  });
+  $("signout").addEventListener("click", async function () { await sb.auth.signOut(); show("signinView"); });
+  document.querySelectorAll(".tab").forEach(function (t) { t.addEventListener("click", function () { go(t.dataset.tab); }); });
+  document.addEventListener("click", function (e) {
+    var g = e.target.closest("[data-go]"); if (g) go(g.dataset.go);
+    var oc = e.target.closest("[data-open-client]");
+    if (oc) { e.preventDefault(); state.current = { id: oc.dataset.openClient }; show("clientsView"); loadClients(); }
+  });
+
+  /* ---------- shared client data ---------- */
+  async function loadClientsData() {
+    var r = await Promise.all([
+      sb.from("portal_clients").select("*").order("name"),
+      sb.from("portal_codes").select("client_id, active, last_used_at"),
+      sb.from("portal_messages").select("client_id").eq("from_admin", false).is("read_at", null)
+    ]);
+    var clients = check(r[0]), codes = check(r[1]), unread = check(r[2]);
+    state.clients = clients.map(function (c) {
+      var mine = codes.filter(function (k) { return k.client_id === c.id; });
+      return Object.assign(c, {
+        activeCodes: mine.filter(function (k) { return k.active; }).length,
+        lastLogin: mine.map(function (k) { return k.last_used_at; }).filter(Boolean).sort().pop(),
+        newMsgs: unread.filter(function (m) { return m.client_id === c.id; }).length
+      });
+    });
+    var total = unread.length;
+    document.querySelector('.tab[data-tab="overview"]').textContent = "Overview" + (total ? " (" + total + " new)" : "");
+  }
+
+  /* ---------- overview ---------- */
+  async function loadOverview() {
+    var since7 = new Date(Date.now() - 7 * 864e5).toISOString(), since1 = new Date(Date.now() - 864e5).toISOString();
+    var r = await Promise.all([
+      sb.from("portal_messages").select("*").eq("from_admin", false).is("read_at", null).order("created_at", { ascending: false }).limit(20),
+      sb.from("portal_items").select("*").eq("uploaded_by", "client").order("created_at", { ascending: false }).limit(10),
+      sb.from("portal_events").select("*").eq("kind", "login_ok").order("created_at", { ascending: false }).limit(10),
+      sb.from("portal_items").select("id", { count: "exact", head: true }).eq("uploaded_by", "client").gte("created_at", since7),
+      sb.from("portal_events").select("id", { count: "exact", head: true }).eq("kind", "login_ok").gte("created_at", since7),
+      sb.from("portal_events").select("id", { count: "exact", head: true }).in("kind", ["login_fail", "login_blocked"]).gte("created_at", since1)
+    ]);
+    await loadClientsData();
+    var msgs = check(r[0]), ups = check(r[1]), logins = check(r[2]);
+    var unread = state.clients.reduce(function (n, c) { return n + c.newMsgs; }, 0);
+    var wrong = r[5].count || 0;
+    $("ovStats").innerHTML =
+      '<div class="stat' + (unread ? " alert" : "") + '"><b>' + unread + "</b><span>Unread messages</span></div>" +
+      '<div class="stat"><b>' + (r[3].count || 0) + "</b><span>Files from clients, last 7 days</span></div>" +
+      '<div class="stat"><b>' + (r[4].count || 0) + "</b><span>Client logins, last 7 days</span></div>" +
+      '<div class="stat' + (wrong >= 10 ? " alert" : "") + '"><b>' + wrong + "</b><span>Wrong codes, last 24 hours</span></div>";
+
+    $("ovMsgs").innerHTML = msgs.length ? msgs.map(function (m) {
+      return '<button class="fi" data-open-client="' + m.client_id + '"><b>' + esc(clientName(m.client_id)) + (m.author ? ' <span class="muted">· ' + esc(m.author) + "</span>" : "") +
+        '</b><span class="when">' + ago(m.created_at) + '</span><span class="snip">' + esc(m.body) + "</span></button>";
+    }).join("") : '<p class="placeholder" style="padding:28px 20px">No unread messages.</p>';
+
+    $("ovUploads").innerHTML = ups.length ? ups.map(function (f) {
+      return '<a class="fi" href="' + esc(GH_PORTAL.fileUrl(f.file_path)) + '" target="_blank" rel="noopener"><b>' + esc(f.file_name || f.title) +
+        '</b><span class="when">' + ago(f.created_at) + '</span><span class="snip muted">' + esc(clientName(f.client_id)) + (f.file_size ? " · " + size(f.file_size) : "") + " · Download</span></a>";
+    }).join("") : '<p class="placeholder" style="padding:28px 20px">No files from clients yet.</p>';
+
+    $("ovLogins").innerHTML = logins.length ? logins.map(function (e) {
+      return '<button class="fi" data-open-client="' + e.client_id + '"><b>' + esc(clientName(e.client_id)) + '</b><span class="when">' + ago(e.created_at) +
+        '</span><span class="snip muted">' + esc(e.detail || "") + (e.user_agent ? " · " + esc(device(e.user_agent)) : "") + (e.ip ? " · " + esc(e.ip) : "") + "</span></button>";
+    }).join("") : '<p class="placeholder" style="padding:28px 20px">No logins yet.</p>';
+
+    var active = state.clients.filter(function (c) { return !c.archived; });
+    $("ovClients").innerHTML = active.length ? active.map(function (c) {
+      return '<button class="fi" data-open-client="' + c.id + '"><b>' + esc(c.name) + (c.newMsgs ? ' <span class="flag on">' + c.newMsgs + " new</span>" : "") +
+        '</b><span class="when">last login ' + ago(c.lastLogin).toLowerCase() + '</span><span class="snip muted">' + c.activeCodes + " active code" + (c.activeCodes === 1 ? "" : "s") + "</span></button>";
+    }).join("") : '<p class="placeholder" style="padding:28px 20px">No clients yet.</p>';
+  }
+
+  /* ---------- clients ---------- */
+  async function loadClients() {
+    await loadClientsData();
+    renderClients();
+    if (state.current) openClient(state.current.id, true);
+  }
+
+  function renderClients() {
+    var list = state.clients.filter(function (c) { return state.showArchived || !c.archived; });
+    $("clientCount").textContent = list.length;
+    $("clientList").innerHTML = list.length ? list.map(function (c) {
+      return '<button class="client' + (c.archived ? " arch" : "") + '" data-id="' + c.id + '" aria-current="' + (!!state.current && state.current.id === c.id) + '">' +
+        "<b>" + esc(c.name) + (c.archived ? " (archived)" : "") + (c.newMsgs ? ' <span class="flag on">' + c.newMsgs + " new</span>" : "") + "</b><span>" + c.activeCodes + " active code" + (c.activeCodes === 1 ? "" : "s") + " · last login " + ago(c.lastLogin).toLowerCase() + "</span></button>";
+    }).join("") : '<p class="placeholder">No clients yet.</p>';
+  }
+
+  $("clientList").addEventListener("click", function (e) { var b = e.target.closest(".client"); if (b) { state.editing = null; openClient(b.dataset.id); } });
+  $("showArchived").addEventListener("change", function () { state.showArchived = this.checked; renderClients(); });
+  $("newClientForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var name = $("newClientName").value.trim(); if (!name) return;
+    var c = check(await sb.from("portal_clients").insert({ name: name }).select().single());
+    $("newClientName").value = "";
+    toast("Client added. Next: generate a code for them.");
+    state.current = c;
+    await loadClients();
+  });
+
+  async function openClient(id, quiet) {
+    var c = state.clients.find(function (x) { return x.id === id; });
+    if (!c) { state.current = null; $("detail").innerHTML = '<div class="card placeholder">Pick a client on the left, or add a new one.</div>'; return; }
+    state.current = c;
+    renderClients();
+    var r = await Promise.all([
+      sb.from("portal_codes").select("*").eq("client_id", id).order("created_at"),
+      sb.from("portal_items").select("*").eq("client_id", id).order("created_at", { ascending: false }),
+      sb.from("portal_events").select("*").eq("client_id", id).order("created_at", { ascending: false }).limit(50),
+      sb.from("portal_messages").select("*").eq("client_id", id).order("created_at")
+    ]);
+    state.codes = check(r[0]); state.items = check(r[1]); state.messages = check(r[3]);
+    renderDetail(check(r[2]));
+    if (state.messages.some(function (m) { return !m.from_admin && !m.read_at; })) {
+      await sb.from("portal_messages").update({ read_at: new Date().toISOString() }).eq("client_id", id).eq("from_admin", false).is("read_at", null);
+      await loadClientsData(); renderClients();
+    }
+  }
+
+  function card(title, sub, inner) {
+    return '<div class="card"><div class="card-h"><h2>' + title + "</h2>" + (sub ? '<span class="muted">' + sub + "</span>" : "") + "</div>" + inner + "</div>";
+  }
+  function editBtns(it) {
+    return '<button class="btn ghost small" data-act="edit" data-id="' + it.id + '">Edit</button><button class="btn danger small" data-act="delitem" data-id="' + it.id + '">Remove</button>';
+  }
+
+  function renderDetail(events) {
+    var c = state.current, ed = state.editing;
+    var files = state.items.filter(function (i) { return i.kind === "file"; });
+    var links = state.items.filter(function (i) { return i.kind === "link"; });
+    var notes = state.items.filter(function (i) { return i.kind === "note"; });
+    function editing(kind) { return ed && ed.kind === kind ? ed : null; }
+
+    // Messages
+    var thread = state.messages.length ? state.messages.map(function (m) {
+      var who = m.from_admin ? "Gatehouse" + (m.author ? " · " + m.author : "") : (m.author || "Client");
+      return '<div class="msg ' + (m.from_admin ? "me" : "them") + '"><p>' + esc(m.body) + "</p><small>" + esc(who) + " · " + stamp(m.created_at) + (m.from_admin ? (m.read_at ? " · seen" : " · not seen yet") : "") + "</small></div>";
+    }).join("") : '<p class="muted">No messages yet.</p>';
+    var msgCard = card("Messages", "The client sees this thread on their dashboard",
+      '<div class="thread" id="thread">' + thread + "</div>" +
+      '<form class="sec-form" id="replyForm"><textarea id="replyBody" maxlength="5000" placeholder="Write a reply…" required></textarea><div class="acts"><button class="btn" type="submit">Send reply</button></div></form>');
+
+    // Files
+    var fRows = files.length ? files.map(function (f) {
+      var from = f.uploaded_by === "client" ? '<span class="flag on">From client</span>' : '<span class="flag">From Gatehouse</span>';
+      return '<tr><td><b>' + esc(f.title) + "</b>" + (f.file_name && f.file_name !== f.title ? '<div class="muted">' + esc(f.file_name) + "</div>" : "") + "</td><td>" + from + '</td><td class="meta hide-sm">' + esc(size(f.file_size)) + '</td><td class="meta hide-sm">' + day(f.created_at) +
+        '</td><td class="acts"><a class="btn ghost small" href="' + esc(GH_PORTAL.fileUrl(f.file_path)) + '" target="_blank" rel="noopener">Download</a>' + editBtns(f) + "</td></tr>";
+    }).join("") : '<tr class="empty-row"><td colspan="5">No files yet.</td></tr>';
+    var fe = editing("file");
+    var fileCard = card("Files", "Yours and the client's, newest first",
+      "<table><tbody>" + fRows + "</tbody></table>" +
+      '<form class="sec-form' + (fe ? " editing" : "") + '" id="fileForm">' + (fe ? '<span class="edit-tag">Renaming a file</span>' : "") +
+        '<div class="two"><label class="f">Title<input type="text" id="fTitle" maxlength="200" placeholder="e.g. Website brief" value="' + esc(fe ? fe.title : "") + '"></label>' +
+        (fe ? "<span></span>" : '<label class="f">File<input type="file" id="fFile"></label>') + "</div>" +
+        '<div class="acts"><button class="btn" type="submit" id="fBtn">' + (fe ? "Save changes" : "Upload file") + "</button>" + (fe ? '<button class="btn ghost" type="button" data-act="cancel">Cancel</button>' : '<span class="muted">Leave the title empty to use the file name.</span>') + "</div></form>");
+
+    // Links
+    var lRows = links.length ? links.map(function (l) {
+      return "<tr><td><b>" + esc(l.title) + '</b><div class="muted" style="word-break:break-all"><a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.url) + '</a></div></td><td class="meta hide-sm">' + day(l.created_at) + '</td><td class="acts">' + editBtns(l) + "</td></tr>";
+    }).join("") : '<tr class="empty-row"><td colspan="3">No links yet.</td></tr>';
+    var le = editing("link");
+    var linkCard = card("Links", "Previews, shared folders, anything with an address",
+      "<table><tbody>" + lRows + "</tbody></table>" +
+      '<form class="sec-form' + (le ? " editing" : "") + '" id="linkForm">' + (le ? '<span class="edit-tag">Editing a link</span>' : "") +
+        '<div class="two"><label class="f">Title<input type="text" id="lTitle" maxlength="200" required placeholder="e.g. Website redesign preview" value="' + esc(le ? le.title : "") + '"></label>' +
+        '<label class="f">Address<input type="url" id="lUrl" required placeholder="https://" value="' + esc(le ? le.url : "") + '"></label></div>' +
+        '<div class="acts"><button class="btn" type="submit">' + (le ? "Save changes" : "Add link") + "</button>" + (le ? '<button class="btn ghost" type="button" data-act="cancel">Cancel</button>' : "") + "</div></form>");
+
+    // Notes
+    var nRows = notes.length ? notes.map(function (n) {
+      return "<tr><td><b>" + esc(n.title) + '</b><div class="note-body">' + esc(n.body) + '</div></td><td class="meta hide-sm">' + day(n.created_at) + '</td><td class="acts">' + editBtns(n) + "</td></tr>";
+    }).join("") : '<tr class="empty-row"><td colspan="3">No project notes yet.</td></tr>';
+    var ne = editing("note");
+    var noteCard = card("Project notes", "Updates and next steps the client can read",
+      "<table><tbody>" + nRows + "</tbody></table>" +
+      '<form class="sec-form' + (ne ? " editing" : "") + '" id="noteForm">' + (ne ? '<span class="edit-tag">Editing a note</span>' : "") +
+        '<label class="f">Title<input type="text" id="nTitle" maxlength="200" required placeholder="e.g. Week of Nov 10: design direction" value="' + esc(ne ? ne.title : "") + '"></label>' +
+        '<label class="f">Note<textarea id="nBody" maxlength="10000" required>' + esc(ne ? ne.body : "") + "</textarea></label>" +
+        '<div class="acts"><button class="btn" type="submit">' + (ne ? "Save changes" : "Add note") + "</button>" + (ne ? '<button class="btn ghost" type="button" data-act="cancel">Cancel</button>' : "") + "</div></form>");
+
+    // Codes
+    var codeRows = state.codes.length ? state.codes.map(function (k) {
+      var expired = k.expires_at && new Date(k.expires_at) < new Date();
+      var status = !k.active ? '<span class="flag off">Off</span>' : expired ? '<span class="flag off">Expired</span>' : '<span class="flag on">Active</span>';
+      return '<tr><td class="code">' + esc(k.code) + "</td><td>" + esc(k.label || "") + (k.expires_at ? '<div class="muted">until ' + new Date(k.expires_at).toLocaleDateString() + "</div>" : "") + "</td><td>" + status +
+        '</td><td class="hide-sm">' + ago(k.last_used_at) + '</td><td class="hide-sm">' + k.use_count + '</td><td class="acts">' +
+        '<button class="btn ghost small" data-act="copycode" data-id="' + k.id + '">Copy</button>' +
+        '<button class="btn ghost small" data-act="copyinvite" data-id="' + k.id + '">Copy invite</button>' +
+        '<button class="btn ghost small" data-act="togglecode" data-id="' + k.id + '">' + (k.active ? "Turn off" : "Turn on") + "</button>" +
+        '<button class="btn danger small" data-act="delcode" data-id="' + k.id + '">Delete</button></td></tr>';
+    }).join("") : '<tr class="empty-row"><td colspan="6">No codes yet. Generate one below and send it to the client.</td></tr>';
+    var codeCard = card("Access codes", "Clients enter these at " + esc(SITE.replace(/^https?:\/\//, "")) + "/login",
+      '<table><thead><tr><th>Code</th><th>Label</th><th>Status</th><th class="hide-sm">Last used</th><th class="hide-sm">Uses</th><th></th></tr></thead><tbody>' + codeRows + "</tbody></table>" +
+      '<form class="row-form" id="codeForm"><label class="f">Label (who it\'s for)<input type="text" id="codeLabel" placeholder="e.g. Abe, CEO" maxlength="120"></label>' +
+      '<label class="f">Expires (optional)<input type="date" id="codeExp"></label><button class="btn" type="submit">Generate code</button></form>');
+
+    var evCard = card("Activity for this client", "Latest 50",
+      '<table><thead><tr><th>When</th><th class="hide-sm">Client</th><th>Event</th><th>Detail</th><th class="hide-sm">IP</th><th class="hide-sm">Device</th></tr></thead><tbody>' +
+      (events.length ? events.map(evRow).join("") : '<tr class="empty-row"><td colspan="6">No activity yet.</td></tr>') + "</tbody></table>");
+
+    var head = '<div class="card"><div class="card-b"><form class="title-row" id="renameForm">' +
+      '<label class="f grow">Client name<input type="text" id="cName" value="' + esc(c.name) + '" maxlength="120" required></label>' +
+      '<label class="f grow">Private note (only you see this)<input type="text" id="cNote" value="' + esc(c.note || "") + '" maxlength="1000"></label>' +
+      '<button class="btn ghost" type="submit">Save</button>' +
+      '<button class="btn ghost" type="button" data-act="archive">' + (c.archived ? "Restore" : "Archive") + "</button>" +
+      '<button class="btn danger" type="button" data-act="delclient">Delete client</button></form></div></div>';
+
+    $("detail").innerHTML = '<div class="detail">' + head + msgCard + fileCard + linkCard + noteCard + codeCard + evCard + "</div>";
+    var th = $("thread"); th.scrollTop = th.scrollHeight;
+    if (ed) { var f = $(ed.kind === "file" ? "fileForm" : ed.kind === "link" ? "linkForm" : "noteForm"); f.scrollIntoView({ block: "center" }); }
+  }
+
+  function evRow(e) {
+    var cls = e.kind === "login_ok" ? "ev-ok" : (e.kind === "login_fail" || e.kind === "login_blocked") ? "ev-fail" : "";
+    return '<tr class="' + cls + '"><td>' + stamp(e.created_at) + '</td><td class="hide-sm">' + esc(e.client_id ? clientName(e.client_id) : "—") + "</td><td>" + (EVENT[e.kind] || esc(e.kind)) +
+      "</td><td>" + esc(e.detail || "") + '</td><td class="hide-sm">' + esc(e.ip || "") + '</td><td class="hide-sm">' + esc(device(e.user_agent)) + "</td></tr>";
+  }
+
+  function rerender() { openClient(state.current.id, true); }
+
+  $("detail").addEventListener("click", async function (e) {
+    var b = e.target.closest("button[data-act]"); if (!b) return;
+    var act = b.dataset.act, c = state.current;
+    var code = state.codes.find(function (k) { return k.id === b.dataset.id; });
+    var it = state.items.find(function (x) { return x.id === b.dataset.id; });
+    if (act === "copycode") return copy(code.code, "Code copied");
+    if (act === "copyinvite") return copy("Your Gatehouse Strategic client dashboard: go to " + SITE + "/login and enter code " + code.code, "Invite copied");
+    if (act === "togglecode") { check(await sb.from("portal_codes").update({ active: !code.active }).eq("id", code.id)); toast(code.active ? "Code turned off" : "Code turned on"); return loadClients(); }
+    if (act === "delcode") { if (!armed(b)) return; check(await sb.from("portal_codes").delete().eq("id", code.id)); toast("Code deleted"); return loadClients(); }
+    if (act === "archive") { check(await sb.from("portal_clients").update({ archived: !c.archived }).eq("id", c.id)); toast(c.archived ? "Client restored" : "Client archived. Their codes stop working."); return loadClients(); }
+    if (act === "delclient") {
+      if (!armed(b, "Deletes codes, files, notes and messages. Click again")) return;
+      var paths = state.items.filter(function (x) { return x.kind === "file"; }).map(function (x) { return x.file_path; });
+      if (paths.length) await sb.storage.from("portal-files").remove(paths);
+      check(await sb.from("portal_clients").delete().eq("id", c.id));
+      state.current = null; toast("Client deleted"); return loadClients();
+    }
+    if (act === "edit") { state.editing = it; return rerender(); }
+    if (act === "cancel") { state.editing = null; return rerender(); }
+    if (act === "delitem") {
+      if (!armed(b)) return;
+      if (it.kind === "file") await sb.storage.from("portal-files").remove([it.file_path]);
+      check(await sb.from("portal_items").delete().eq("id", it.id));
+      if (state.editing && state.editing.id === it.id) state.editing = null;
+      toast("Removed"); return rerender();
+    }
+  });
+
+  $("detail").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var c = state.current, ed = state.editing, id = e.target.id;
+    var btn = e.target.querySelector('button[type="submit"]'); if (btn) btn.disabled = true;
+    try {
+      if (id === "renameForm") {
+        check(await sb.from("portal_clients").update({ name: $("cName").value.trim(), note: $("cNote").value.trim() || null }).eq("id", c.id));
+        toast("Saved"); return loadClients();
+      }
+      if (id === "replyForm") {
+        var body = $("replyBody").value.trim(); if (!body) return;
+        check(await sb.from("portal_messages").insert({ client_id: c.id, from_admin: true, body: body }));
+        toast("Reply sent"); return rerender();
+      }
+      if (id === "codeForm") {
+        var exp = $("codeExp").value ? new Date($("codeExp").value + "T23:59:59").toISOString() : null;
+        for (var tries = 0; tries < 5; tries++) {
+          var r = await sb.from("portal_codes").insert({ client_id: c.id, code: newCode(), label: $("codeLabel").value.trim() || null, expires_at: exp });
+          if (!r.error) { toast("Code created. Use Copy invite to send it."); return loadClients(); }
+          if (r.error.code !== "23505") { toast(r.error.message); return; }
+        }
+        return toast("Couldn't create a unique code. Try again.");
+      }
+      if (id === "fileForm") {
+        var title = $("fTitle").value.trim();
+        if (ed) {
+          check(await sb.from("portal_items").update({ title: title || ed.file_name || "File" }).eq("id", ed.id));
+          state.editing = null; toast("Saved"); return rerender();
+        }
+        var f = $("fFile").files[0];
+        if (!f) return toast("Choose a file first");
+        if (f.size > 50 * 1048576) return toast("Files can be up to 50 MB");
+        var path = randHex(16) + "/" + f.name.replace(/[^A-Za-z0-9._-]+/g, "-").slice(-120);
+        var up = await sb.storage.from("portal-files").upload(path, f, { contentType: f.type || "application/octet-stream" });
+        if (up.error) return toast("Upload failed: " + up.error.message);
+        check(await sb.from("portal_items").insert({ client_id: c.id, kind: "file", title: title || f.name, file_path: path, file_name: f.name, file_size: f.size, uploaded_by: "admin" }));
+        toast("File added"); return rerender();
+      }
+      if (id === "linkForm") {
+        var lt = $("lTitle").value.trim(), lu = $("lUrl").value.trim();
+        if (!/^https?:\/\//i.test(lu)) return toast("Enter a full address starting with https://");
+        if (ed) check(await sb.from("portal_items").update({ title: lt, url: lu }).eq("id", ed.id));
+        else check(await sb.from("portal_items").insert({ client_id: c.id, kind: "link", title: lt, url: lu }));
+        state.editing = null; toast(ed ? "Saved" : "Link added"); return rerender();
+      }
+      if (id === "noteForm") {
+        var nt = $("nTitle").value.trim(), nb = $("nBody").value.trim();
+        if (!nb) return toast("Write the note first");
+        if (ed) check(await sb.from("portal_items").update({ title: nt, body: nb }).eq("id", ed.id));
+        else check(await sb.from("portal_items").insert({ client_id: c.id, kind: "note", title: nt, body: nb }));
+        state.editing = null; toast(ed ? "Saved" : "Note added"); return rerender();
+      }
+    } finally {
+      if (btn && document.body.contains(btn)) btn.disabled = false;
+    }
+  });
+
+  /* ---------- activity ---------- */
+  async function loadActivity() {
+    var q = sb.from("portal_events").select("*").order("created_at", { ascending: false }).limit(200);
+    if ($("evFilter").value) q = q.eq("kind", $("evFilter").value);
+    var since7 = new Date(Date.now() - 7 * 864e5).toISOString(), since1 = new Date(Date.now() - 864e5).toISOString();
+    var r = await Promise.all([
+      q,
+      sb.from("portal_events").select("id", { count: "exact", head: true }).eq("kind", "login_ok").gte("created_at", since7),
+      sb.from("portal_events").select("id", { count: "exact", head: true }).eq("kind", "message_sent").gte("created_at", since7),
+      sb.from("portal_events").select("id", { count: "exact", head: true }).eq("kind", "item_open").gte("created_at", since7),
+      sb.from("portal_events").select("id", { count: "exact", head: true }).eq("kind", "login_fail").gte("created_at", since1)
+    ]);
+    if (!state.clients.length) await loadClientsData();
+    $("stats").innerHTML =
+      '<div class="stat"><b>' + (r[1].count || 0) + "</b><span>Logins, last 7 days</span></div>" +
+      '<div class="stat"><b>' + (r[2].count || 0) + "</b><span>Messages from clients, last 7 days</span></div>" +
+      '<div class="stat"><b>' + (r[3].count || 0) + "</b><span>Items opened, last 7 days</span></div>" +
+      '<div class="stat"><b>' + (r[4].count || 0) + "</b><span>Wrong codes, last 24 hours</span></div>";
+    var rows = check(r[0]);
+    $("evBody").innerHTML = rows.length ? rows.map(evRow).join("") : '<tr class="empty-row"><td colspan="6">No activity yet.</td></tr>';
+  }
+  $("evFilter").addEventListener("change", loadActivity);
+  $("evRefresh").addEventListener("click", loadActivity);
+
+  start();
+})();
+</script>
+</body>
+</html>

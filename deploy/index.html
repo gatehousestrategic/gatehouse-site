@@ -120,6 +120,11 @@ h2.sec { font-size: clamp(30px, 2.6vw, 38px); line-height: 1.2; }
 .cell { border-left: 1px solid rgba(255,255,255,.18); display: flex; align-items: flex-end; padding: 0 16px 18px; font: 700 12px/1.2 var(--sans); letter-spacing: .03em; text-transform: uppercase; text-decoration: none; color: #fff; transition: background .2s; }
 .cell:hover { background: var(--navy-2); }
 .cell.contact { color: var(--blue-light); flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 10px; text-transform: none; font-size: 13px; letter-spacing: 0; }
+.nav-login { align-items: center; justify-content: flex-end; padding: 0 40px 0 28px; border-left: 0; }
+.nav-login:hover { background: none; }
+.login-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 46px; padding: 0 22px; background: var(--blue); color: #fff; font: 600 14px/1 var(--sans); letter-spacing: 0; text-transform: none; text-decoration: none; border-radius: 2px; transition: background .2s; white-space: nowrap; }
+.login-btn::after { content: "→"; }
+.login-btn:hover { background: #2f78bf; }
 .burger { display: none; }
 
 /* hero */
@@ -313,6 +318,7 @@ a.wrow:hover .go { color: var(--navy); }
   .burger { display: grid; place-items: center; width: 72px; border: 0; border-left: 1px solid rgba(255,255,255,.18); background: none; color: #fff; cursor: pointer; }
   .burger span { display: block; width: 24px; height: 1.5px; background: currentColor; box-shadow: 0 7px 0 currentColor, 0 -7px 0 currentColor; }
   .nav.open .cell { display: flex; grid-column: 1 / -1; border-left: 0; border-top: 1px solid rgba(255,255,255,.18); padding: 18px; align-items: center; font-size: 14px; }
+  .nav.open .nav-login { padding: 18px; justify-content: flex-start; }
   .nav.open .container { height: auto; }
   .nav.open .logo, .nav.open .burger { height: 72px; }
   .hero { height: 620px; background-position: 30% center; }
@@ -378,7 +384,7 @@ a.wrow:hover .go { color: var(--navy); }
     <a class="cell" href="#work">Our work</a>
     <a class="cell" href="#how">How we work</a>
     <a class="cell" href="#faq">Questions</a>
-    <a class="cell contact" href="#contact">hello@gatehousestrategic.com</a>
+    <div class="cell nav-login"><a class="login-btn" href="login/">Client login</a></div>
     <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span></button>
   </div>
 </header>

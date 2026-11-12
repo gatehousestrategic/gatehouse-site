@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Client dashboard | Gatehouse Strategic</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0d2a4c; --navy-2: #163a63; --blue: #3d8bd6; --blue-light: #a9cdf0;
+  --pale: #e3eaf2; --pale-2: #f3f6fa; --line: #9cbde0; --line-soft: #d3dde8; --text: #34465c; --muted: #66768a; --bad: #a8321f;
+  --serif: "Spectral", Georgia, serif;
+  --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--pale-2); color: var(--text); font: 400 15.5px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+h1, h2, h3, p { margin: 0; }
+button, input, textarea { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+.bar { background: var(--navy); color: #fff; }
+.bar-in { max-width: 1440px; margin: 0 auto; height: 86px; display: flex; align-items: center; justify-content: space-between; }
+.logo { display: flex; align-items: center; padding-left: 40px; text-decoration: none; font-family: var(--serif); font-size: 24px; line-height: 1; }
+.logo .mark { width: 42px; height: 42px; margin-right: 12px; }
+.logo small { display: block; font: 600 10px/1 var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--blue-light); margin-top: 6px; }
+.out { height: 100%; display: flex; align-items: center; padding: 0 40px; border: 0; border-left: 1px solid rgba(255,255,255,.18); background: none; color: #fff; font: 700 12px/1 var(--sans); letter-spacing: .03em; text-transform: uppercase; cursor: pointer; }
+.out:hover { background: var(--navy-2); }
+
+.head { background: #fff; border-bottom: 1px solid var(--line-soft); }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
+.head .wrap { padding-top: 52px; padding-bottom: 40px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 20px; }
+.kicker { font: 600 14px/1.2 var(--sans); color: var(--blue); }
+.head h1 { margin-top: 10px; color: var(--navy); font: 400 clamp(32px, 3.2vw, 46px)/1.1 var(--serif); }
+.head-meta { font-size: 14px; color: var(--muted); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; padding-top: 32px; padding-bottom: 96px; align-items: start; }
+.col { display: grid; gap: 24px; }
+.card { background: #fff; border: 1px solid var(--line-soft); }
+.card-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 22px; border-bottom: 1px solid var(--line-soft); }
+.card-h h2 { font: 400 22px/1.2 var(--serif); color: var(--navy); }
+.card-h span { font-size: 13px; color: var(--muted); }
+.empty { padding: 22px; color: var(--muted); }
+
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 16px 22px; border-bottom: 1px solid var(--line-soft); }
+.row:last-child { border-bottom: 0; }
+.row b { display: block; color: var(--navy); font-weight: 600; word-break: break-word; }
+.row small { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
+.who { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: 2px; background: var(--pale); color: var(--navy); margin-right: 6px; }
+.who.you { background: #eef3e6; color: #3f5a1e; }
+.open { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; background: var(--navy); color: #fff; text-decoration: none; font: 600 13.5px/1 var(--sans); border-radius: 2px; white-space: nowrap; }
+.open:hover { background: var(--navy-2); }
+.open.ghost { background: #fff; color: var(--navy); border: 1px solid var(--line); }
+.open.ghost:hover { border-color: var(--navy); }
+
+.note { padding: 20px 22px; border-bottom: 1px solid var(--line-soft); }
+.note:last-child { border-bottom: 0; }
+.note h3 { font: 600 16px/1.3 var(--sans); color: var(--navy); }
+.note small { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
+.note p { margin-top: 10px; white-space: pre-wrap; line-height: 1.65; }
+
+.thread { max-height: 460px; overflow: auto; padding: 18px 22px; display: grid; gap: 14px; }
+.msg { max-width: 88%; padding: 12px 14px; border-radius: 2px; }
+.msg.them { background: var(--pale); justify-self: start; }
+.msg.me { background: var(--navy); color: #fff; justify-self: end; }
+.msg p { white-space: pre-wrap; }
+.msg small { display: block; margin-top: 6px; font-size: 12px; opacity: .7; }
+.compose { display: grid; gap: 10px; padding: 16px 22px 20px; border-top: 1px solid var(--line-soft); }
+.compose input, .compose textarea { width: 100%; border: 1px solid var(--line); border-radius: 2px; padding: 10px 12px; background: #fff; }
+.compose textarea { min-height: 96px; resize: vertical; }
+.compose input:focus, .compose textarea:focus { outline: 2px solid var(--blue); outline-offset: -1px; border-color: var(--blue); }
+.send { justify-self: start; height: 42px; padding: 0 18px; border: 0; border-radius: 2px; background: var(--navy); color: #fff; font-weight: 600; cursor: pointer; }
+.send:hover { background: var(--navy-2); }
+.send[disabled] { opacity: .6; cursor: progress; }
+.status { font-size: 13.5px; color: var(--muted); min-height: 18px; }
+.status.bad { color: var(--bad); }
+
+.drop { display: block; margin: 18px 22px 22px; border: 1.5px dashed var(--line); border-radius: 2px; padding: 26px 18px; text-align: center; cursor: pointer; background: var(--pale-2); }
+.drop:hover, .drop.over { border-color: var(--blue); background: #eaf2fb; }
+.drop b { display: block; color: var(--navy); font-weight: 600; }
+.drop span { font-size: 13px; color: var(--muted); }
+.ups { padding: 0 22px 18px; display: grid; gap: 6px; font-size: 13.5px; }
+
+.help { padding: 0 0 8px; font-size: 14px; color: var(--muted); }
+.help a { color: var(--navy); font-weight: 600; text-underline-offset: 3px; }
+.loading { padding: 80px 0; text-align: center; color: var(--muted); }
+
+@media (max-width: 960px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .bar-in { height: 72px; }
+  .logo { padding-left: 18px; }
+  .out { padding: 0 18px; }
+  .wrap { padding: 0 16px; }
+  .head .wrap { padding-top: 36px; padding-bottom: 28px; }
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .open { justify-self: start; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <a class="logo" href="../" aria-label="Gatehouse Strategic home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 49V29a11 11 0 0 1 22 0v20" fill="none" stroke="#ffffff" stroke-width="4.5"/><path d="M15 49.5h34" stroke="#3d8bd6" stroke-width="4.5"/></svg><span>Gatehouse<small>Strategic</small></span></a>
+    <button class="out" id="out" type="button">Sign out</button>
+  </div>
+</header>
+
+<section class="head">
+  <div class="wrap">
+    <div>
+      <p class="kicker">Client dashboard</p>
+      <h1 id="name">Loading…</h1>
+    </div>
+    <p class="head-meta" id="meta"></p>
+  </div>
+</section>
+
+<p class="loading" id="loading">Loading your dashboard…</p>
+
+<main class="wrap grid" id="main" hidden>
+  <div class="col">
+    <section class="card">
+      <div class="card-h"><h2>Files</h2><span id="fileCount"></span></div>
+      <div id="files"></div>
+    </section>
+    <section class="card" id="linksCard">
+      <div class="card-h"><h2>Links</h2></div>
+      <div id="links"></div>
+    </section>
+    <section class="card">
+      <div class="card-h"><h2>Project notes</h2></div>
+      <div id="notes"></div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="card">
+      <div class="card-h"><h2>Messages</h2><span>Goes straight to our team</span></div>
+      <div class="thread" id="thread"></div>
+      <form class="compose" id="compose">
+        <input id="author" placeholder="Your name" maxlength="120" autocomplete="name">
+        <textarea id="body" placeholder="Write a message…" maxlength="5000" required></textarea>
+        <button class="send" id="send" type="submit">Send message</button>
+        <p class="status" id="sendStatus" role="status"></p>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-h"><h2>Send us files</h2><span>Up to 50 MB each</span></div>
+      <label class="drop" id="drop">
+        <input type="file" id="fileIn" multiple hidden>
+        <b>Choose files or drop them here</b>
+        <span>They'll appear under Files, marked as from you.</span>
+      </label>
+      <div class="ups" id="ups"></div>
+    </section>
+
+    <p class="help">Something urgent? Email <a href="mailto:hello@gatehousestrategic.com">hello@gatehousestrategic.com</a>.</p>
+  </div>
+</main>
+
+<script src="api.js"></script>
+<script>
+(function () {
+  var P = GH_PORTAL;
+  var token = P.getToken();
+  var uploadKey = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function toLogin(reason) { P.setToken(null); location.replace("../login/" + (reason ? "?" + reason : "")); }
+  if (!token) return toLogin();
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function safeUrl(u) { return /^https?:\/\//i.test(u || "") ? u : "#"; }
+  function day(d) { return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+  function when(d) { return new Date(d).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
+  function byNew(a, b) { return new Date(b.created_at) - new Date(a.created_at); }
+  function size(n) { if (!n) return ""; return n < 1024 * 1024 ? Math.max(1, Math.round(n / 1024)) + " KB" : (n / 1048576).toFixed(1) + " MB"; }
+  try { $("author").value = localStorage.getItem("gh_portal_author") || ""; } catch (e) {}
+
+  $("out").addEventListener("click", function () {
+    P.rpc("portal_logout", { p_token: token }).catch(function () {}).then(function () { toLogin("signed-out"); });
+  });
+
+  function load() {
+    return P.rpc("portal_open", { p_token: token }).then(function (res) {
+      if (!res || !res.ok) return toLogin("expired");
+      uploadKey = res.upload_key;
+      $("name").textContent = res.client;
+      document.title = res.client + " | Gatehouse Strategic";
+      $("loading").hidden = true;
+      $("main").hidden = false;
+      render(res);
+    }).catch(function () {
+      $("loading").textContent = "We couldn't load your dashboard just now. Please refresh to try again.";
+    });
+  }
+
+  function render(res) {
+    var files = res.items.filter(function (i) { return i.kind === "file"; });
+    var links = res.items.filter(function (i) { return i.kind === "link"; });
+    var notes = res.items.filter(function (i) { return i.kind === "note"; });
+    var latest = res.items.concat(res.messages).map(function (x) { return x.created_at; }).sort().pop();
+    $("meta").textContent = latest ? "Last update " + day(latest) : "";
+
+    $("fileCount").textContent = files.length ? files.length + " file" + (files.length === 1 ? "" : "s") : "";
+    $("files").innerHTML = files.length ? files.slice().sort(byNew).map(function (f) {
+      var you = f.uploaded_by === "client";
+      return '<div class="row"><div><b>' + esc(f.title) + '</b><small><span class="who' + (you ? " you" : "") + '">' + (you ? "From you" : "From Gatehouse") + "</span>" +
+        esc([size(f.file_size), day(f.created_at)].filter(Boolean).join(" · ")) + "</small></div>" +
+        '<a class="open' + (you ? " ghost" : "") + '" data-id="' + esc(f.id) + '" href="' + esc(P.fileUrl(f.file_path)) + '" target="_blank" rel="noopener" download>Download</a></div>';
+    }).join("") : '<p class="empty">No files yet.</p>';
+
+    $("linksCard").hidden = !links.length;
+    $("links").innerHTML = links.slice().sort(byNew).map(function (l) {
+      return '<div class="row"><div><b>' + esc(l.title) + "</b><small>Added " + day(l.created_at) + '</small></div><a class="open" data-id="' + esc(l.id) + '" href="' + esc(safeUrl(l.url)) + '" target="_blank" rel="noopener">Open</a></div>';
+    }).join("");
+
+    $("notes").innerHTML = notes.length ? notes.slice().sort(byNew).map(function (n) {
+      return '<div class="note"><h3>' + esc(n.title) + "</h3><small>" + day(n.created_at) + "</small><p>" + esc(n.body) + "</p></div>";
+    }).join("") : '<p class="empty">No notes yet.</p>';
+
+    $("thread").innerHTML = res.messages.length ? res.messages.map(function (m) {
+      var who = m.from_admin ? "Gatehouse" + (m.author ? " · " + m.author : "") : (m.author || "You");
+      return '<div class="msg ' + (m.from_admin ? "them" : "me") + '"><p>' + esc(m.body) + "</p><small>" + esc(who) + " · " + when(m.created_at) + "</small></div>";
+    }).join("") : '<p class="empty" style="padding:0">No messages yet. Ask us anything.</p>';
+    $("thread").scrollTop = $("thread").scrollHeight;
+  }
+
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("a.open[data-id]");
+    if (a) P.rpc("portal_track", { p_token: token, p_item: a.getAttribute("data-id") }).catch(function () {});
+  });
+
+  $("compose").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var body = $("body").value.trim();
+    if (!body) return;
+    var author = $("author").value.trim();
+    try { localStorage.setItem("gh_portal_author", author); } catch (x) {}
+    $("send").disabled = true;
+    $("sendStatus").className = "status";
+    $("sendStatus").textContent = "Sending…";
+    P.rpc("portal_send", { p_token: token, p_body: body, p_author: author || null }).then(function (r) {
+      if (r && r.ok) { $("body").value = ""; $("sendStatus").textContent = "Sent. We'll reply here."; return load(); }
+      if (r && r.error === "expired") return toLogin("expired");
+      $("sendStatus").className = "status bad";
+      $("sendStatus").textContent = r && r.error === "too_many" ? "That's a lot of messages in an hour. Please email us instead." : "Couldn't send. Please try again.";
+    }).catch(function () {
+      $("sendStatus").className = "status bad";
+      $("sendStatus").textContent = "Couldn't send. Please try again.";
+    }).then(function () { $("send").disabled = false; });
+  });
+
+  // Uploads go to in/<this session's folder>/, then get listed under Files.
+  function upload(file) {
+    var line = document.createElement("div");
+    line.textContent = file.name + ": uploading…";
+    $("ups").appendChild(line);
+    if (file.size > 50 * 1048576) { line.textContent = file.name + ": too large (50 MB limit)"; return Promise.resolve(); }
+    var rand = Array.from(crypto.getRandomValues(new Uint8Array(8)), function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+    var path = "in/" + uploadKey + "/" + rand + "-" + file.name.replace(/[^A-Za-z0-9._-]+/g, "-").slice(-120);
+    return fetch(P.url + "/storage/v1/object/portal-files/" + path, {
+      method: "POST",
+      headers: { apikey: P.key, Authorization: "Bearer " + P.key, "Content-Type": file.type || "application/octet-stream", "x-upsert": "false" },
+      body: file
+    }).then(function (r) {
+      if (!r.ok) throw new Error("upload");
+      return P.rpc("portal_register_upload", { p_token: token, p_path: path, p_name: file.name, p_size: file.size });
+    }).then(function (r) {
+      if (!r || !r.ok) throw new Error("register");
+      line.textContent = file.name + ": sent";
+    }).catch(function () {
+      line.textContent = file.name + ": couldn't upload. Please try again.";
+    });
+  }
+  function handle(list) {
+    var files = Array.prototype.slice.call(list || []);
+    if (!files.length) return;
+    files.reduce(function (p, f) { return p.then(function () { return upload(f); }); }, Promise.resolve()).then(load);
+  }
+  $("fileIn").addEventListener("change", function () { handle(this.files); this.value = ""; });
+  var drop = $("drop");
+  ["dragenter", "dragover"].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave", "drop"].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", function (e) { handle(e.dataTransfer.files); });
+
+  load();
+})();
+</script>
+</body>
+</html>
