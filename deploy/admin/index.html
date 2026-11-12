@@ -257,7 +257,8 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="../portal/api.js"></script>
+<script src="../portal/api.js?v=4"></script>
+<script src="../portal/reader.js?v=1"></script>
 <script>
 (function () {
   var sb = supabase.createClient(GH_PORTAL.url, GH_PORTAL.key);
@@ -405,7 +406,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
 
     $("ovUploads").innerHTML = ups.length ? ups.map(function (f) {
       return '<button class="fi" data-dl="' + esc(f.id) + '"><b>' + esc(f.file_name || f.title) +
-        '</b><span class="when">' + ago(f.created_at) + '</span><span class="snip muted">' + esc(clientName(f.client_id)) + (f.file_size ? " · " + size(f.file_size) : "") + " · Download</span></button>";
+        '</b><span class="when">' + ago(f.created_at) + '</span><span class="snip muted">' + esc(clientName(f.client_id)) + (f.file_size ? " · " + size(f.file_size) : "") + " · Open</span></button>";
     }).join("") : '<p class="placeholder" style="padding:28px 20px">No files from clients yet.</p>';
 
     $("ovLogins").innerHTML = logins.length ? logins.map(function (e) {
@@ -494,7 +495,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     var fRows = files.length ? files.map(function (f) {
       var from = f.uploaded_by === "client" ? '<span class="flag on">From client</span>' : '<span class="flag">From Gatehouse</span>';
       return '<tr><td><b>' + esc(f.title) + "</b>" + (f.file_name && f.file_name !== f.title ? '<div class="muted">' + esc(f.file_name) + "</div>" : "") + "</td><td>" + from + '</td><td class="meta hide-sm">' + esc(size(f.file_size)) + '</td><td class="meta hide-sm">' + day(f.created_at) +
-        '</td><td class="acts"><button class="btn ghost small" data-act="download" data-id="' + f.id + '">Download</button>' + editBtns(f) + "</td></tr>";
+        '</td><td class="acts"><button class="btn ghost small" data-act="view" data-id="' + f.id + '">Open</button><button class="btn ghost small" data-act="download" data-id="' + f.id + '">Download</button>' + editBtns(f) + "</td></tr>";
     }).join("") : '<tr class="empty-row"><td colspan="5">No files yet.</td></tr>';
     var fe = editing("file");
     var fileCard = card("Files", "Yours and the client's, newest first",
@@ -594,10 +595,21 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     if (r.error) return toast("Couldn't open that file: " + r.error.message);
     location.href = r.data.signedUrl;
   }
+  function viewFile(item) {
+    GH_READER.openFile({
+      title: item.title,
+      meta: [item.uploaded_by === "client" ? "From " + clientName(item.client_id) : "From Gatehouse", size(item.file_size), day(item.created_at)].filter(Boolean).join(" · "),
+      fileName: item.file_name || item.title, size: item.file_size,
+      getUrl: function () {
+        return sb.storage.from("portal-files").createSignedUrl(item.file_path, 300).then(function (r) { return r.error ? null : r.data.signedUrl; });
+      },
+      download: function () { download(item); }
+    });
+  }
   $("ovUploads").addEventListener("click", function (e) {
     var b = e.target.closest("[data-dl]"); if (!b) return;
     var it = (state.ovUploads || []).find(function (x) { return x.id === b.dataset.dl; });
-    if (it) download(it);
+    if (it) viewFile(it);
   });
 
   $("detail").addEventListener("click", async function (e) {
@@ -606,6 +618,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     var code = state.codes.find(function (k) { return k.id === b.dataset.id; });
     var it = state.items.find(function (x) { return x.id === b.dataset.id; });
     if (act === "download") return download(it);
+    if (act === "view") return viewFile(it);
     if (act === "copycode") return copy(code.code, "Code copied");
     if (act === "copyinvite") return copy("Your Gatehouse Strategic client dashboard: go to " + SITE + "/login and enter code " + code.code, "Invite copied");
     if (act === "togglecode") { check(await sb.from("portal_codes").update({ active: !code.active }).eq("id", code.id)); toast(code.active ? "Code turned off" : "Code turned on"); return loadClients(); }

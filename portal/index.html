@@ -58,7 +58,11 @@ button, input, textarea { font: inherit; color: inherit; }
 .open.ghost { background: #fff; color: var(--navy); border: 1px solid var(--line); }
 .open.ghost:hover { border-color: var(--navy); }
 
-.note { padding: 20px 22px; border-bottom: 1px solid var(--line-soft); }
+.btns { display: flex; gap: 8px; }
+.note { display: block; width: 100%; text-align: left; background: #fff; border: 0; cursor: pointer; font: inherit; color: inherit; padding: 20px 22px; border-bottom: 1px solid var(--line-soft); }
+.note:hover { background: var(--pale-2); }
+.note p { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.note .more { display: inline-block; margin-top: 10px; font-weight: 600; font-size: 13.5px; color: var(--navy); border-bottom: 1px solid var(--blue); }
 .note:last-child { border-bottom: 0; }
 .note h3 { font: 600 16px/1.3 var(--sans); color: var(--navy); }
 .note small { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
@@ -167,7 +171,8 @@ button, input, textarea { font: inherit; color: inherit; }
   </div>
 </main>
 
-<script src="api.js"></script>
+<script src="api.js?v=4"></script>
+<script src="reader.js?v=1"></script>
 <script>
 (function () {
   var P = GH_PORTAL;
@@ -208,7 +213,9 @@ button, input, textarea { font: inherit; color: inherit; }
     });
   }
 
+  var byId = {};
   function render(res) {
+    byId = {}; res.items.forEach(function (i) { byId[i.id] = i; });
     var files = res.items.filter(function (i) { return i.kind === "file"; });
     var links = res.items.filter(function (i) { return i.kind === "link" || i.kind === "site"; });
     var notes = res.items.filter(function (i) { return i.kind === "note"; });
@@ -220,7 +227,7 @@ button, input, textarea { font: inherit; color: inherit; }
       var you = f.uploaded_by === "client";
       return '<div class="row"><div><b>' + esc(f.title) + '</b><small><span class="who' + (you ? " you" : "") + '">' + (you ? "From you" : "From Gatehouse") + "</span>" +
         esc([size(f.file_size), day(f.created_at)].filter(Boolean).join(" · ")) + "</small></div>" +
-        '<button type="button" class="open' + (you ? " ghost" : "") + '" data-file="' + esc(f.id) + '">Download</button></div>';
+        '<div class="btns"><button type="button" class="open" data-view="' + esc(f.id) + '">Open</button><button type="button" class="open ghost" data-file="' + esc(f.id) + '">Download</button></div></div>';
     }).join("") : '<p class="empty">No files yet.</p>';
 
     $("linksCard").hidden = !links.length;
@@ -232,7 +239,7 @@ button, input, textarea { font: inherit; color: inherit; }
     }).join("");
 
     $("notes").innerHTML = notes.length ? notes.slice().sort(byNew).map(function (n) {
-      return '<div class="note"><h3>' + esc(n.title) + "</h3><small>" + day(n.created_at) + "</small><p>" + esc(n.body) + "</p></div>";
+      return '<button type="button" class="note" data-note="' + esc(n.id) + '"><h3>' + esc(n.title) + "</h3><small>" + day(n.created_at) + "</small><p>" + esc(n.body) + '</p><span class="more">Read note</span></button>';
     }).join("") : '<p class="empty">No notes yet.</p>';
 
     $("thread").innerHTML = res.messages.length ? res.messages.map(function (m) {
@@ -242,7 +249,38 @@ button, input, textarea { font: inherit; color: inherit; }
     $("thread").scrollTop = $("thread").scrollHeight;
   }
 
+  function fileMeta(it) { return [it.uploaded_by === "client" ? "From you" : "From Gatehouse", size(it.file_size), day(it.created_at)].filter(Boolean).join(" · "); }
+  function download(id) {
+    return P.access(token, id, "download").then(function (r) {
+      if (r && r.ok) { location.href = r.url; return; }
+      if (r && r.error === "expired") return toLogin("expired");
+      alertLine("That file couldn't be opened. Please try again.");
+    }).catch(function () { alertLine("That file couldn't be opened. Please try again."); });
+  }
+
   document.addEventListener("click", function (e) {
+    var n = e.target.closest("[data-note]");
+    if (n && byId[n.getAttribute("data-note")]) {
+      var note = byId[n.getAttribute("data-note")];
+      GH_READER.openNote({ title: note.title, meta: "Project note · " + day(note.created_at), body: note.body });
+      P.rpc("portal_track", { p_token: token, p_item: note.id }).catch(function () {});
+      return;
+    }
+    var v = e.target.closest("[data-view]");
+    if (v && byId[v.getAttribute("data-view")]) {
+      var it = byId[v.getAttribute("data-view")];
+      GH_READER.openFile({
+        title: it.title, meta: fileMeta(it), fileName: it.file_name || it.title, size: it.file_size,
+        getUrl: function () {
+          return P.access(token, it.id, "view").then(function (r) {
+            if (r && r.error === "expired") { toLogin("expired"); return null; }
+            return r && r.ok ? r.url : null;
+          });
+        },
+        download: function () { download(it.id); }
+      });
+      return;
+    }
     var a = e.target.closest("a.open[data-id]");
     if (a) P.rpc("portal_track", { p_token: token, p_item: a.getAttribute("data-id") }).catch(function () {});
     var f = e.target.closest("button[data-file]");
@@ -250,12 +288,7 @@ button, input, textarea { font: inherit; color: inherit; }
       // Ask for a 5-minute download link; the request itself is logged.
       var label = f.textContent;
       f.disabled = true; f.textContent = "Preparing…";
-      P.access(token, f.getAttribute("data-file")).then(function (r) {
-        if (r && r.ok) { location.href = r.url; return; }
-        if (r && r.error === "expired") return toLogin("expired");
-        alertLine("That file couldn't be opened. Please try again.");
-      }).catch(function () { alertLine("That file couldn't be opened. Please try again."); })
-        .then(function () { f.disabled = false; f.textContent = label; });
+      download(f.getAttribute("data-file")).then(function () { f.disabled = false; f.textContent = label; });
     }
   });
   function alertLine(msg) { $("fileCount").textContent = msg; }

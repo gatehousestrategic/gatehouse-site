@@ -22,7 +22,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
   try {
-    const { token, item_id } = await req.json();
+    // mode "view" returns a link the reader pane can show; anything else downloads.
+    const { token, item_id, mode } = await req.json();
+    const viewing = mode === "view";
     if (typeof token !== "string" || typeof item_id !== "string") return json({ ok: false, error: "bad_request" }, 400);
 
     const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -39,14 +41,15 @@ Deno.serve(async (req) => {
     if (!it) return json({ ok: false, error: "not_found" }, 404);
 
     await db.from("portal_events").insert({
-      kind: "item_open", client_id: s.client_id, code_id: s.code_id, item_id: it.id, detail: it.title,
+      kind: "item_open", client_id: s.client_id, code_id: s.code_id, item_id: it.id,
+      detail: (it.kind === "file" ? (viewing ? "Viewed: " : "Downloaded: ") : "") + it.title,
       ip: (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || null,
       user_agent: (req.headers.get("user-agent") || "").slice(0, 300),
     });
 
     if (it.kind === "file") {
       const { data, error } = await db.storage.from("portal-files")
-        .createSignedUrl(it.file_path, 300, { download: it.file_name || true });
+        .createSignedUrl(it.file_path, 300, viewing ? undefined : { download: it.file_name || true });
       if (error) throw error;
       return json({ ok: true, url: data.signedUrl });
     }

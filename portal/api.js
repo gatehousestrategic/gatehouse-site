@@ -19,11 +19,11 @@ window.GH_PORTAL = (function () {
 
   // Files are private. The portal-files function checks the session and
   // returns short-lived links for one item (a file, or a website preview).
-  function access(token, itemId) {
+  function access(token, itemId, mode) {
     return fetch(URL_ + "/functions/v1/portal-files", {
       method: "POST",
       headers: { apikey: KEY, Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ token: token, item_id: itemId })
+      body: JSON.stringify({ token: token, item_id: itemId, mode: mode || "download" })
     }).then(function (r) { return r.json(); });
   }
 
