@@ -31,15 +31,18 @@ public key instead of going through a server route.
   `gh_site_analytics(p_days)`, where 1 = Today in New York time with hourly bars.
   Country comes from `cf-ipcountry` if Supabase passes it, otherwise a time-zone fallback.
   Tested on local Postgres 16.
-- `admin/index.html`: new **Website** tab (range picker; metrics for visitors, page views,
+- `admin/index.html`: new **Analytics** tab (internally `data-tab="website"`; range picker; metrics for visitors, page views,
   contact clicks, client portal logins, time on page, bounce and live visitors; daily or
   hourly chart; top lists). Also fixed the admin top bar overflowing on phones.
 
-### OPEN: the SQL has not been run yet
-Run `supabase/site-analytics.sql` in the gridaudit project (safe to re-run).
-Until then the beacon calls fail silently and the Website tab says
-"Analytics aren't available yet". The cloud session that built this couldn't reach
-Supabase (network blocked, no connector), so it handed off here.
-After running it: load the home page in a normal browser that isn't signed in to /admin,
-then check the Website tab in /admin. If the country list stays empty,
-Supabase isn't passing `cf-ipcountry`, and only the time-zone fallback is in use.
+### SQL run 2026-11-13
+`supabase/site-analytics.sql` was run in gridaudit on 2026-11-13 from the SQL Editor
+(safe to re-run after edits). Checked: all gh_ tables and functions exist; the live
+home page's `gh_track_view` call returns 204; a simulated outside visit (rolled back)
+stored country, device, browser, OS, language, referrer, time on page and a contact
+click correctly. A real visit from the owner's desktop stored nothing, most likely because that
+network is in `portal_admin_ips` (skipped by design; not confirmed, since this
+network blocks IP-lookup sites). `gh_site_analytics` answers "permission denied" unless the caller
+is signed in to /admin; that is expected.
+Still to see: real visits and whether the country list fills from `cf-ipcountry`
+(if not, only the time-zone fallback is in use).
