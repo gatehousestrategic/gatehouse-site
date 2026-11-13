@@ -637,10 +637,12 @@ a.wrow:hover .go { color: var(--navy); }
     e.preventDefault();
     var email = form.email.value.trim(), msg = form.msg.value.trim();
     if (!email || !form.email.checkValidity()) { note.textContent = "Please add a valid email."; return; }
+    if (window.ghTrack) window.ghTrack("contact_form");
     location.href = "mailto:hello@gatehousestrategic.com?subject=" + encodeURIComponent("Project inquiry") + "&body=" + encodeURIComponent("From: " + email + "\n\n" + msg);
     note.textContent = "Opening your email app. If nothing happens, email hello@gatehousestrategic.com.";
   });
 })();
 </script>
+<script src="/track.js?v=1" defer></script>
 </body>
 </html>
