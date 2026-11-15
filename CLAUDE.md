@@ -61,3 +61,19 @@ network blocks IP-lookup sites). `gh_site_analytics` answers "permission denied"
 is signed in to /admin; that is expected.
 Still to see: real visits and whether the country list fills from `cf-ipcountry`
 (if not, only the time-zone fallback is in use).
+
+### Campaigns (added 2026-11-15)
+- `supabase/campaigns.sql`: tables `gh_campaigns` (name, slug = the utm_campaign tag, note,
+  archived_at) and `gh_campaign_links` (label, source, medium, content = utm_content, landing path),
+  admin-only through RLS with `portal_is_admin()`. Admin RPC `gh_campaign_stats(p_days)` (null = all
+  time) returns numbers per campaign and per link, plus tagged visits that match no campaign.
+  Same counting as Analytics: a visitor-day joins a campaign if any view carries its tag.
+- `site-analytics.sql` now stores `utm_medium` and `utm_content` too, lowercases all tags, and
+  `gh_track_view` takes them as two extra arguments with defaults (old 6-argument calls still work).
+  The Analytics "Campaigns" list and `campaign` filter are by tag (`''` = tagged link without one).
+- `track.js` sends medium and content; pages load it as `track.js?v=2`.
+- `admin/index.html`: **Campaigns** tab (create, archive, delete; links with a live preview and
+  Copy; per-link numbers; "Make a campaign" from an unmatched tag; "Open in Analytics").
+  Links always point at https://gatehousestrategic.com.
+- Run order: site-analytics.sql, then campaigns.sql, then push (the new track.js needs the new
+  gh_track_view). Tested 2026-11-15 in gridaudit inside a rolled-back transaction.

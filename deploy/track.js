@@ -46,6 +46,8 @@
     p_referrer: refHost(),
     p_utm_source: q.get("utm_source"),
     p_utm_campaign: q.get("utm_campaign"),
+    p_utm_medium: q.get("utm_medium"),
+    p_utm_content: q.get("utm_content"),
     p_key: key,
     p_tz: tz
   });

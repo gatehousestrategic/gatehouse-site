@@ -206,6 +206,41 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
   .tabs { order: 3; flex: 0 0 100%; overflow-x: auto; border-top: 1px solid rgba(255,255,255,.18); }
   .tab { height: 48px; white-space: nowrap; }
 }
+/* five tabs: keep the top bar inside the window on mid-size screens */
+@media (max-width: 1200px) and (min-width: 901px) {
+  .tab { padding: 0 16px; }
+  .who { gap: 12px; padding: 0 16px; }
+}
+/* campaigns */
+.camp-new { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.4fr) auto; gap: 10px; align-items: end; padding: 16px 20px; }
+.camp { margin-top: 24px; overflow-x: auto; }
+.camp-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; padding: 16px 20px; border-bottom: 1px solid var(--line-soft); }
+.camp-h h2 { font: 400 22px/1.2 var(--serif); color: var(--navy); }
+.camp-h .tag { font-size: 13px; color: var(--muted); }
+.camp-h .tag code { font: 600 13px/1 ui-monospace, Consolas, monospace; color: var(--navy); }
+.camp-h .acts { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+.camp-note { padding: 12px 20px 0; font-size: 14px; color: var(--text); white-space: pre-wrap; }
+.camp-nums { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-bottom: 1px solid var(--line-soft); }
+.camp-nums div { padding: 14px 20px; border-right: 1px solid var(--line-soft); }
+.camp-nums div:last-child { border-right: 0; }
+.camp-nums b { display: block; font: 600 22px/1 var(--sans); color: var(--navy); font-variant-numeric: tabular-nums; }
+.camp-nums span { display: block; margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+.camp table td.n { font-variant-numeric: tabular-nums; text-align: right; }
+.camp table th.n { text-align: right; }
+.camp .url { display: block; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12.5px/1.4 ui-monospace, Consolas, monospace; color: var(--muted); }
+.link-form { display: grid; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--line-soft); background: var(--pale-2); }
+.link-form .row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.link-form .preview { font: 12.5px/1.5 ui-monospace, Consolas, monospace; color: var(--muted); word-break: break-all; }
+.link-form .acts { display: flex; gap: 8px; align-items: center; }
+.camp-tools { display: flex; align-items: center; gap: 18px; margin-top: 24px; font-size: 13px; color: var(--muted); }
+@media (max-width: 900px) {
+  .camp-new, .link-form .row { grid-template-columns: minmax(0, 1fr); }
+  .camp-nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .camp-nums div { border-bottom: 1px solid var(--line-soft); }
+  .camp .url { display: none; }
+  .camp th, .camp td { padding: 10px 8px; }
+  .camp-h .acts { margin-left: 0; }
+}
 @media (max-width: 900px) {
   .ov { grid-template-columns: minmax(0, 1fr); }
   .tops { grid-template-columns: minmax(0, 1fr); }
@@ -224,6 +259,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
       <button class="tab" data-tab="clients" aria-selected="false">Clients</button>
       <button class="tab" data-tab="activity" aria-selected="false">Activity</button>
       <button class="tab" data-tab="website" aria-selected="false">Analytics</button>
+      <button class="tab" data-tab="campaigns" aria-selected="false">Campaigns</button>
     </nav>
     <div class="who" id="who" hidden><span id="whoEmail"></span><button id="signout" type="button">Sign out</button></div>
   </div>
@@ -323,6 +359,30 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
   <div id="webBody"></div>
 </section>
 
+<!-- campaigns -->
+<section class="wrap" id="campaignsView" hidden>
+  <div class="web-head">
+    <h1>Campaigns</h1>
+    <nav class="ranges" id="campRanges" aria-label="Time range">
+      <button type="button" data-range="30">30 days</button>
+      <button type="button" data-range="90">90 days</button>
+      <button type="button" data-range="365">12 months</button>
+      <button type="button" data-range="0">All time</button>
+    </nav>
+  </div>
+  <p class="web-note">Set up a campaign, add a link for each post, email or ad, and share those links. Every visit that arrives through one is counted here and in Analytics. A visitor is one person on one day; once they arrive through a campaign link, all their pages and contact clicks that day count toward it.</p>
+  <div class="card">
+    <div class="card-h"><h2>New campaign</h2></div>
+    <form class="camp-new" id="campNewForm">
+      <label class="f">Name<input type="text" id="campName" maxlength="120" placeholder="Fall outreach" required></label>
+      <label class="f">Tag in links<input type="text" id="campSlug" maxlength="60" placeholder="fall-outreach" required pattern="[a-z0-9][a-z0-9\-]*" title="Lowercase letters, numbers and dashes"></label>
+      <label class="f">Note (optional)<input type="text" id="campNote" maxlength="2000" placeholder="What it is and who it's for"></label>
+      <button class="btn" type="submit">Create campaign</button>
+    </form>
+  </div>
+  <div id="campBody"></div>
+</section>
+
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -381,7 +441,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
   function randHex(n) { return Array.from(crypto.getRandomValues(new Uint8Array(n)), function (x) { return ("0" + x.toString(16)).slice(-2); }).join(""); }
 
   /* ---------- views and sign-in ---------- */
-  var VIEWS = ["signinView", "overviewView", "clientsView", "activityView", "websiteView"];
+  var VIEWS = ["signinView", "overviewView", "clientsView", "activityView", "websiteView", "campaignsView"];
   function show(view) {
     VIEWS.forEach(function (v) { $(v).hidden = v !== view; });
     $("tabs").hidden = $("who").hidden = view === "signinView";
@@ -394,6 +454,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     if (tab === "clients") loadClients();
     if (tab === "activity") loadActivity();
     if (tab === "website") loadWebsite();
+    if (tab === "campaigns") loadCampaigns();
   }
 
   async function start() {
@@ -875,7 +936,12 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     referrer: function (v) { return v || "Direct or unknown"; },
     country: function (v) { return flag(v) + " " + named("region", v); },
     language: function (v) { return named("language", v); },
-    device: function (v) { return DEVICE[v] || v; }
+    device: function (v) { return DEVICE[v] || v; },
+    campaign: function (v) {
+      if (!v) return "Tagged link, no campaign tag";
+      var c = campData.list.find(function (x) { return x.slug === v; });
+      return c ? c.name + " · " + v : v;
+    }
   };
   function dimLabel(dim, v) { return LABEL[dim] ? LABEL[dim](v) : v; }
   function topList(key, title, rows, dim, empty) {
@@ -934,6 +1000,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     document.querySelectorAll("#webRanges button").forEach(function (b) { b.setAttribute("aria-current", !webDay && Number(b.dataset.range) === webRange ? "true" : "false"); });
     if (location.hash !== webHash()) history.replaceState(null, "", webHash());
     var r = await sb.rpc("gh_site_analytics", { p_days: webRange, p_filters: webFilters, p_day: webDay });
+    if (!campData.list.length) await loadCampaignNames();
     var s = r.data;
     if (r.error || !s) {
       $("webBody").innerHTML = '<div class="card placeholder">Analytics aren&#39;t available yet. ' + esc(r.error ? r.error.message : "") + "</div>";
@@ -970,7 +1037,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
         topList("pages", "Pages", s.pages, "page") +
         topList("entry", "Entry pages (first page seen)", s.entryPages, "entry") +
         topList("referrers", "Where visitors came from", s.referrers, "referrer") +
-        topList("campaigns", "Campaigns (utm_source / utm_campaign)", s.campaigns, "campaign", "No visits from tagged links yet. Add ?utm_source=linkedin&utm_campaign=fall to a link to see it here.") +
+        topList("campaigns", "Campaigns", s.campaigns, "campaign", "No visits from campaign links yet. Make links in the Campaigns tab.") +
         topList("countries", "Countries", s.countries, "country", "No country data yet.") +
         topList("languages", "Languages", s.languages, "language") +
         topList("devices", "Devices", s.devices, "device") +
@@ -993,6 +1060,193 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     if ((t = e.target.closest(".drill-row"))) {
       var dim = t.dataset.dim, val = t.dataset.val;
       return setWeb(function () { if (webFilters[dim] === val) delete webFilters[dim]; else webFilters[dim] = val; });
+    }
+  });
+
+  /* ---------- campaigns ---------- */
+  // Links always point at the live site, even when this admin is opened elsewhere.
+  var LIVE = "https://gatehousestrategic.com";
+  var LANDING = [["/", "Home"], ["/westwood", "Westwood directory"], ["/b4c", "Bike4Chai preview"], ["/login", "Client login"]];
+  var SOURCES = ["linkedin", "email", "newsletter", "facebook", "instagram", "x", "google", "partner", "event", "qr"];
+  var MEDIUMS = ["social", "email", "paid", "referral", "print", "qr", "event"];
+  var campRange = 0, campShowArchived = false, campData = { list: [], links: [], stats: null };
+  function slugify(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60); }
+  function tagify(s) { return String(s || "").toLowerCase().trim().replace(/[^a-z0-9._-]+/g, "-").replace(/^[^a-z0-9]+|-+$/g, "").slice(0, 60); }
+  function campUrl(c, l) {
+    var q = new URLSearchParams();
+    q.set("utm_source", l.source);
+    if (l.medium) q.set("utm_medium", l.medium);
+    q.set("utm_campaign", c.slug);
+    q.set("utm_content", l.content);
+    return LIVE + l.path + "?" + q.toString();
+  }
+  function pct(a, b) { return b ? Math.round(a / b * 100) + "%" : "–"; }
+  function emptyP(text) { return '<p class="muted" style="padding:16px 20px">' + text + "</p>"; }
+
+  async function loadCampaignNames() {
+    var r = await sb.from("gh_campaigns").select("id, name, slug, note, archived_at, created_at").order("created_at", { ascending: false });
+    if (!r.error) campData.list = r.data;
+  }
+  async function loadCampaigns() {
+    document.querySelectorAll("#campRanges button").forEach(function (b) { b.setAttribute("aria-current", Number(b.dataset.range) === campRange ? "true" : "false"); });
+    var r = await Promise.all([
+      sb.from("gh_campaigns").select("id, name, slug, note, archived_at, created_at").order("created_at", { ascending: false }),
+      sb.from("gh_campaign_links").select("*").order("created_at"),
+      sb.rpc("gh_campaign_stats", { p_days: campRange || null })
+    ]);
+    var err = r[0].error || r[1].error || r[2].error;
+    if (err) {
+      $("campBody").innerHTML = '<div class="card placeholder" style="margin-top:24px">Campaigns aren&#39;t available yet. ' + esc(err.message) + "</div>";
+      return;
+    }
+    campData = { list: r[0].data, links: r[1].data, stats: r[2].data };
+    renderCampaigns();
+  }
+  function linkForm(c) {
+    var opts = LANDING.map(function (p) { return '<option value="' + p[0] + '">' + esc(p[1]) + " · " + p[0] + "</option>"; }).join("");
+    return '<form class="link-form" data-link-form="' + c.id + '">' +
+      '<div class="row">' +
+        '<label class="f">What it&#39;s for<input type="text" name="label" maxlength="120" placeholder="LinkedIn post, Nov 18" required></label>' +
+        '<label class="f">Source<input type="text" name="source" maxlength="60" list="campSources" placeholder="linkedin" required></label>' +
+        '<label class="f">Medium<input type="text" name="medium" maxlength="60" list="campMediums" placeholder="social"></label>' +
+        '<label class="f">Landing page<select name="path">' + opts + "</select></label>" +
+      "</div>" +
+      '<p class="preview" data-preview></p>' +
+      '<div class="acts"><button class="btn" type="submit">Add link</button><span class="muted" style="font-size:13px">Each link gets its own line in the numbers, named after &ldquo;What it&#39;s for&rdquo;.</span></div>' +
+      "</form>";
+  }
+  function previewLink(form) {
+    var c = campData.list.find(function (x) { return x.id === form.dataset.linkForm; });
+    var l = { source: tagify(form.source.value) || "source", medium: tagify(form.medium.value), content: slugify(form.label.value) || "post", path: form.path.value };
+    form.querySelector("[data-preview]").textContent = campUrl(c, l);
+  }
+  function campCard(c, st) {
+    var n = st.campaigns[c.id] || { visitors: 0, views: 0, contacts: 0, bounce: null, avg_seconds: null };
+    var links = campData.links.filter(function (l) { return l.campaign_id === c.id; });
+    var rows = links.map(function (l) {
+      var ln = st.links[l.id] || { visitors: 0, views: 0, contacts: 0 }, url = campUrl(c, l);
+      return "<tr><td><b>" + esc(l.label) + '</b><span class="url" title="' + esc(url) + '">' + esc(url) + "</span></td>" +
+        '<td class="hide-sm">' + esc(l.source) + (l.medium ? ' <span class="muted">/ ' + esc(l.medium) + "</span>" : "") + "</td>" +
+        '<td class="hide-sm">' + esc(PAGE[l.path] || l.path) + "</td>" +
+        '<td class="n">' + num(ln.visitors) + '</td><td class="n hide-sm">' + num(ln.views) + '</td><td class="n">' + num(ln.contacts) + "</td>" +
+        '<td class="acts"><button class="btn small" type="button" data-copy-link="' + esc(url) + '">Copy link</button>' +
+        '<button class="btn danger small" type="button" data-del-link="' + l.id + '">Delete</button></td></tr>';
+    }).join("");
+    var seen = n.first_seen ? "First visit " + day(n.first_seen) + ", latest " + ago(n.last_seen).toLowerCase() : "No visits yet";
+    var table = '<table><thead><tr><th>Link</th><th class="hide-sm">Source / medium</th><th class="hide-sm">Lands on</th>' +
+      '<th class="n">Visitors</th><th class="n hide-sm">Views</th><th class="n">Contacts</th><th></th></tr></thead><tbody>' + rows + "</tbody></table>";
+    return '<div class="card camp">' +
+      '<div class="camp-h"><h2>' + esc(c.name) + "</h2>" +
+        '<span class="tag">Tag <code>' + esc(c.slug) + "</code> · " + esc(seen) + (c.archived_at ? ' · <span class="flag off">Archived</span>' : "") + "</span>" +
+        '<span class="acts"><button class="btn ghost small" type="button" data-camp-analytics="' + esc(c.slug) + '">Open in Analytics</button>' +
+        '<button class="btn ghost small" type="button" data-camp-archive="' + c.id + '">' + (c.archived_at ? "Restore" : "Archive") + "</button>" +
+        '<button class="btn danger small" type="button" data-camp-delete="' + c.id + '">Delete</button></span></div>' +
+      (c.note ? '<p class="camp-note">' + esc(c.note) + "</p>" : "") +
+      '<div class="camp-nums">' +
+        "<div><b>" + num(n.visitors) + "</b><span>Visitors</span></div>" +
+        "<div><b>" + num(n.views) + "</b><span>Page views</span></div>" +
+        "<div><b>" + num(n.contacts) + "</b><span>Contacted you (" + pct(n.contacts, n.visitors) + ")</span></div>" +
+        "<div><b>" + (n.bounce === null || n.bounce === undefined ? "–" : Math.round(n.bounce * 100) + "%") + "</b><span>Saw one page only</span></div>" +
+        "<div><b>" + dur(n.avg_seconds) + "</b><span>Time on page</span></div>" +
+      "</div>" +
+      (links.length ? table : emptyP("No links yet. Add one for each post, email or ad below.")) +
+      linkForm(c) +
+      "</div>";
+  }
+  function untrackedCard(un) {
+    var body = un.length
+      ? '<table><thead><tr><th>Campaign tag</th><th>Source</th><th class="hide-sm">Medium</th><th class="hide-sm">Content</th><th class="n">Visitors</th><th></th></tr></thead><tbody>' +
+        un.map(function (u) {
+          return "<tr><td>" + (u.campaign ? "<code>" + esc(u.campaign) + "</code>" : '<span class="muted">none</span>') + "</td><td>" + esc(u.source || "–") +
+            '</td><td class="hide-sm">' + esc(u.medium || "–") + '</td><td class="hide-sm">' + esc(u.content || "–") + '</td><td class="n">' + num(u.visitors) + "</td>" +
+            '<td class="acts">' + (u.campaign ? '<button class="btn ghost small" type="button" data-camp-from="' + esc(u.campaign) + '">Make a campaign</button>' : "") + "</td></tr>";
+        }).join("") + "</tbody></table>"
+      : emptyP("None. Every tagged visit belongs to a campaign above.");
+    return '<div class="card camp"><div class="card-h"><h2>Tagged visits that don&#39;t match a campaign</h2><span class="muted">Visitors</span></div>' + body + "</div>";
+  }
+  function renderCampaigns() {
+    var st = campData.stats || { campaigns: {}, links: {}, untracked: [] };
+    var shown = campData.list.filter(function (c) { return campShowArchived || !c.archived_at; });
+    var archivedCount = campData.list.filter(function (c) { return c.archived_at; }).length;
+    var html = '<datalist id="campSources">' + SOURCES.map(function (s) { return '<option value="' + s + '">'; }).join("") + "</datalist>" +
+      '<datalist id="campMediums">' + MEDIUMS.map(function (s) { return '<option value="' + s + '">'; }).join("") + "</datalist>";
+    html += shown.map(function (c) { return campCard(c, st); }).join("");
+    if (!shown.length) html += '<div class="card placeholder" style="margin-top:24px">' + (campData.list.length ? "All campaigns are archived." : "No campaigns yet. Create one above.") + "</div>";
+    if (archivedCount) html += '<label class="camp-tools"><input type="checkbox" id="campShowArchived"' + (campShowArchived ? " checked" : "") + "> Show " + archivedCount + " archived</label>";
+    html += untrackedCard(st.untracked || []);
+    $("campBody").innerHTML = html;
+    document.querySelectorAll("[data-link-form]").forEach(previewLink);
+  }
+
+  var slugTouched = false;
+  $("campName").addEventListener("input", function () { if (!slugTouched) $("campSlug").value = slugify(this.value); });
+  $("campSlug").addEventListener("input", function () { slugTouched = this.value !== ""; });
+  $("campNewForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var form = this, slug = slugify($("campSlug").value);
+    if (!slug) return toast("Give the campaign a tag.");
+    var r = await sb.from("gh_campaigns").insert({ name: $("campName").value.trim(), slug: slug, note: $("campNote").value.trim() || null });
+    if (r.error) return toast(r.error.code === "23505" ? "Another campaign already uses the tag " + slug + "." : r.error.message);
+    form.reset(); slugTouched = false;
+    toast("Campaign created. Add a link for each place you'll share it.");
+    loadCampaigns();
+  });
+  $("campRanges").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-range]");
+    if (!b) return;
+    campRange = Number(b.dataset.range);
+    loadCampaigns();
+  });
+  $("campBody").addEventListener("input", function (e) { var f = e.target.closest("[data-link-form]"); if (f) previewLink(f); });
+  $("campBody").addEventListener("change", function (e) {
+    if (e.target.id === "campShowArchived") { campShowArchived = e.target.checked; renderCampaigns(); return; }
+    var f = e.target.closest("[data-link-form]"); if (f) previewLink(f);
+  });
+  $("campBody").addEventListener("submit", async function (e) {
+    var f = e.target.closest("[data-link-form]");
+    if (!f) return;
+    e.preventDefault();
+    var row = { campaign_id: f.dataset.linkForm, label: f.label.value.trim(), source: tagify(f.source.value), medium: tagify(f.medium.value) || null, content: slugify(f.label.value), path: f.path.value };
+    if (!row.source) return toast("Add a source, like linkedin or email.");
+    if (!row.content) return toast("Describe the link with letters or numbers.");
+    var r = await sb.from("gh_campaign_links").insert(row);
+    if (r.error) return toast(r.error.code === "23505" ? "This campaign already has a link called that. Give it a different name." : r.error.message);
+    var c = campData.list.find(function (x) { return x.id === row.campaign_id; });
+    copy(campUrl(c, row), "Link added and copied");
+    loadCampaigns();
+  });
+  $("campBody").addEventListener("click", async function (e) {
+    var t, r;
+    if ((t = e.target.closest("[data-copy-link]"))) return copy(t.dataset.copyLink, "Link copied");
+    if ((t = e.target.closest("[data-camp-analytics]"))) {
+      webRange = campRange === 30 || campRange === 90 ? campRange : 365; webDay = null; webFilters = { campaign: t.dataset.campAnalytics }; webShowAll = {};
+      history.pushState(null, "", webHash());
+      return go("website");
+    }
+    if ((t = e.target.closest("[data-camp-from]"))) {
+      $("campSlug").value = t.dataset.campFrom; slugTouched = true;
+      $("campName").focus(); window.scrollTo({ top: 0, behavior: "smooth" });
+      return toast("Name it and press Create campaign. Past visits with this tag will count.");
+    }
+    if ((t = e.target.closest("[data-camp-archive]"))) {
+      var c = campData.list.find(function (x) { return x.id === t.dataset.campArchive; });
+      r = await sb.from("gh_campaigns").update({ archived_at: c.archived_at ? null : new Date().toISOString() }).eq("id", c.id);
+      if (r.error) return toast(r.error.message);
+      toast(c.archived_at ? "Campaign restored" : "Campaign archived. Its numbers are kept.");
+      return loadCampaigns();
+    }
+    if ((t = e.target.closest("[data-camp-delete]"))) {
+      if (!armed(t, "Delete campaign and its links?")) return;
+      r = await sb.from("gh_campaigns").delete().eq("id", t.dataset.campDelete);
+      if (r.error) return toast(r.error.message);
+      toast("Campaign deleted. Its visits stay in Analytics under its tag.");
+      return loadCampaigns();
+    }
+    if ((t = e.target.closest("[data-del-link]"))) {
+      if (!armed(t, "Delete link?")) return;
+      r = await sb.from("gh_campaign_links").delete().eq("id", t.dataset.delLink);
+      if (r.error) return toast(r.error.message);
+      return loadCampaigns();
     }
   });
 

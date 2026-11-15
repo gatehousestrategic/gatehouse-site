@@ -39,6 +39,10 @@ create table if not exists gh_page_views (
 );
 alter table gh_page_views enable row level security;
 
+-- Added 2026-11-15 for campaigns (see campaigns.sql).
+alter table gh_page_views add column if not exists utm_medium text;
+alter table gh_page_views add column if not exists utm_content text;
+
 create index if not exists gh_page_views_day_idx on gh_page_views (day);
 create index if not exists gh_page_views_visit_idx on gh_page_views (day, visitor);
 create index if not exists gh_page_views_key_idx on gh_page_views (day, visitor, view_key);
@@ -160,8 +164,12 @@ $fn$;
 
 -- ---------- what the public key may call ----------
 
+-- The six-argument version came first; the two campaign tags default to null,
+-- so a page still running the old track.js keeps working.
+drop function if exists gh_track_view(text, text, text, text, text, text);
 create or replace function gh_track_view(
-  p_path text, p_referrer text, p_utm_source text, p_utm_campaign text, p_key text, p_tz text
+  p_path text, p_referrer text, p_utm_source text, p_utm_campaign text, p_key text, p_tz text,
+  p_utm_medium text default null, p_utm_content text default null
 ) returns void language plpgsql security definer set search_path = public as $fn$
 declare
   v_visitor text;
@@ -177,13 +185,15 @@ begin
   -- One visitor can't flood the numbers.
   if (select count(*) from gh_page_views where day = v_day and visitor = v_visitor) >= 300 then return; end if;
 
-  insert into gh_page_views (day, visitor, path, referrer, utm_source, utm_campaign,
+  insert into gh_page_views (day, visitor, path, referrer, utm_source, utm_campaign, utm_medium, utm_content,
                              device, browser, os, country, language, view_key)
   values (
     v_day, v_visitor, v_path,
     case when v_ref ~ '^[a-z0-9.-]{1,200}$' and v_ref <> 'gatehousestrategic.com' then v_ref end,
     nullif(lower(left(trim(p_utm_source), 100)), ''),
-    nullif(left(trim(p_utm_campaign), 100), ''),
+    nullif(lower(left(trim(p_utm_campaign), 100)), ''),
+    nullif(lower(left(trim(p_utm_medium), 100)), ''),
+    nullif(lower(left(trim(p_utm_content), 100)), ''),
     case
       when v_ua ~* 'iPad|Tablet|PlayBook|Silk' or (v_ua ~* 'Android' and v_ua !~* 'Mobile') then 'tablet'
       when v_ua ~* 'Mobi|iPhone|iPod|Android|Opera Mini|IEMobile' then 'mobile'
@@ -253,7 +263,7 @@ $fn$;
 -- longer ranges are the last N days, including today.
 -- p_day: one day, shown by hour (drill-down from the daily chart).
 -- p_filters: drill-down filters, any of page, entry, referrer ('' = direct),
--- campaign, country, language, device, browser, os. Filters pick visitors
+-- campaign (the utm_campaign tag; '' = tagged without one), country, language, device, browser, os. Filters pick visitors
 -- (one visitor = one person on one day): a visitor is kept when any of their
 -- views matches, and then all their views and contact clicks are counted.
 drop function if exists gh_site_analytics(integer);
@@ -292,7 +302,8 @@ begin
            (array_agg(path order by created_at))[1] as entry,
            (array_agg(referrer order by created_at) filter (where referrer is not null))[1] as ref,
            bool_or(path = f->>'page') as m_page,
-           bool_or(utm_source || coalesce(' / ' || utm_campaign, '') = f->>'campaign') as m_campaign,
+           bool_or((utm_source is not null or utm_campaign is not null)
+                   and coalesce(lower(utm_campaign), '') = f->>'campaign') as m_campaign,
            bool_or(country = f->>'country') as m_country,
            bool_or(language = f->>'language') as m_language,
            bool_or(device = f->>'device') as m_device,
@@ -356,8 +367,8 @@ begin
                 select coalesce(ref, '') as label, count(*) as visitors, sum(n) as views
                   from visits group by 1 order by 2 desc, 3 desc limit 100) r),
     'campaigns', (select coalesce(jsonb_agg(r), '[]') from (
-                select utm_source || coalesce(' / ' || utm_campaign, '') as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v where utm_source is not null group by 1 order by 2 desc, 3 desc limit 100) r),
+                select coalesce(lower(utm_campaign), '') as label, count(distinct (day, visitor)) as visitors, count(*) as views
+                  from v where utm_source is not null or utm_campaign is not null group by 1 order by 2 desc, 3 desc limit 100) r),
     'countries', (select coalesce(jsonb_agg(r), '[]') from (
                 select country as label, count(distinct (day, visitor)) as visitors, count(*) as views
                   from v where country is not null group by 1 order by 2 desc, 3 desc limit 100) r),
@@ -397,10 +408,10 @@ revoke all on function gh_analytics_counted_visitor() from public, anon, authent
 revoke all on function gh_analytics_path(text) from public, anon, authenticated;
 revoke all on function gh_analytics_country(text) from public, anon, authenticated;
 
-revoke all on function gh_track_view(text, text, text, text, text, text) from public;
+revoke all on function gh_track_view(text, text, text, text, text, text, text, text) from public;
 revoke all on function gh_track_time(text, integer) from public;
 revoke all on function gh_track_action(text, text) from public;
-grant execute on function gh_track_view(text, text, text, text, text, text) to anon, authenticated;
+grant execute on function gh_track_view(text, text, text, text, text, text, text, text) to anon, authenticated;
 grant execute on function gh_track_time(text, integer) to anon, authenticated;
 grant execute on function gh_track_action(text, text) to anon, authenticated;
 
