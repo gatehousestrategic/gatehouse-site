@@ -249,55 +249,94 @@ end;
 $fn$;
 
 -- ---------- the analytics page (admins only) ----------
--- 1 is Today: since midnight New York time, with an hourly breakdown.
--- Longer ranges are whole UTC days ending today.
-
-create or replace function gh_site_analytics(p_days integer)
+-- Days are New York days. p_days: 1 is Today (since midnight, by hour);
+-- longer ranges are the last N days, including today.
+-- p_day: one day, shown by hour (drill-down from the daily chart).
+-- p_filters: drill-down filters, any of page, entry, referrer ('' = direct),
+-- campaign, country, language, device, browser, os. Filters pick visitors
+-- (one visitor = one person on one day): a visitor is kept when any of their
+-- views matches, and then all their views and contact clicks are counted.
+drop function if exists gh_site_analytics(integer);
+create or replace function gh_site_analytics(p_days integer, p_filters jsonb default '{}', p_day date default null)
 returns jsonb language plpgsql stable security definer set search_path = public as $fn$
 declare
   tz constant text := 'America/New_York';
-  is_today boolean := p_days = 1;
+  is_hourly boolean := p_days = 1 or p_day is not null;
+  f jsonb := coalesce(p_filters, '{}');
+  today date := (now() at time zone tz)::date;
+  first_day date;
   since date;
   start_ts timestamptz;
+  end_ts timestamptz := 'infinity';
   result jsonb;
 begin
   if not portal_is_admin() then
     raise exception 'not allowed' using errcode = '42501';
   end if;
+  if jsonb_typeof(f) <> 'object' then f := '{}'; end if;
 
-  if is_today then
-    start_ts := date_trunc('day', now() at time zone tz) at time zone tz;
-    since := (start_ts at time zone 'utc')::date;
+  if p_day is not null then
+    first_day := p_day;
+    end_ts := (p_day + 1)::timestamp at time zone tz;
   else
-    since := (now() at time zone 'utc')::date - (greatest(1, least(p_days, 366)) - 1);
-    start_ts := since::timestamp at time zone 'utc';
+    first_day := today - (greatest(1, least(p_days, 366)) - 1);
   end if;
+  start_ts := first_day::timestamp at time zone tz;
+  since := (start_ts at time zone 'utc')::date;  -- the stored day is a UTC day; this only narrows the scan
 
-  with v as (
-    select * from gh_page_views where day >= since and created_at >= start_ts
+  with v_all as (
+    select * from gh_page_views where day >= since and created_at >= start_ts and created_at < end_ts
+  ),
+  visits_all as (
+    select day, visitor, count(*) as n,
+           (array_agg(path order by created_at))[1] as entry,
+           (array_agg(referrer order by created_at) filter (where referrer is not null))[1] as ref,
+           bool_or(path = f->>'page') as m_page,
+           bool_or(utm_source || coalesce(' / ' || utm_campaign, '') = f->>'campaign') as m_campaign,
+           bool_or(country = f->>'country') as m_country,
+           bool_or(language = f->>'language') as m_language,
+           bool_or(device = f->>'device') as m_device,
+           bool_or(browser = f->>'browser') as m_browser,
+           bool_or(os = f->>'os') as m_os
+      from v_all group by day, visitor
   ),
   visits as (
-    select day, visitor, count(*) as n, (array_agg(path order by created_at))[1] as entry
-      from v group by day, visitor
+    select * from visits_all
+     where (not f ? 'page' or m_page)
+       and (not f ? 'entry' or entry = f->>'entry')
+       and (not f ? 'referrer' or coalesce(ref, '') = f->>'referrer')
+       and (not f ? 'campaign' or m_campaign)
+       and (not f ? 'country' or m_country)
+       and (not f ? 'language' or m_language)
+       and (not f ? 'device' or m_device)
+       and (not f ? 'browser' or m_browser)
+       and (not f ? 'os' or m_os)
+  ),
+  v as (
+    select v_all.* from v_all join visits using (day, visitor)
   ),
   days as (
-    select d::date as day from generate_series(since, (now() at time zone 'utc')::date, interval '1 day') d
+    select d::date as day from generate_series(first_day, today, interval '1 day') d
+     where not is_hourly
   ),
   hours as (
-    select h as hour_start from generate_series(start_ts, now(), interval '1 hour') h
-     where is_today
+    select h as hour_start from generate_series(start_ts, least(now(), end_ts - interval '1 microsecond'), interval '1 hour') h
+     where is_hourly
   ),
   acts as (
-    select * from gh_site_actions where day >= since and created_at >= start_ts
+    select a.* from gh_site_actions a join visits using (day, visitor)
+     where a.created_at >= start_ts and a.created_at < end_ts
   )
   select jsonb_build_object(
-    'since', since,
+    'since', first_day,
+    'filters', f,
+    'day', p_day,
     'visitors', (select count(*) from visits),
     'views', (select count(*) from v),
     'daily', (select coalesce(jsonb_agg(jsonb_build_object(
                  'day', days.day,
-                 'visitors', (select count(*) from visits where visits.day = days.day),
-                 'views', (select count(*) from v where v.day = days.day)) order by days.day), '[]')
+                 'visitors', (select count(distinct (v.day, v.visitor)) from v where (v.created_at at time zone tz)::date = days.day),
+                 'views', (select count(*) from v where (v.created_at at time zone tz)::date = days.day)) order by days.day), '[]')
               from days),
     'hourly', (select coalesce(jsonb_agg(jsonb_build_object(
                  'hour', extract(hour from hours.hour_start at time zone tz)::int,
@@ -309,39 +348,42 @@ begin
               from hours),
     'pages', (select coalesce(jsonb_agg(r), '[]') from (
                 select path as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v group by path order by 2 desc, 3 desc limit 10) r),
+                  from v group by path order by 2 desc, 3 desc limit 100) r),
     'entryPages', (select coalesce(jsonb_agg(r), '[]') from (
                 select entry as label, count(*) as visitors, sum(n) as views
-                  from visits group by entry order by 2 desc limit 10) r),
+                  from visits group by entry order by 2 desc, 3 desc limit 100) r),
     'referrers', (select coalesce(jsonb_agg(r), '[]') from (
-                select coalesce(referrer, '') as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v group by 1 order by 2 desc, 3 desc limit 10) r),
+                select coalesce(ref, '') as label, count(*) as visitors, sum(n) as views
+                  from visits group by 1 order by 2 desc, 3 desc limit 100) r),
     'campaigns', (select coalesce(jsonb_agg(r), '[]') from (
                 select utm_source || coalesce(' / ' || utm_campaign, '') as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v where utm_source is not null group by 1 order by 2 desc, 3 desc limit 10) r),
+                  from v where utm_source is not null group by 1 order by 2 desc, 3 desc limit 100) r),
     'countries', (select coalesce(jsonb_agg(r), '[]') from (
                 select country as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v where country is not null group by 1 order by 2 desc, 3 desc limit 10) r),
+                  from v where country is not null group by 1 order by 2 desc, 3 desc limit 100) r),
     'languages', (select coalesce(jsonb_agg(r), '[]') from (
                 select language as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v where language is not null group by 1 order by 2 desc, 3 desc limit 10) r),
+                  from v where language is not null group by 1 order by 2 desc, 3 desc limit 100) r),
     'devices', (select coalesce(jsonb_agg(r), '[]') from (
                 select device as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v where device is not null group by 1 order by 2 desc, 3 desc limit 10) r),
+                  from v where device is not null group by 1 order by 2 desc, 3 desc limit 100) r),
     'browsers', (select coalesce(jsonb_agg(r), '[]') from (
                 select browser as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v where browser is not null group by 1 order by 2 desc, 3 desc limit 10) r),
+                  from v where browser is not null group by 1 order by 2 desc, 3 desc limit 100) r),
     'operatingSystems', (select coalesce(jsonb_agg(r), '[]') from (
                 select os as label, count(distinct (day, visitor)) as visitors, count(*) as views
-                  from v where os is not null group by 1 order by 2 desc, 3 desc limit 10) r),
-    'avgSeconds', (select round(avg(seconds)) from v where seconds is not null),
+                  from v where os is not null group by 1 order by 2 desc, 3 desc limit 100) r),
+    -- With a page filter, time on page is for that page only.
+    'avgSeconds', (select round(avg(seconds)) from v where seconds is not null
+                      and (not f ? 'page' or path = f->>'page')),
     'bounceRate', (select case when count(*) = 0 then null
                                else (count(*) filter (where n = 1))::float / count(*) end from visits),
     'liveNow', (select count(distinct visitor) from gh_page_views where created_at >= now() - interval '5 minutes'),
     'contacts', (select count(distinct (day, visitor)) from acts),
     'contactForm', (select count(*) from acts where action = 'contact_form'),
     'contactEmail', (select count(*) from acts where action = 'contact_email'),
-    'portalLogins', (select count(*) from portal_events where kind = 'login_ok' and not admin and created_at >= start_ts)
+    'portalLogins', (select count(*) from portal_events where kind = 'login_ok' and not admin
+                        and created_at >= start_ts and created_at < end_ts)
   ) into result;
 
   return result;
@@ -362,5 +404,5 @@ grant execute on function gh_track_view(text, text, text, text, text, text) to a
 grant execute on function gh_track_time(text, integer) to anon, authenticated;
 grant execute on function gh_track_action(text, text) to anon, authenticated;
 
-revoke all on function gh_site_analytics(integer) from public, anon;
-grant execute on function gh_site_analytics(integer) to authenticated;
+revoke all on function gh_site_analytics(integer, jsonb, date) from public, anon;
+grant execute on function gh_site_analytics(integer, jsonb, date) to authenticated;

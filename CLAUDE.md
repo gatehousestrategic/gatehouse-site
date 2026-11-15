@@ -35,6 +35,21 @@ public key instead of going through a server route.
   contact clicks, client portal logins, time on page, bounce and live visitors; daily or
   hourly chart; top lists). Also fixed the admin top bar overflowing on phones.
 
+### Drill-down (added 2026-11-14)
+- `gh_site_analytics(p_days, p_filters jsonb default '{}', p_day date default null)`
+  replaced the one-argument version (the SQL drops the old one). All days are New York days.
+- Filters (`page`, `entry`, `referrer` with '' meaning direct, `campaign`, `country`,
+  `language`, `device`, `browser`, `os`) pick visitors: a visitor (one person on one day)
+  is kept if any of their views matches, then all their views and contact clicks count.
+  With a `page` filter, time on page is for that page only. Client portal logins and
+  "visitors right now" are not filtered.
+- Source is now per visitor (the first outside referrer of the visit), not per view.
+- `p_day` shows one day by hour (clicking a bar in the daily chart).
+- In `admin/index.html`, rows in every list are buttons that add or remove a filter; the
+  "Filtered:" line has × per filter and "Clear all"; lists show 10 with "Show all" (up to 100).
+  The view is kept in the address as `#analytics?range=30&country=US&day=2026-11-12`, so
+  Back works and views can be bookmarked; opening /admin with that hash goes straight to it.
+
 ### SQL run 2026-11-13
 `supabase/site-analytics.sql` was run in gridaudit on 2026-11-13 from the SQL Editor
 (safe to re-run after edits). Checked: all gh_ tables and functions exist; the live

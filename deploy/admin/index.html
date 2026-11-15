@@ -177,11 +177,28 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .chart th, .chart td { padding: 6px 10px; }
 .tops { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 24px; }
 .top ul { list-style: none; margin: 0; padding: 12px 14px; display: grid; gap: 3px; }
-.top li { position: relative; display: flex; justify-content: space-between; gap: 12px; padding: 7px 9px; font-size: 14px; }
-.top li i { position: absolute; inset: 0 auto 0 0; background: var(--pale); }
-.top li span { position: relative; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.top li b { position: relative; flex-shrink: 0; font-weight: 600; color: var(--navy); font-variant-numeric: tabular-nums; }
+.drill-row { position: relative; display: flex; justify-content: space-between; gap: 12px; width: 100%; padding: 7px 9px; border: 0; background: none; font: inherit; font-size: 14px; color: inherit; text-align: left; cursor: pointer; }
+.drill-row i { position: absolute; inset: 0 auto 0 0; background: var(--pale); }
+.drill-row span { position: relative; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.drill-row b { position: relative; flex-shrink: 0; font-weight: 600; color: var(--navy); font-variant-numeric: tabular-nums; }
+.drill-row:hover span { color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+.drill-row:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.drill-row[aria-pressed="true"] { box-shadow: inset 3px 0 0 var(--navy); }
+.drill-row[aria-pressed="true"] span { font-weight: 600; color: var(--navy); }
+.top .more { display: block; margin: 0 14px 12px; padding: 4px 9px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--blue); cursor: pointer; }
+.top .more:hover { text-decoration: underline; }
 .top .none { padding: 16px 20px; font-size: 14px; color: var(--muted); }
+.drill { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 20px; padding: 12px 16px; border: 1px solid var(--line-soft); border-left: 3px solid var(--navy); background: #fff; font-size: 14px; }
+.drill-k { font-weight: 600; color: var(--navy); }
+.drill b { font-weight: 600; color: var(--navy); }
+.drill .sep { color: var(--muted); }
+.drill .x { margin-left: 2px; padding: 0 5px; border: 1px solid var(--line-soft); background: none; font-size: 14px; line-height: 20px; color: var(--muted); cursor: pointer; }
+.drill .x:hover { color: var(--navy); border-color: var(--navy); }
+.drill .clear { margin-left: auto; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--blue); cursor: pointer; }
+.drill .clear:hover { text-decoration: underline; }
+.drill-hint { margin: -10px 0 20px; font-size: 13px; color: var(--muted); }
+.day-bar { cursor: pointer; }
+.day-bar:hover rect + rect { fill: var(--navy); }
 @media (max-width: 900px) {
   .bar-in { height: auto; flex-wrap: wrap; }
   .logo, .who { height: 60px; }
@@ -372,6 +389,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
   }
   function go(tab) {
     show(tab + "View");
+    if (tab !== "website" && location.hash.indexOf("#analytics") === 0) history.replaceState(null, "", location.pathname + location.search);
     if (tab === "overview") loadOverview();
     if (tab === "clients") loadClients();
     if (tab === "activity") loadActivity();
@@ -390,7 +408,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     $("whoEmail").textContent = s.user.email;
     sb.rpc("portal_admin_seen").then(function () {}, function () {});
     await loadClientsData();
-    go("overview");
+    go(readWebHash() ? "website" : "overview");
   }
 
   $("signinForm").addEventListener("submit", async function (e) {
@@ -807,7 +825,9 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
   $("evRefresh").addEventListener("click", loadActivity);
 
   /* ---------- website analytics ---------- */
-  var webRange = 30;
+  var webRange = 30, webDay = null, webFilters = {}, webShowAll = {}, webData = null;
+  var DIMS = ["page", "entry", "referrer", "campaign", "country", "language", "device", "browser", "os"];
+  var DIM_NAME = { page: "Page", entry: "Entry page", referrer: "Source", campaign: "Campaign", country: "Country", language: "Language", device: "Device", browser: "Browser", os: "Operating system" };
   var PAGE = { "/": "Home", "/login": "Client login", "/b4c": "Bike4Chai preview", "/b4c/scope": "Bike4Chai scope", "/westwood": "Westwood directory" };
   var DEVICE = { mobile: "Phone", tablet: "Tablet", desktop: "Computer" };
   function num(n) { return Number(n || 0).toLocaleString("en-US"); }
@@ -835,9 +855,9 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     });
     bars.forEach(function (d, i) {
       var bh = (d.visitors / max) * h, x = 36 + i * step + (step - bw) / 2;
-      svg += '<g><rect x="' + (36 + i * step) + '" y="0" width="' + step + '" height="' + h + '" fill="transparent"/>' +
+      svg += (d.day ? '<g class="day-bar" data-day="' + d.day + '">' : "<g>") + '<rect x="' + (36 + i * step) + '" y="0" width="' + step + '" height="' + h + '" fill="transparent"/>' +
         (bh > 0 ? '<rect x="' + x + '" y="' + (h - bh) + '" width="' + bw + '" height="' + bh + '" fill="#3d8bd6"/>' : "") +
-        "<title>" + esc(d.long + ": " + num(d.visitors) + " visitors, " + num(d.views) + " page views") + "</title>" +
+        "<title>" + esc(d.long + ": " + num(d.visitors) + " visitors, " + num(d.views) + " page views" + (d.day ? ". Click to see this day by hour." : "")) + "</title>" +
         (i % every === 0 ? '<text x="' + (36 + i * step + step / 2) + '" y="' + (h + 18) + '" text-anchor="middle" fill="#66768a" font-size="11">' + esc(d.label) + "</text>" : "") + "</g>";
     });
     svg += "</svg>";
@@ -849,57 +869,131 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     }
     return out;
   }
-  function topList(title, rows, label, empty) {
+  var LABEL = {
+    page: function (v) { return pageName(v); },
+    entry: function (v) { return pageName(v); },
+    referrer: function (v) { return v || "Direct or unknown"; },
+    country: function (v) { return flag(v) + " " + named("region", v); },
+    language: function (v) { return named("language", v); },
+    device: function (v) { return DEVICE[v] || v; }
+  };
+  function dimLabel(dim, v) { return LABEL[dim] ? LABEL[dim](v) : v; }
+  function topList(key, title, rows, dim, empty) {
     var max = Math.max.apply(null, [1].concat(rows.map(function (r) { return r.visitors; })));
-    var body = rows.length ? "<ul>" + rows.map(function (r) {
-      return '<li><i style="width:' + (r.visitors / max * 100) + '%"></i><span>' + esc(label ? label(r) : r.label) + '</span><b title="' + num(r.views) + ' page views">' + num(r.visitors) + "</b></li>";
-    }).join("") + "</ul>" : '<p class="none">' + esc(empty || "No visits yet.") + "</p>";
+    var all = !!webShowAll[key], shown = all ? rows : rows.slice(0, 10);
+    var body = rows.length ? "<ul>" + shown.map(function (r) {
+      var on = Object.prototype.hasOwnProperty.call(webFilters, dim) && webFilters[dim] === r.label;
+      return '<li><button type="button" class="drill-row" data-dim="' + dim + '" data-val="' + esc(r.label) + '" aria-pressed="' + on + '" title="' +
+        (on ? "Remove this filter" : "Show only these visitors") + '"><i style="width:' + (r.visitors / max * 100) + '%"></i><span>' + esc(dimLabel(dim, r.label)) +
+        '</span><b title="' + num(r.views) + ' page views">' + num(r.visitors) + "</b></button></li>";
+    }).join("") + "</ul>" +
+      (rows.length > 10 ? '<button type="button" class="more" data-more="' + key + '">' + (all ? "Show top 10" : "Show all " + num(rows.length)) + "</button>" : "")
+      : '<p class="none">' + esc(empty || "No visits yet.") + "</p>";
     return '<div class="card top"><div class="card-h"><h2>' + esc(title) + '</h2><span class="muted">Visitors</span></div>' + body + "</div>";
   }
+
+  /* The view lives in the address (#analytics?range=30&country=US), so Back works and views can be bookmarked. */
+  function webHash() {
+    var q = new URLSearchParams();
+    q.set("range", webRange);
+    if (webDay) q.set("day", webDay);
+    DIMS.forEach(function (d) { if (Object.prototype.hasOwnProperty.call(webFilters, d)) q.set(d, webFilters[d]); });
+    return "#analytics?" + q.toString();
+  }
+  function readWebHash() {
+    if (location.hash.indexOf("#analytics") !== 0) return false;
+    var q = new URLSearchParams(location.hash.split("?")[1] || "");
+    var r = Number(q.get("range"));
+    webRange = [1, 7, 30, 90, 365].indexOf(r) >= 0 ? r : 30;
+    webDay = /^\d{4}-\d{2}-\d{2}$/.test(q.get("day") || "") ? q.get("day") : null;
+    webFilters = {};
+    DIMS.forEach(function (d) { if (q.has(d)) webFilters[d] = q.get(d); });
+    return true;
+  }
+  function setWeb(change) {
+    change();
+    webShowAll = {};
+    history.pushState(null, "", webHash());
+    loadWebsite();
+  }
+  window.addEventListener("popstate", function () {
+    if (readWebHash()) { if ($("websiteView").hidden) go("website"); else loadWebsite(); }
+  });
+
+  function drillLine() {
+    var parts = DIMS.filter(function (d) { return Object.prototype.hasOwnProperty.call(webFilters, d); }).map(function (d) {
+      return "<span>" + esc(DIM_NAME[d]) + " is <b>" + esc(dimLabel(d, webFilters[d])) + '</b> <button type="button" class="x" data-unfilter="' + d + '" aria-label="Remove filter: ' + esc(DIM_NAME[d]) + '">×</button></span>';
+    });
+    if (webDay) parts.unshift("<span>Day is <b>" + esc(dayLabel(webDay, true)) + '</b> <button type="button" class="x" data-unday aria-label="Back to the full range">×</button></span>');
+    if (!parts.length) return '<p class="drill-hint">Click any row below to show only those visitors, or a day in the chart to see it by hour.</p>';
+    return '<div class="drill"><span class="drill-k">Filtered:</span> ' + parts.join('<span class="sep">·</span>') +
+      (parts.length > 1 ? ' <button type="button" class="clear" data-clearall>Clear all</button>' : "") + "</div>";
+  }
+
   async function loadWebsite() {
-    document.querySelectorAll("#webRanges button").forEach(function (b) { b.setAttribute("aria-current", Number(b.dataset.range) === webRange ? "true" : "false"); });
-    var r = await sb.rpc("gh_site_analytics", { p_days: webRange });
+    document.querySelectorAll("#webRanges button").forEach(function (b) { b.setAttribute("aria-current", !webDay && Number(b.dataset.range) === webRange ? "true" : "false"); });
+    if (location.hash !== webHash()) history.replaceState(null, "", webHash());
+    var r = await sb.rpc("gh_site_analytics", { p_days: webRange, p_filters: webFilters, p_day: webDay });
     var s = r.data;
     if (r.error || !s) {
       $("webBody").innerHTML = '<div class="card placeholder">Analytics aren&#39;t available yet. ' + esc(r.error ? r.error.message : "") + "</div>";
       return;
     }
-    var chart = webRange === 1
-      ? "<h2 class=\"chart-h\">Today so far, by hour (New York time)</h2>" +
-        barChart((s.hourly || []).map(function (x) { return { label: hourLabel(x.hour), long: hourLabel(x.hour) + " ET", visitors: x.visitors, views: x.views }; }), "Hour", false)
-      : "<h2 class=\"chart-h\">Visitors per day</h2>" +
-        barChart(s.daily.map(function (d) { return { label: dayLabel(d.day), long: dayLabel(d.day, true), visitors: d.visitors, views: d.views }; }), "Day", webRange === 7);
+    webData = s;
+    renderWebsite();
+  }
+  function renderWebsite() {
+    var s = webData, filtered = Object.keys(webFilters).length > 0;
+    var hourly = (s.hourly || []).map(function (x) { return { label: hourLabel(x.hour), long: hourLabel(x.hour) + " ET", visitors: x.visitors, views: x.views }; });
+    var chart = webDay
+      ? '<h2 class="chart-h">' + esc(dayLabel(webDay, true)) + ", by hour (New York time)</h2>" + barChart(hourly, "Hour", true)
+      : webRange === 1
+      ? '<h2 class="chart-h">Today so far, by hour (New York time)</h2>' + barChart(hourly, "Hour", false)
+      : '<h2 class="chart-h">Visitors per day</h2>' +
+        barChart(s.daily.map(function (d) { return { day: d.day, label: dayLabel(d.day), long: dayLabel(d.day, true), visitors: d.visitors, views: d.views }; }), "Day", webRange === 7);
     $("webBody").innerHTML =
+      drillLine() +
       '<div class="stats">' +
         metric("Visitors", num(s.visitors), "Counted once per day") +
         metric("Page views", num(s.views), (s.views / Math.max(1, s.visitors)).toFixed(1) + " pages per visitor") +
         metric("Contact clicks", num(s.contacts),
           (s.visitors ? (s.contacts / s.visitors * 100).toFixed(1) + "% of visitors · " : "") + num(s.contactForm) + " form, " + num(s.contactEmail) + " email link") +
-        metric("Client portal logins", num(s.portalLogins), "Over the same days, not counting yours") +
+        metric("Client portal logins", num(s.portalLogins), filtered ? "All logins over the same days; filters don't apply" : "Over the same days, not counting yours") +
       "</div>" +
       '<div class="stats three">' +
-        metric("Time on page", dur(s.avgSeconds), "Average time a page was on screen") +
+        metric("Time on page", dur(s.avgSeconds), webFilters.page !== undefined ? "Average time on this page" : "Average time a page was on screen") +
         metric("Bounce rate", s.bounceRate === null ? "–" : Math.round(s.bounceRate * 100) + "%", "Visitors who saw only one page") +
-        metric("Visitors right now", num(s.liveNow), "Active in the last 5 minutes") +
+        metric("Visitors right now", num(s.liveNow), filtered ? "All visitors, last 5 minutes; filters don't apply" : "Active in the last 5 minutes") +
       "</div>" +
       '<div class="card chart">' + chart + "</div>" +
       '<div class="tops">' +
-        topList("Pages", s.pages, function (x) { return pageName(x.label); }) +
-        topList("Entry pages (first page seen)", s.entryPages, function (x) { return pageName(x.label); }) +
-        topList("Where visitors came from", s.referrers, function (x) { return x.label || "Direct or unknown"; }) +
-        topList("Campaigns (utm_source / utm_campaign)", s.campaigns, null, "No visits from tagged links yet. Add ?utm_source=linkedin&utm_campaign=fall to a link to see it here.") +
-        topList("Countries", s.countries, function (x) { return flag(x.label) + " " + named("region", x.label); }, "No country data yet.") +
-        topList("Languages", s.languages, function (x) { return named("language", x.label); }) +
-        topList("Devices", s.devices, function (x) { return DEVICE[x.label] || x.label; }) +
-        topList("Browsers", s.browsers) +
-        topList("Operating systems", s.operatingSystems) +
+        topList("pages", "Pages", s.pages, "page") +
+        topList("entry", "Entry pages (first page seen)", s.entryPages, "entry") +
+        topList("referrers", "Where visitors came from", s.referrers, "referrer") +
+        topList("campaigns", "Campaigns (utm_source / utm_campaign)", s.campaigns, "campaign", "No visits from tagged links yet. Add ?utm_source=linkedin&utm_campaign=fall to a link to see it here.") +
+        topList("countries", "Countries", s.countries, "country", "No country data yet.") +
+        topList("languages", "Languages", s.languages, "language") +
+        topList("devices", "Devices", s.devices, "device") +
+        topList("browsers", "Browsers", s.browsers, "browser") +
+        topList("os", "Operating systems", s.operatingSystems, "os") +
       "</div>";
   }
   $("webRanges").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-range]");
     if (!b) return;
-    webRange = Number(b.dataset.range);
-    loadWebsite();
+    setWeb(function () { webRange = Number(b.dataset.range); webDay = null; });
+  });
+  $("webBody").addEventListener("click", function (e) {
+    var t;
+    if ((t = e.target.closest("[data-unfilter]"))) return setWeb(function () { delete webFilters[t.dataset.unfilter]; });
+    if ((t = e.target.closest("[data-unday]"))) return setWeb(function () { webDay = null; });
+    if ((t = e.target.closest("[data-clearall]"))) return setWeb(function () { webFilters = {}; webDay = null; });
+    if ((t = e.target.closest("[data-more]"))) { webShowAll[t.dataset.more] = !webShowAll[t.dataset.more]; return renderWebsite(); }
+    if ((t = e.target.closest(".day-bar"))) return setWeb(function () { webDay = t.dataset.day; });
+    if ((t = e.target.closest(".drill-row"))) {
+      var dim = t.dataset.dim, val = t.dataset.val;
+      return setWeb(function () { if (webFilters[dim] === val) delete webFilters[dim]; else webFilters[dim] = val; });
+    }
   });
 
   start();
