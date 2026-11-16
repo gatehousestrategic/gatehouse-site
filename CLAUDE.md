@@ -77,3 +77,23 @@ Still to see: real visits and whether the country list fills from `cf-ipcountry`
   Links always point at https://gatehousestrategic.com.
 - Run order: site-analytics.sql, then campaigns.sql, then push (the new track.js needs the new
   gh_track_view). Tested 2026-11-15 in gridaudit inside a rolled-back transaction.
+
+## Portal email alerts (added 2026-11-16)
+`supabase/portal-alerts.sql` (run in gridaudit 2026-11-16): triggers on `portal_messages`
+(client messages, not `from_admin`) and `portal_items` (`uploaded_by = 'client'`) call
+`portal_send_alert()`, which posts to the Resend API with pg_net. From
+portal@gatehousestrategic.com to os@gatehousestrategic.com (domain verified in Resend).
+The key is the Vault secret `resend_api_key`, added by the owner; never put it in this repo.
+A missing key or a Resend error only skips the email; the message or upload still saves.
+Send results are in `net._http_response`. A test alert on 2026-11-16 returned 200.
+
+## Client update emails (added 2026-11-16)
+`supabase/portal-client-emails.sql` (run in gridaudit 2026-11-16): `portal_clients.notify_email`
+(comma-separated, set as "Email for updates" on the client page in /admin) and `notify_last_at`.
+Triggers on `portal_messages` (`from_admin`) and `portal_items` (`uploaded_by = 'admin'`) call
+`portal_notify_client()`: a short "something new, sign in at /login" email from
+portal@gatehousestrategic.com, reply-to os@gatehousestrategic.com, never the message text.
+At most one per client per 15 minutes; no email for archived clients or an empty address.
+Same Resend key and failure behavior as the owner alerts. Tested 2026-11-16: rolled-back run
+(one email for a message plus a note, bad address dropped, client without address skipped)
+and one real send to the owner's address (Resend 200).

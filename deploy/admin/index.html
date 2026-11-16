@@ -700,6 +700,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     var head = '<div class="card"><div class="card-b"><form class="title-row" id="renameForm">' +
       '<label class="f grow">Client name<input type="text" id="cName" value="' + esc(c.name) + '" maxlength="120" required></label>' +
       '<label class="f grow">Private note (only you see this)<input type="text" id="cNote" value="' + esc(c.note || "") + '" maxlength="1000"></label>' +
+      '<label class="f grow">Email for updates (optional)<input type="text" id="cEmail" value="' + esc(c.notify_email || "") + '" maxlength="500" placeholder="name@company.com, other@company.com" title="When you send a message or add something for this client, they get a short email (at most one every 15 minutes). Leave empty for no emails."></label>' +
       '<button class="btn ghost" type="submit">Save</button>' +
       '<a class="btn ghost" href="../portal/?as=' + encodeURIComponent(c.id) + '" target="_blank" rel="noopener">View as client</a>' +
       '<button class="btn ghost" type="button" data-act="archive">' + (c.archived ? "Restore" : "Archive") + "</button>" +
@@ -783,8 +784,11 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     var btn = e.target.querySelector('button[type="submit"]'); if (btn) btn.disabled = true;
     try {
       if (id === "renameForm") {
-        check(await sb.from("portal_clients").update({ name: $("cName").value.trim(), note: $("cNote").value.trim() || null }).eq("id", c.id));
-        toast("Saved"); return loadClients();
+        var em = $("cEmail").value.split(/[,;\s]+/).filter(Boolean);
+        var badEm = em.filter(function (x) { return !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x); });
+        if (badEm.length) return toast("Check the email: " + badEm[0]);
+        check(await sb.from("portal_clients").update({ name: $("cName").value.trim(), note: $("cNote").value.trim() || null, notify_email: em.join(", ") || null }).eq("id", c.id));
+        toast(em.length ? "Saved. Updates will email " + em.join(", ") : "Saved"); return loadClients();
       }
       if (id === "replyForm") {
         var body = $("replyBody").value.trim(); if (!body) return;
