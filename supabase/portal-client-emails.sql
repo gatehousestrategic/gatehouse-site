@@ -1,5 +1,6 @@
 -- Update emails to clients. Run in the gridaudit project, after portal-alerts.sql
--- (it uses the same Resend key in Vault, resend_api_key). Safe to run again.
+-- (it uses the same Resend key in Vault, resend_api_key, and portal_email_html()
+-- from that file for the HTML layout). Safe to run again.
 --
 -- Each client can have an "Email for updates" (one or more addresses, separated
 -- by commas) set on their page in /admin. When the owner sends that client a
@@ -52,7 +53,14 @@ begin
       'text', 'Hi,' || E'\n\n' ||
         'There''s something new for you in your Gatehouse client portal (' || p_what || ').' || E'\n\n' ||
         'Sign in with your access code: https://gatehousestrategic.com/login' || E'\n\n' ||
-        'Gatehouse Strategic'
+        'Gatehouse Strategic',
+      'html', portal_email_html(null, 'There''s something new in your portal',
+        '<p style="margin:0;">' || case when p_what = 'a message from us'
+          then 'We''ve sent you a message. Sign in to read it and reply.'
+          else 'We''ve added new files or notes for you. Sign in to see them.' end || '</p>'
+        || '<p style="margin:22px 0 0;font-size:14px;color:#6c7f95;">Sign in with your access code. If you can''t find it, reply to this email and we''ll help.</p>',
+        'Open your portal', 'https://gatehousestrategic.com/login',
+        'Gatehouse Strategic &middot; <a href="https://gatehousestrategic.com" style="color:#6c7f95;">gatehousestrategic.com</a><br>You''re getting this because you have a client portal with Gatehouse Strategic.')
     )
   );
 exception when others then

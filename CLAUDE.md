@@ -97,3 +97,11 @@ At most one per client per 15 minutes; no email for archived clients or an empty
 Same Resend key and failure behavior as the owner alerts. Tested 2026-11-16: rolled-back run
 (one email for a message plus a note, bad address dropped, client without address skipped)
 and one real send to the owner's address (Resend 200).
+
+### Branded emails (2026-11-16)
+Both email types are HTML with a plain-text copy. `portal_email_html()` in portal-alerts.sql
+builds the layout (navy header with `img/email-logo.png`, white card, one square-cornered button,
+no pills); `portal_html_esc()` escapes client text. The logo PNG is rendered from the site's mark
+plus "Gatehouse / Strategic" in Spectral (email apps don't load SVG or web fonts); don't delete or
+rename it. Run order: portal-alerts.sql, then portal-client-emails.sql. Sent one of each to the
+owner on 2026-11-16 (Resend 200).
