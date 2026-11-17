@@ -235,6 +235,7 @@ h2.sec { font-size: clamp(30px, 2.6vw, 38px); line-height: 1.2; }
 .work-list { padding: 110px 120px 120px 60px; }
 .wrow { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: center; border-top: 1px solid var(--line-soft); padding: 30px 0; text-decoration: none; }
 .wrow:last-child { border-bottom: 1px solid var(--line-soft); }
+.wrow .shots { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 .wrow .thumb { display: block; width: 100%; aspect-ratio: 16 / 10; padding: 0; background: var(--pale) left top / cover no-repeat; border: 1px solid var(--line-soft); filter: grayscale(1); transition: filter .3s, box-shadow .3s; position: relative; }
 button.thumb { cursor: zoom-in; }
 button.thumb::after { content: "View larger"; position: absolute; right: 10px; bottom: 10px; font: 600 12px/1 var(--sans); color: #fff; background: rgba(13,42,76,.88); padding: 7px 10px; border-radius: 4px; opacity: 0; transition: opacity .2s; }
@@ -242,7 +243,7 @@ button.thumb:hover::after, button.thumb:focus-visible::after { opacity: 1; }
 button.thumb:hover { box-shadow: 0 18px 40px -22px rgba(13,42,76,.55); }
 button.thumb:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 .wrow:hover .thumb { filter: none; }
-.wrow .thumb.plain { display: grid; place-items: center; background: var(--navy); border-color: var(--navy); filter: none; }
+.wrow .thumb.plain { display: grid; place-items: center; background: var(--navy); border-color: var(--navy); filter: none; aspect-ratio: 16 / 5; }
 .wrow .thumb.plain span { font: 300 64px/1 var(--sans); color: var(--blue-light); }
 .wrow .meta { font: 700 11.5px/1.2 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #6c7f95; margin-bottom: 6px; }
 .wrow h3 { font-size: 24px; line-height: 1.25; margin-bottom: 4px; }
@@ -258,6 +259,12 @@ a.wrow:hover .go { color: var(--navy); }
 .viewer p { color: #fff; font: 500 15px/1.4 var(--sans); margin-top: 14px; }
 .viewer-close { position: absolute; top: -46px; right: 0; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; background: transparent; color: #fff; font: 300 26px/1 var(--sans); cursor: pointer; }
 .viewer-close:hover { background: rgba(255,255,255,.12); }
+.viewer-nav { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+.viewer-nav p { margin: 0 auto 0 0; }
+.viewer-nav button { width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.5); border-radius: 4px; background: transparent; color: #fff; font: 400 20px/1 var(--sans); cursor: pointer; }
+.viewer-nav button:hover { background: rgba(255,255,255,.12); }
+.viewer-nav span { color: rgba(255,255,255,.75); font: 500 14px/1 var(--sans); min-width: 44px; text-align: center; }
+.viewer-nav[data-single] button, .viewer-nav[data-single] span { display: none; }
 
 /* faq */
 .faq { background: linear-gradient(180deg, #eef3f8, #fff); border-top: 1px solid var(--line); }
@@ -563,7 +570,7 @@ a.wrow:hover .go { color: var(--navy); }
 <dialog class="viewer" id="viewer" aria-label="Screenshot">
   <button type="button" class="viewer-close" id="viewerClose" aria-label="Close">×</button>
   <img id="viewerImg" alt="">
-  <p id="viewerCap"></p>
+  <div class="viewer-nav" id="viewerNav"><p id="viewerCap"></p><button type="button" id="viewerPrev" aria-label="Previous screenshot">←</button><span id="viewerCount"></span><button type="button" id="viewerNext" aria-label="Next screenshot">→</button></div>
 </dialog>
 
 </main>
@@ -601,33 +608,52 @@ a.wrow:hover .go { color: var(--navy); }
   burger.addEventListener("click", function () { var o = nav.classList.toggle("open"); burger.setAttribute("aria-expanded", o); });
   nav.addEventListener("click", function (e) { if (e.target.closest(".cell")) { nav.classList.remove("open"); burger.setAttribute("aria-expanded", "false"); } });
 
+  // Ordered by build complexity, most complex first. Each software project has two screenshots.
   var work = [
-    ["om-builder.png", "Real estate", "Offering memorandum builder", "Revisions: days to minutes"],
-    ["sales-intel.png", "Sales intelligence", "Contact warmth scoring engine", "Every contact, ranked"],
-    ["prospecting.png", "B2B services", "Cold lead-hunting tool", "Fit-scored leads, sourced cold"],
-    ["snf-marketplace.png", "Healthcare · Marketplace", "Skilled nursing facility marketplace", "Broker fees eliminated"],
-    ["lead-hunter-membership.png", "B2B services", "Self-serve prospecting membership", "Self-serve, on demand"],
-    ["utility-platform.png", "Utilities · Confidential", "Custom CRM, bill audit platform and website", "Salespeople each run their own clients; four AI models cross-check every finding"],
-    ["benefits-app.png", "Government / healthcare · Confidential", "Guided benefits application", "Fewer errors, faster submissions"],
+    [["utility-platform-crm.png", "utility-platform-site.png"], "Utilities · Confidential", "Custom CRM, bill audit platform and website", "Salespeople each run their own clients; four AI models cross-check every finding"],
+    [["om-builder.png", "om-builder-2.png"], "Real estate", "Offering memorandum builder", "Revisions: days to minutes"],
+    [["benefits-app.png", "benefits-app-2.png"], "Government / healthcare · Confidential", "Guided benefits application", "Fewer errors, faster submissions"],
+    [["lead-hunter-membership.png", "lead-hunter-membership-2.png"], "B2B services", "Self-serve prospecting membership", "Self-serve, on demand"],
+    [["sales-intel.png", "sales-intel-2.jpg"], "Sales intelligence", "Contact warmth scoring engine", "Every contact, ranked"],
+    [["prospecting.png", "prospecting-2.png"], "B2B services", "Cold lead-hunting tool", "Fit-scored leads, sourced cold"],
+    [["snf-marketplace.png", "snf-marketplace-2.png"], "Healthcare · Marketplace", "Skilled nursing facility marketplace", "Broker fees eliminated"],
     [null, "Manufacturing · Strategy", "12-month AI roadmap and team", "First AI hire in 45 days", null, "45"],
     [null, "Professional services · Strategy", "Company-wide AI guardrails", "6 use cases prioritized", null, "6"]
   ];
   var list = document.getElementById("worklist");
-  work.forEach(function (w) {
+  work.forEach(function (w, wi) {
     var el = document.createElement(w[4] ? "a" : "div");
     el.className = "wrow";
     if (w[4]) { el.href = w[4]; el.target = "_blank"; el.rel = "noopener"; }
-    el.innerHTML = (w[0] ? '<button type="button" class="thumb" data-full="img/' + w[0] + '" data-title="' + w[2] + '" aria-label="View larger screenshot: ' + w[2] + '" style="background-image:url(img/' + w[0] + ')"></button>' : '<div class="thumb plain"><span>' + w[5] + '</span></div>') +
+    var pics = w[0] ? '<div class="shots">' + w[0].map(function (f, i) {
+      return '<button type="button" class="thumb" data-work="' + wi + '" data-i="' + i + '" aria-label="View larger screenshot ' + (i + 1) + ' of ' + w[0].length + ': ' + w[2] + '" style="background-image:url(img/' + f + ')"></button>';
+    }).join("") + '</div>' : '<div class="thumb plain"><span>' + w[5] + '</span></div>';
+    el.innerHTML = pics +
       '<div><p class="meta">' + w[1] + '</p><h3>' + w[2] + '</h3><p class="out">' + w[3] + '</p></div>' +
       (w[4] ? '<span class="go">Visit</span>' : '<span></span>');
     list.appendChild(el);
   });
 
-  var viewer = document.getElementById("viewer"), vImg = document.getElementById("viewerImg"), vCap = document.getElementById("viewerCap");
+  var viewer = document.getElementById("viewer"), vImg = document.getElementById("viewerImg"), vCap = document.getElementById("viewerCap"),
+    vNav = document.getElementById("viewerNav"), vCount = document.getElementById("viewerCount"), vWork = null, vI = 0;
+  function showShot() {
+    var files = work[vWork][0];
+    vImg.src = "img/" + files[vI]; vImg.alt = "Screenshot " + (vI + 1) + " of " + files.length + ": " + work[vWork][2];
+    vCap.textContent = work[vWork][2]; vCount.textContent = (vI + 1) + " / " + files.length;
+    if (files.length > 1) vNav.removeAttribute("data-single"); else vNav.setAttribute("data-single", "");
+  }
+  function step(d) { var n = work[vWork][0].length; vI = (vI + d + n) % n; showShot(); }
   list.addEventListener("click", function (e) {
     var t = e.target.closest("button.thumb"); if (!t) return;
-    vImg.src = t.dataset.full; vImg.alt = "Screenshot: " + t.dataset.title; vCap.textContent = t.dataset.title;
+    vWork = +t.dataset.work; vI = +t.dataset.i; showShot();
     if (viewer.showModal) viewer.showModal(); else viewer.setAttribute("open", "");
+  });
+  document.getElementById("viewerPrev").addEventListener("click", function () { step(-1); });
+  document.getElementById("viewerNext").addEventListener("click", function () { step(1); });
+  viewer.addEventListener("keydown", function (e) {
+    if (vWork === null) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); step(1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
   });
   document.getElementById("viewerClose").addEventListener("click", function () { viewer.close(); });
   viewer.addEventListener("click", function (e) { if (e.target === viewer) viewer.close(); });
