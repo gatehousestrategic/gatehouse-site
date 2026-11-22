@@ -106,6 +106,20 @@ button::after { content: "→"; color: var(--blue-light); }
   if (/expired/.test(location.search)) err.textContent = "Your session ended. Please enter your code again.";
   if (/signed-out/.test(location.search)) err.textContent = "";
 
+  // A random tag for this browser, kept between visits, so /admin can count
+  // how many different devices use a code (supabase/portal-devices.sql).
+  function deviceTag() {
+    try {
+      var t = localStorage.getItem("gh_portal_device");
+      if (!/^[A-Za-z0-9-]{8,64}$/.test(t || "")) {
+        t = window.crypto && crypto.randomUUID ? crypto.randomUUID()
+          : Array.prototype.map.call(crypto.getRandomValues(new Uint8Array(16)), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+        localStorage.setItem("gh_portal_device", t);
+      }
+      return t;
+    } catch (e) { return null; }
+  }
+
   function fail(msg) {
     err.textContent = msg;
     input.setAttribute("aria-invalid", "true");
@@ -120,8 +134,9 @@ button::after { content: "→"; color: var(--blue-light); }
     if (norm.length < 6) return fail("Please enter the full code.");
     go.disabled = true;
     var adminJwt = GH_PORTAL.adminBearer();
-    GH_PORTAL.rpc("portal_login", { p_code: norm }, adminJwt).catch(function (e) {
-      if (adminJwt) return GH_PORTAL.rpc("portal_login", { p_code: norm });
+    var args = { p_code: norm, p_device: deviceTag() };
+    GH_PORTAL.rpc("portal_login", args, adminJwt).catch(function (e) {
+      if (adminJwt) return GH_PORTAL.rpc("portal_login", args);
       throw e;
     }).then(function (res) {
       if (res && res.ok) {

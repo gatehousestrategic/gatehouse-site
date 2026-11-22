@@ -130,6 +130,12 @@ td.acts .btn + .btn { margin-left: 6px; }
 .detail { grid-template-columns: minmax(0, 1fr); }
 .detail .card { overflow-x: auto; }
 .flag { white-space: nowrap; }
+.dev-btn { min-width: 52px; }
+.dev-row > td { background: var(--pale); padding: 12px 16px; }
+.dev-table { width: 100%; font-size: 13.5px; }
+.dev-table th, .dev-table td { padding: 6px 10px 6px 0; border: 0; background: transparent; }
+.dev-note { font-size: 12.5px; margin: 10px 0 0; }
+.dev-legend { padding: 0 20px 4px; }
 @media (max-width: 1100px) {
   .cols { grid-template-columns: minmax(0, 1fr); }
   .clients { max-height: 260px; }
@@ -591,10 +597,14 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
       sb.from("portal_codes").select("*").eq("client_id", id).order("created_at"),
       sb.from("portal_items").select("*").eq("client_id", id).order("created_at", { ascending: false }),
       sb.from("portal_events").select("*").eq("client_id", id).order("created_at", { ascending: false }).limit(50),
-      sb.from("portal_messages").select("*").eq("client_id", id).order("created_at")
+      sb.from("portal_messages").select("*").eq("client_id", id).order("created_at"),
+      sb.from("portal_events").select("code_id, device_id, created_at, user_agent, ip").eq("client_id", id).eq("kind", "login_ok").order("created_at", { ascending: false }).limit(5000)
     ]);
     state.codes = check(r[0]); state.items = check(r[1]); state.messages = check(r[3]);
-    renderDetail(check(r[2]));
+    state.logins = r[4].error ? [] : r[4].data;
+    if (!quiet || !state.openDevices || state.openDevicesClient !== id) { state.openDevices = {}; state.openDevicesClient = id; }
+    state.lastEvents = check(r[2]);
+    renderDetail(state.lastEvents);
     if (state.messages.some(function (m) { return !m.from_admin && !m.read_at; })) {
       await sb.from("portal_messages").update({ read_at: new Date().toISOString() }).eq("client_id", id).eq("from_admin", false).is("read_at", null);
       await loadClientsData(); renderClients();
@@ -681,15 +691,21 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     var codeRows = state.codes.length ? state.codes.map(function (k) {
       var expired = k.expires_at && new Date(k.expires_at) < new Date();
       var status = !k.active ? '<span class="flag off">Off</span>' : expired ? '<span class="flag off">Expired</span>' : '<span class="flag on">Active</span>';
+      var dv = devicesFor(k.id), open = state.openDevices && state.openDevices[k.id];
+      var devCell = dv.list.length
+        ? '<button class="btn ghost small dev-btn" data-act="devices" data-id="' + k.id + '" aria-expanded="' + !!open + '">' + dv.list.length + (open ? " ▴" : " ▾") + "</button>"
+        : '<span class="muted">—</span>';
       return '<tr><td class="code">' + esc(k.code) + "</td><td>" + esc(k.label || "") + (k.expires_at ? '<div class="muted">until ' + new Date(k.expires_at).toLocaleDateString() + "</div>" : "") + "</td><td>" + status +
-        '</td><td class="hide-sm">' + ago(k.last_used_at) + '</td><td class="hide-sm">' + k.use_count + '</td><td class="acts">' +
+        '</td><td class="hide-sm">' + ago(k.last_used_at) + '</td><td class="hide-sm">' + k.use_count + "</td><td>" + devCell + '</td><td class="acts">' +
         '<button class="btn ghost small" data-act="copycode" data-id="' + k.id + '">Copy</button>' +
         '<button class="btn ghost small" data-act="copyinvite" data-id="' + k.id + '">Copy invite</button>' +
         '<button class="btn ghost small" data-act="togglecode" data-id="' + k.id + '">' + (k.active ? "Turn off" : "Turn on") + "</button>" +
-        '<button class="btn danger small" data-act="delcode" data-id="' + k.id + '">Delete</button></td></tr>';
-    }).join("") : '<tr class="empty-row"><td colspan="6">No codes yet. Generate one below and send it to the client.</td></tr>';
+        '<button class="btn danger small" data-act="delcode" data-id="' + k.id + '">Delete</button></td></tr>' +
+        (open ? '<tr class="dev-row"><td colspan="7">' + devTable(dv) + "</td></tr>" : "");
+    }).join("") : '<tr class="empty-row"><td colspan="7">No codes yet. Generate one below and send it to the client.</td></tr>';
     var codeCard = card("Access codes", "Clients enter these at " + esc(SITE.replace(/^https?:\/\//, "")) + "/login",
-      '<table><thead><tr><th>Code</th><th>Label</th><th>Status</th><th class="hide-sm">Last used</th><th class="hide-sm">Uses</th><th></th></tr></thead><tbody>' + codeRows + "</tbody></table>" +
+      '<table><thead><tr><th>Code</th><th>Label</th><th>Status</th><th class="hide-sm">Last used</th><th class="hide-sm">Uses</th><th title="Different browsers that signed in with this code">Devices</th><th></th></tr></thead><tbody>' + codeRows + "</tbody></table>" +
+      '<p class="muted dev-note dev-legend">Devices counts the different browsers that signed in with each code (counted since Nov 2026). One person on a phone and a laptop counts as two; a cleared browser or private window counts as a new one.</p>' +
       '<form class="row-form" id="codeForm"><label class="f">Label (who it\'s for)<input type="text" id="codeLabel" placeholder="e.g. Abe, CEO" maxlength="120"></label>' +
       '<label class="f">Expires (optional)<input type="date" id="codeExp"></label><button class="btn" type="submit">Generate code</button></form>');
 
@@ -709,6 +725,28 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     $("detail").innerHTML = '<div class="detail">' + head + msgCard + fileCard + siteCard + linkCard + noteCard + codeCard + evCard + "</div>";
     var th = $("thread"); th.scrollTop = th.scrollHeight;
     if (ed) { var f = $(({ file: "fileForm", link: "linkForm", note: "noteForm", site: "siteForm" })[ed.kind]); f.scrollIntoView({ block: "center" }); }
+  }
+
+  // Sign-ins for one code, grouped by the browser tag the login page sends.
+  function devicesFor(codeId) {
+    var by = {}, untagged = 0;
+    (state.logins || []).forEach(function (l) {
+      if (l.code_id !== codeId) return;
+      if (!l.device_id) { untagged++; return; }
+      var d = by[l.device_id] || (by[l.device_id] = { n: 0, first: l.created_at, last: l.created_at, ua: l.user_agent });
+      d.n++;
+      if (l.created_at < d.first) d.first = l.created_at;
+      if (l.created_at > d.last) { d.last = l.created_at; d.ua = l.user_agent; }
+    });
+    var list = Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return a.last < b.last ? 1 : -1; });
+    return { list: list, untagged: untagged };
+  }
+  function devTable(dv) {
+    return '<table class="dev-table"><thead><tr><th>Device</th><th>First sign-in</th><th>Last sign-in</th><th>Sign-ins</th></tr></thead><tbody>' +
+      dv.list.map(function (d, i) {
+        return "<tr><td>" + (esc(device(d.ua)) || "Unknown browser") + ' <span class="muted">#' + (dv.list.length - i) + "</span></td><td>" + stamp(d.first) + "</td><td>" + stamp(d.last) + "</td><td>" + d.n + "</td></tr>";
+      }).join("") + "</tbody></table>" +
+      (dv.untagged ? '<p class="muted dev-note">Plus ' + dv.untagged + " earlier sign-in" + (dv.untagged === 1 ? "" : "s") + " from before devices were counted.</p>" : "");
   }
 
   function evRow(e) {
@@ -754,6 +792,7 @@ td.meta { font-size: 13px; color: var(--muted); white-space: nowrap; }
     var it = state.items.find(function (x) { return x.id === b.dataset.id; });
     if (act === "download") return download(it);
     if (act === "view") return viewFile(it);
+    if (act === "devices") { state.openDevices[code.id] = !state.openDevices[code.id]; return renderDetail(state.lastEvents); }
     if (act === "copycode") return copy(code.code, "Code copied");
     if (act === "copyinvite") return copy("Your Gatehouse Strategic client dashboard: go to " + SITE + "/login and enter code " + code.code, "Invite copied");
     if (act === "togglecode") { check(await sb.from("portal_codes").update({ active: !code.active }).eq("id", code.id)); toast(code.active ? "Code turned off" : "Code turned on"); return loadClients(); }

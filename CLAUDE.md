@@ -105,3 +105,14 @@ no pills); `portal_html_esc()` escapes client text. The logo PNG is rendered fro
 plus "Gatehouse / Strategic" in Spectral (email apps don't load SVG or web fonts); don't delete or
 rename it. Run order: portal-alerts.sql, then portal-client-emails.sql. Sent one of each to the
 owner on 2026-11-16 (Resend 200).
+
+## Portal device count (added 2026-11-21)
+`supabase/portal-devices.sql` (run in gridaudit 2026-11-21 by the owner): `portal_events.device_id`
+and `portal_login(p_code, p_device default null)` (the one-argument version is dropped; calls
+without p_device still work). `login/index.html` keeps a random tag per browser in localStorage
+(`gh_portal_device`) and sends it. On a client's page in /admin the Access codes table has a
+**Devices** column (different browsers per code, from `login_ok` events); clicking it lists each
+device with first/last sign-in and count. It counts browsers, not people. Sign-ins before
+2026-11-21 have no tag and are shown as "earlier sign-ins". Checked 2026-11-21: wrong codes with,
+without and with a malformed tag all answer no_match; a rolled-back test showed a correct code
+signs in with and without p_device and stores the tag.
