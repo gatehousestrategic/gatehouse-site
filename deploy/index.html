@@ -203,6 +203,7 @@ h2.sec { font-size: clamp(30px, 2.6vw, 38px); line-height: 1.2; }
 .prod-head + .screen-grid { border-top: 0; }
 .screen-grid.flip .screen-copy { order: 2; }
 .screen-grid.flip .devices { order: 1; }
+.screen-grid.flip { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
 .devices.solo { padding: 0; }
 .prod-name { font-size: clamp(34px, 3.2vw, 46px); line-height: 1.1; margin-bottom: 20px; }
 .gap { font: 400 17px/1.45 var(--sans); color: var(--navy); border-left: 2px solid var(--blue); padding: 2px 0 2px 16px; margin-bottom: 20px; max-width: 470px; }
@@ -367,7 +368,7 @@ a.wrow:hover .go { color: var(--navy); }
   .products { padding: 70px 0 30px; }
   .prod-head { padding: 0 22px 10px; }
   .screen-grid.flip .screen-copy, .screen-grid.flip .devices { order: 0; }
-  .screen-grid { grid-template-columns: minmax(0, 1fr); gap: 44px; padding: 50px 22px; }
+  .screen-grid, .screen-grid.flip { grid-template-columns: minmax(0, 1fr); gap: 44px; padding: 50px 22px; }
   .devices { padding: 0 40px 50px 0; }
   .phone { width: 36%; border-radius: 22px; padding: 6px; }
   .phone img { border-radius: 17px; }
